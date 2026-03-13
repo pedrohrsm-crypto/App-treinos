@@ -21,7 +21,8 @@ def exemplo_triathlon():
         dias_semana=6,
         distancia_prova="Meio Ironman",
         limiar_lactato=168.0,
-        vo2_max=52.0
+        vo2_max=52.0,
+        genero="Masculino"
     )
     
     generator = TrainingPlanGenerator(atleta)
@@ -63,6 +64,7 @@ def exemplo_corrida():
         distancia_prova="Maratona",
         limiar_lactato=172.0,
         vo2_max=48.0,
+        genero="Feminino",
         problemas_saude=[problema_joelho]
     )
     
@@ -108,6 +110,7 @@ def exemplo_natacao():
         distancia_prova="3000m",
         limiar_lactato=165.0,
         vo2_max=55.0,
+        genero="Masculino",
         problemas_saude=[problema_ombro]
     )
     
@@ -153,6 +156,7 @@ def exemplo_ciclismo():
         distancia_prova="160K",
         limiar_lactato=160.0,
         vo2_max=45.0,
+        genero="Masculino",
         problemas_saude=[problema_lombar]
     )
     
@@ -172,10 +176,55 @@ def exemplo_ciclismo():
     print(f"\n✅ Exportado: {filename}\n")
 
 
+def exemplo_ciclo_menstrual():
+    """Exemplo: Atleta feminina com ajustes por ciclo menstrual"""
+    print("=" * 70)
+    print("EXEMPLO 5: CORREDORA - FASE MENSTRUAL DO CICLO")
+    print("=" * 70)
+    
+    atleta = Athlete(
+        nome="Juliana Lima",
+        idade=26,
+        peso=55.0,
+        altura=162.0,
+        esporte="Corrida",
+        dias_semana=5,
+        distancia_prova="10K",
+        limiar_lactato=175.0,
+        vo2_max=51.0,
+        genero="Feminino",
+        fase_menstrual="menstrual"  # Fase menstrual do ciclo
+    )
+    
+    generator = TrainingPlanGenerator(atleta)
+    plano = generator.get_weekly_training()
+    
+    print(f"\nPlano gerado para {atleta.nome}")
+    print(f"IMC: {atleta.imc} | Treinos na semana: {len(plano)}")
+    print(f"🌸 ATENÇÃO: Treinos ajustados para fase menstrual do ciclo\n")
+    
+    # Mostrar recomendações
+    if generator.menstrual_analysis and generator.menstrual_analysis.get('recomendacoes'):
+        print("🤖 RECOMENDAÇÕES DE IA - CICLO MENSTRUAL:")
+        for rec in generator.menstrual_analysis['recomendacoes']:
+            print(rec)
+        print()
+    
+    for treino in plano:
+        print(f"📅 {treino['dia']} - {treino['tipo']} ({treino['duracao']})")
+        if '🌸' in treino['descricao']:
+            print(f"   ⚠️ TREINO AJUSTADO")
+    
+    # Exportar
+    exporter = ExcelExporter(atleta, plano)
+    filename = exporter.export_to_excel("Exemplo_Corrida_Ciclo_Menstrual.xlsx")
+    print(f"\n✅ Exportado: {filename}\n")
+
+
 def exemplo_diabetes():
     """Exemplo: Triatleta com diabetes"""
     print("=" * 70)
-    print("EXEMPLO 5: TRIATLETA COM DIABETES TIPO 1")
+    print("EXEMPLO 6: TRIATLETA COM DIABETES TIPO 1")
     print("=" * 70)
     
     # Problema de saúde: diabetes
@@ -195,6 +244,7 @@ def exemplo_diabetes():
         distancia_prova="Olímpico",
         limiar_lactato=170.0,
         vo2_max=50.0,
+        genero="Feminino",
         problemas_saude=[problema_diabetes]
     )
     
@@ -225,10 +275,11 @@ if __name__ == "__main__":
     print("2 - Corrida (Maratona) - Com lesão no joelho")
     print("3 - Natação (3000m) - Com lesão no ombro")
     print("4 - Ciclismo (160K) - Com problema lombar")
-    print("5 - Triathlon (Olímpico) - Com diabetes")
-    print("6 - Executar todos os exemplos")
+    print("5 - Corrida (10K) - 🌸 Fase menstrual do ciclo")
+    print("6 - Triathlon (Olímpico) - Com diabetes")
+    print("7 - Executar todos os exemplos")
     
-    escolha = input("\nOpção (1-6): ").strip()
+    escolha = input("\nOpção (1-7): ").strip()
     
     print()
     
@@ -241,12 +292,15 @@ if __name__ == "__main__":
     elif escolha == "4":
         exemplo_ciclismo()
     elif escolha == "5":
-        exemplo_diabetes()
+        exemplo_ciclo_menstrual()
     elif escolha == "6":
+        exemplo_diabetes()
+    elif escolha == "7":
         exemplo_triathlon()
         exemplo_corrida()
         exemplo_natacao()
         exemplo_ciclismo()
+        exemplo_ciclo_menstrual()
         exemplo_diabetes()
     else:
         print("Opção inválida!")

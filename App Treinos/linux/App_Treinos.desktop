@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=App Treinos
+Comment=Sistema Profissional de Planejamento de Treino
+Exec=bash -c 'cd "$(dirname "%k")/.." && bash linux/app_treinos_launcher.sh'
+Icon=utilities-terminal
+Terminal=true
+Categories=Sports;Education;
+Keywords=treino;training;esportes;periodização;
+StartupNotify=true

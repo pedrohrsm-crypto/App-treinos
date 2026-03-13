@@ -103,6 +103,7 @@ def testar_ajuste_treinos():
         distancia_prova="Meia Maratona",
         limiar_lactato=165.0,
         vo2_max=50.0,
+        genero="Masculino",
         problemas_saude=[problema]
     )
     
@@ -145,6 +146,7 @@ def testar_comparacao():
         distancia_prova="10K",
         limiar_lactato=165.0,
         vo2_max=50.0,
+        genero="Masculino",
         problemas_saude=[]
     )
     
@@ -166,6 +168,7 @@ def testar_comparacao():
         distancia_prova="10K",
         limiar_lactato=165.0,
         vo2_max=50.0,
+        genero="Masculino",
         problemas_saude=[problema]
     )
     
@@ -201,6 +204,55 @@ def testar_comparacao():
             print(f"  ⚠️ Modificado por IA")
 
 
+def testar_ciclo_menstrual():
+    """Testa os ajustes para diferentes fases do ciclo menstrual"""
+    
+    print("\n\n" + "=" * 80)
+    print("TESTE DE AJUSTES POR CICLO MENSTRUAL")
+    print("=" * 80)
+    
+    fases = ['menstrual', 'folicular', 'ovulatoria', 'lutea']
+    
+    for fase in fases:
+        print(f"\n{'='*80}")
+        print(f"🌸 TESTANDO FASE: {fase.upper()}")
+        print("="*80)
+        
+        atleta = Athlete(
+            nome=f"Atleta - Fase {fase.capitalize()}",
+            idade=28,
+            peso=58.0,
+            altura=165.0,
+            esporte="Corrida",
+            dias_semana=4,
+            distancia_prova="10K",
+            limiar_lactato=172.0,
+            vo2_max=48.0,
+            genero="Feminino",
+            fase_menstrual=fase
+        )
+        
+        generator = TrainingPlanGenerator(atleta)
+        
+        # Mostrar recomendações
+        if generator.menstrual_analysis:
+            print("\n🤖 RECOMENDAÇÕES DA IA:")
+            for rec in generator.menstrual_analysis.get('recomendacoes', []):
+                print(rec)
+        
+        # Mostrar um treino ajustado
+        plano = generator.get_weekly_training()
+        if plano:
+            treino = plano[0]
+            print(f"\n📋 Exemplo de treino ajustado:")
+            print(f"   Dia: {treino['dia']}")
+            print(f"   Tipo: {treino['tipo']}")
+            print(f"   Duração: {treino['duracao']}")
+            print(f"   Zona: {treino['zona']}")
+            if '🌸' in treino['descricao']:
+                print(f"   ⚠️ Ajustado para fase {fase}")
+
+
 if __name__ == "__main__":
     print("\n🏃 SISTEMA DE TESTE - IA PARA ADEQUAÇÕES DE SAÚDE\n")
     
@@ -208,6 +260,7 @@ if __name__ == "__main__":
     testar_analise_ia()
     testar_ajuste_treinos()
     testar_comparacao()
+    testar_ciclo_menstrual()
     
     print("\n\n" + "=" * 80)
     print("✅ TESTES CONCLUÍDOS!")
@@ -218,4 +271,5 @@ if __name__ == "__main__":
     print("  ✓ Ajuste automático de treinos")
     print("  ✓ Redução proporcional de volume")
     print("  ✓ Marcação visual de treinos modificados")
+    print("  ✓ Adaptação para ciclo menstrual (4 fases)")
     print("\n" + "=" * 80)

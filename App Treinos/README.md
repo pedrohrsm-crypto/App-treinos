@@ -4,24 +4,76 @@
 
 Sistema completo para criação de planilhas de treinamento personalizadas para atletas de **Triathlon**, **Corrida**, **Natação** e **Ciclismo**, com **inteligência artificial integrada** para adequação de treinos baseados em condições de saúde.
 
+## 🚀 Execução Rápida (Duplo Clique)
+
+### 🪟 **Windows**
+```
+Duplo clique em: App_Treinos.bat
+```
+
+### 🍎 **macOS**
+```bash
+chmod +x App_Treinos.command
+Duplo clique em: App_Treinos.command
+```
+
+### 🐧 **Linux**
+```bash
+chmod +x linux/app_treinos_launcher.sh
+cp linux/App_Treinos.desktop ~/.local/share/applications/
+# Procure "App Treinos" no menu de aplicativos
+```
+
+📖 **Guia completo**: [EXECUCAO_DUPLO_CLIQUE.md](EXECUCAO_DUPLO_CLIQUE.md)
+
+---
+
 ## ✨ Funcionalidades
 
+- ✅ **🖱️ Execução com duplo clique**: Sem precisar abrir terminal!
 - ✅ Coleta completa de dados do atleta (idade, peso, altura, esporte, disponibilidade)
+- ✅ **🆕 Cálculo automático de semanas**: Informe apenas a data da prova e o sistema calcula automaticamente!
+- ✅ **🛡️ Mensagens educativas de limite**: Sistema explica cientificamente o limite de 52 semanas
+- ✅ **Periodização profissional multi-semanas**: Planejamento de 1 a 52 semanas
+- ✅ **5 fases de periodização**: Base → Resistência → Velocidade → Potência → Polimento
+- ✅ **Adaptação para ciclo menstrual**: IA ajusta treinos baseado em fases hormonais
 - ✅ **Análise de saúde com IA**: Coleta detalhada de problemas ortopédicos e sistêmicos
 - ✅ **Adequações automáticas de treino**: Sistema inteligente que ajusta treinos baseado em:
   - Lesões ortopédicas (joelho, ombro, lombar, tornozelo, quadril, etc.)
   - Problemas sistêmicos (diabetes, asma, hipertensão)
   - Gravidade e membro específico afetado
+  - Fase do ciclo menstrual (para atletas femininas)
 - ✅ Personalização baseada em:
   - Distância da prova
   - Limiar de lactato e VO2 Max
   - IMC e dados antropométricos
   - Dias disponíveis para treino
 - ✅ **Recomendações médicas personalizadas** por IA
-- ✅ Geração automática de treinos semanais
+- ✅ Geração automática de treinos semanais ou planos completos
 - ✅ Cálculo de zonas de treinamento
-- ✅ Exportação para Excel com até 5 abas
-- ✅ Interface amigável via terminal
+- ✅ Exportação para Excel com até 6 abas (incluindo periodização)
+- ✅ **Interface aprimorada**: Prompts claros com formatos e exemplos
+- ✅ **Mensagens de erro inteligentes**: Feedback específico e orientativo
+- ✅ **Multiplataforma**: Windows, Linux, macOS
+
+## 💬 Interface de Usuário Aprimorada
+
+### Prompts Inteligentes
+Todas as entradas de dados incluem:
+- **Formato esperado**: `[Número inteiro, 10-100 anos | Ex: 25, 40, 62]`
+- **Intervalos válidos**: Limites mínimos e máximos sempre visíveis
+- **Múltiplos exemplos**: Variações de entrada para facilitar compreensão
+- **Flexibilidade**: Aceita múltiplas formas de resposta (ex: "M", "Masculino", "m")
+
+### Mensagens de Erro Claras
+- ❌ **Erro de formato**: "Formato inválido. Digite apenas números (sem vírgulas ou pontos)."
+- ❌ **Fora do intervalo**: "Valor fora do intervalo permitido. Digite um valor entre 10 e 100 anos."
+- ❌ **Opção inválida**: "Opção inválida. Escolha um número entre 1 e 4."
+
+### Organização Visual
+- 📝 **Seções categorizadas**: Dados básicos, modalidade, saúde, etc.
+- 🎨 **Emojis visuais**: Facilitam identificação rápida de seções
+- 📊 **Separadores**: Organização clara das informações
 
 ## 🤖 Sistema de Inteligência Artificial
 
@@ -228,12 +280,47 @@ Este sistema é ideal para:
 
 ## 🎯 Diferenciais do Sistema
 
-1. **IA Integrada**: Sistema inteligente que realmente ajusta treinos
-2. **Base de Conhecimento Médico**: 7+ regiões ortopédicas mapeadas
-3. **Análise Imediata**: Feedback instantâneo ao cadastrar problemas
-4. **Marcação Visual**: Treinos adaptados claramente identificados
-5. **Documentação Completa**: Tudo registrado na planilha Excel
-6. **Segurança**: Reduz risco de agravamento de lesões
+1. **📅 Cálculo Automático de Datas**: Não sabe quantas semanas? Informe a data da prova!
+2. **�️ Mensagens Educativas**: Sistema explica cientificamente limites e recomendações
+3. **🔄 Periodização Profissional**: 5 fases de treinamento com progressão científica
+4. **🌸 Adaptação Menstrual**: IA ajusta treinos para ciclo menstrual feminino
+5. **🤖 IA Integrada**: Sistema inteligente que realmente ajusta treinos
+6. **💊 Base de Conhecimento Médico**: 7+ regiões ortopédicas mapeadas
+7. **⚡ Análise Imediata**: Feedback instantâneo ao cadastrar problemas
+8. **📊 Planos Multi-Semanas**: Até 52 semanas de periodização (250+ treinos)
+9. **🔁 Recuperação Automática**: Semanas de regeneração a cada 4 semanas
+10. **📑 Marcação Visual**: Treinos adaptados claramente identificados
+11. **📈 Documentação Completa**: Tudo registrado na planilha Excel
+12. **🛡️ Segurança**: Reduz risco de agravamento de lesões
+
+## 📚 Documentação Adicional
+
+- **[MENSAGENS_LIMITE_SISTEMA.md](MENSAGENS_LIMITE_SISTEMA.md)**: Mensagens educativas sobre limites
+- **[CALCULO_AUTOMATICO_SEMANAS.md](CALCULO_AUTOMATICO_SEMANAS.md)**: Como usar o cálculo por data
+- **[PERIODIZACAO_COMPLETA.md](PERIODIZACAO_COMPLETA.md)**: Sistema de periodização multi-semanas
+- **[CICLO_MENSTRUAL.md](CICLO_MENSTRUAL.md)**: Adaptações para ciclo hormonal
+- **[EXEMPLO_USO_CICLO_MENSTRUAL.md](EXEMPLO_USO_CICLO_MENSTRUAL.md)**: Casos práticos
+
+## 🧪 Exemplos e Testes
+
+Execute os arquivos de exemplo para ver o sistema em ação:
+
+```bash
+# Exemplos de periodização (8, 20, 40 semanas)
+python exemplo_periodizacao.py
+
+# Demonstração do cálculo automático de semanas
+python exemplo_calculo_automatico.py
+
+# Teste da função de cálculo de datas
+python teste_calculo_semanas.py
+
+# Exemplos diversos de atletas
+python exemplos.py
+
+# Teste completo da IA de saúde
+python teste_ia_saude.py
+```
 
 ## 📞 Suporte
 
