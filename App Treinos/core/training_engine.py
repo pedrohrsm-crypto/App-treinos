@@ -7,6 +7,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional
+from pathlib import Path
 import os
 import math
 
@@ -1007,9 +1008,19 @@ class ExcelExporter:
     
     def export_to_excel(self, filename: str = None):
         """Exporta o plano para Excel com formatação profissional"""
+        # Definir diretório de exportação
+        export_dir = Path(__file__).parent.parent / 'data' / 'exports'
+        export_dir.mkdir(parents=True, exist_ok=True)
+        
         if filename is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"Plano_Treinamento_{self.athlete.nome.replace(' ', '_')}_{timestamp}.xlsx"
+        
+        # Garantir que o filename tenha apenas o nome do arquivo, não o caminho completo
+        filename = Path(filename).name
+        
+        # Caminho completo do arquivo
+        filepath = export_dir / filename
         
         # Criar DataFrame principal
         df_treinos = pd.DataFrame(self.training_plan)
@@ -1131,7 +1142,7 @@ class ExcelExporter:
             df_periodizacao = pd.DataFrame(period_list)
         
         # Exportar para Excel com múltiplas abas
-        with pd.ExcelWriter(filename, engine='openpyxl') as writer:
+        with pd.ExcelWriter(str(filepath), engine='openpyxl') as writer:
             # Aba de informações
             df_info.to_excel(writer, sheet_name='Informações do Atleta', index=False)
             
@@ -1169,7 +1180,7 @@ class ExcelExporter:
                     adjusted_width = min(max_length + 2, 60)
                     worksheet.column_dimensions[column_letter].width = adjusted_width
         
-        return filename
+        return str(filepath)
 
 
 def main():
@@ -1180,72 +1191,6 @@ def main():
     print("\nModalidades disponíveis: Triathlon, Corrida, Natação, Ciclismo")
     print()
     
-    # ========================================================================
-    # SEÇÃO 1: IDENTIFICAÇÃO DO PROFISSIONAL DE EDUCAÇÃO FÍSICA
-    # ========================================================================
-    print("\n" + "═" * 70)
-    print("👨‍⚕️ IDENTIFICAÇÃO DO PROFISSIONAL DE EDUCAÇÃO FÍSICA")
-    print("═" * 70)
-    print("\n⚠️  ATENÇÃO: Seção obrigatória para garantir segurança e transparência")
-    print("   Todo plano de treinamento deve ser elaborado e assinado por")
-    print("   um profissional de Educação Física devidamente credenciado.")
-    print("\n📋 Dados solicitados:") 
-    print("   • Nome completo do profissional")
-    print("   • CPF (Cadastro de Pessoa Física)")
-    print("   • CREF (Conselho Regional de Educação Física)")
-    print("─" * 70)
-    
-    # Coletar nome do profissional
-    while True:
-        nome_profissional = input("\nNome completo do profissional [Mínimo 5 caracteres | Ex: Dr. João Silva Santos]: ").strip()
-        if len(nome_profissional) >= 5:
-            break
-        print("❌ Nome muito curto. Digite o nome completo (mínimo 5 caracteres).")
-    
-    # Coletar CPF
-    print("\n💡 CPF: Digite apenas números ou no formato 000.000.000-00")
-    while True:
-        cpf_input = input("CPF do profissional [11 dígitos | Ex: 12345678900 ou 123.456.789-00]: ").strip()
-        try:
-            # Tenta validar o CPF
-            cpf_numeros = ''.join(filter(str.isdigit, cpf_input))
-            if TrainerInfo._validar_cpf(cpf_numeros):
-                cpf_profissional = cpf_numeros
-                break
-            else:
-                print("❌ CPF inválido. Verifique os números digitados.")
-        except:
-            print("❌ Formato inválido. Digite apenas os 11 dígitos do CPF.")
-    
-    # Coletar CREF
-    print("\n💡 CREF: Formato aceito: 123456-G/SP, CREF1 123456-G/SP")
-    print("   Exemplos válidos: 123456-G/SP, 098765-G/RJ, CREF1 123456-G/SP")
-    while True:
-        cref_input = input("CREF do profissional [Formato: 123456-G/UF | Ex: 123456-G/SP]: ").strip()
-        if TrainerInfo._validar_cref(cref_input):
-            cref_profissional = cref_input.upper()
-            break
-        print("❌ CREF inválido. Use o formato: 123456-G/UF (ex: 123456-G/SP)")
-    
-    # Criar objeto TrainerInfo
-    try:
-        trainer = TrainerInfo(
-            nome_completo=nome_profissional,
-            cpf=cpf_profissional,
-            cref=cref_profissional
-        )
-        print("\n✅ Dados do profissional validados com sucesso!")
-        print(f"   Profissional: {trainer.nome_completo}")
-        print(f"   CPF: {trainer.formatar_cpf()}")
-        print(f"   CREF: {trainer.formatar_cref()}")
-    except ValueError as e:
-        print(f"\n❌ Erro na validação: {e}")
-        print("   Por favor, reinicie o programa e verifique os dados.")
-        return
-    
-    # ========================================================================
-    # SEÇÃO 2: DADOS DO ATLETA
-    # ========================================================================
     # Coleta de dados do atleta
     print("\n📝 DADOS BÁSICOS DO ATLETA")
     print("─" * 70)
@@ -1599,7 +1544,6 @@ def main():
         limiar_lactato=limiar_lactato,
         vo2_max=vo2_max,
         genero=genero,
-        trainer=trainer,
         semanas_ate_prova=semanas_ate_prova,
         problemas_saude=problemas_saude,
         fase_menstrual=fase_menstrual
