@@ -21,6 +21,7 @@ from gui.register_screen import RegisterScreen
 from gui.admin_panel import AdminPanel
 from gui.training_wizard import TrainingWizard
 from gui.training_list import TrainingListScreen
+from gui.modern_widgets import AnimatedButton, RoundedFrame, AnimatedCard, FadeTransition
 from training_planner import TrainerInfo
 from pdf_exporter import PDFExporter
 from tkinter import filedialog
@@ -481,19 +482,25 @@ class DashboardScreen:
         self._create_content()
     
     def _create_header(self):
-        """Cria cabeçalho do dashboard com layout responsivo."""
-        # Header com altura ajustada
-        header = tk.Frame(self.frame, bg=theme.colors['bg_white'], height=120)
-        header.pack(fill='x', side='top')
-        header.pack_propagate(False)
+        """Cria cabeçalho do dashboard com layout responsivo e bordas arredondadas."""
+        # Container para o header com padding
+        header_container = tk.Frame(self.frame, bg=theme.colors['bg_secondary'], height=140)
+        header_container.pack(fill='x', side='top', padx=20, pady=(20, 0))
+        header_container.pack_propagate(False)
         
-        # Linha de separação inferior (sombra sutil)
-        separator = tk.Frame(header, bg=theme.colors['border_light'], height=2)
-        separator.pack(fill='x', side='bottom')
+        # Header arredondado usando RoundedFrame
+        header = RoundedFrame(
+            header_container,
+            bg_color=theme.colors['bg_white'],
+            corner_radius=16,
+            shadow_color=theme.colors['shadow'],
+            shadow_offset=4
+        )
+        header.pack(fill='both', expand=True)
         
         # Container interno com padding adequado
-        header_content = tk.Frame(header, bg=theme.colors['bg_white'])
-        header_content.pack(fill='both', expand=True, padx=40, pady=15)
+        header_content = tk.Frame(header.frame, bg=theme.colors['bg_white'])
+        header_content.pack(fill='both', expand=True, padx=40, pady=20)
         
         # === LADO ESQUERDO: Logo e Título ===
         left_frame = tk.Frame(header_content, bg=theme.colors['bg_white'])
@@ -597,31 +604,23 @@ class DashboardScreen:
         logout_container = tk.Frame(right_content, bg=theme.colors['bg_white'])
         logout_container.pack(side='left')
         
-        logout_btn = tk.Button(
+        logout_btn = AnimatedButton(
             logout_container,
             text="🚪  Sair",
             font=(theme.fonts['primary'], theme.font_sizes['small'], 'bold'),
-            bg=theme.colors['bg_white'],
-            fg=theme.colors['error'],
-            activebackground=theme.colors['bg_secondary'],
-            activeforeground=theme.colors['error'],
-            relief='solid',
-            bd=1,
-            cursor='hand2',
+            bg_color=theme.colors['bg_white'],
+            fg_color=theme.colors['error'],
+            hover_bg=theme.colors['error'],
+            hover_fg=theme.colors['text_light'],
+            active_bg=theme.colors['error'],
+            corner_radius=8,
+            padding_x=15,
+            padding_y=8,
+            border_width=1,
+            border_color=theme.colors['error'],
             command=self._logout
         )
-        logout_btn.pack(side='left', padx=8, ipadx=15, ipady=8)
-        logout_btn.config(highlightbackground=theme.colors['error'], highlightthickness=0)
-        
-        # Efeito hover no botão logout
-        def on_logout_enter(e):
-            logout_btn.config(bg=theme.colors['error'], fg=theme.colors['text_light'])
-        
-        def on_logout_leave(e):
-            logout_btn.config(bg=theme.colors['bg_white'], fg=theme.colors['error'])
-        
-        logout_btn.bind('<Enter>', on_logout_enter)
-        logout_btn.bind('<Leave>', on_logout_leave)
+        logout_btn.pack(side='left', padx=8)
     
     def _create_content(self):
         """Cria conteúdo principal com hero cards."""
@@ -681,57 +680,36 @@ class DashboardScreen:
             color=theme.colors['triadic_1'],
             command=lambda: self._on_card_click('export_pdf')
         ).pack(side='left', padx=15)
-        
-        # Hero Card 3: Exportar PDF
-        self._create_hero_card(
-            cards_container,
-            title="Exportar PDF",
-            icon="📄",
-            description="Exporte planos de treinamento em formato PDF profissional",
-            color=theme.colors['triadic_1'],
-            command=lambda: self._on_card_click('export_pdf')
-        ).pack(side='left', padx=15)
     
     def _create_hero_card(self, parent, title, icon, description, color, command):
-        """Cria um hero card moderno e interativo."""
-        # Container externo para sombra
+        """Cria um hero card moderno e interativo com AnimatedCard."""
+        # Container externo
         card_wrapper = tk.Frame(
             parent,
-            bg=theme.colors['bg_secondary'],
-            relief='flat',
-            bd=0
+            bg=theme.colors['bg_secondary']
         )
         
-        # Container do card
-        card = tk.Frame(
+        # AnimatedCard principal
+        card = AnimatedCard(
             card_wrapper,
-            bg=theme.colors['bg_white'],
-            relief='flat',
-            bd=0,
-            cursor='hand2'
+            width=theme.sizes['hero_card_width'],
+            height=theme.sizes['hero_card_height'],
+            bg_color=theme.colors['bg_white'],
+            corner_radius=16,
+            shadow_color=theme.colors['shadow'],
+            elevation=8,
+            hover_elevation=16,
+            command=command
         )
-        card.pack(padx=4, pady=4)  # Espaço para sombra
-        
-        # Configurar tamanho fixo
-        card.config(width=theme.sizes['hero_card_width'], 
-                   height=theme.sizes['hero_card_height'])
-        card.pack_propagate(False)
-        
-        # Borda arredondada (simulada)
-        card.config(highlightbackground=theme.colors['border_light'],
-                   highlightthickness=2)
+        card.pack()
         
         # Barra colorida no topo
-        top_bar = tk.Frame(card, bg=color, height=8)
+        top_bar = tk.Frame(card.content_frame, bg=color, height=8)
         top_bar.pack(fill='x', side='top')
         top_bar.pack_propagate(False)
         
-        # Container do conteúdo
-        content_frame = tk.Frame(card, bg=theme.colors['bg_white'])
-        content_frame.pack(fill='both', expand=True)
-        
         # Ícone com círculo de fundo
-        icon_container = tk.Frame(content_frame, bg=theme.colors['bg_white'])
+        icon_container = tk.Frame(card.content_frame, bg=theme.colors['bg_white'])
         icon_container.pack(pady=(25, 10))
         
         # Círculo de fundo para o ícone
@@ -755,30 +733,30 @@ class DashboardScreen:
         
         # Título
         title_label = tk.Label(
-            content_frame,
+            card.content_frame,
             text=title,
             font=(theme.fonts['primary'], theme.font_sizes['card_title'], 'bold'),
             bg=theme.colors['bg_white'],
             fg=theme.colors['text_primary'],
-            wraplength=theme.sizes['hero_card_width'] - 40  # Deixa margem
+            wraplength=theme.sizes['hero_card_width'] - 40
         )
         title_label.pack(pady=(5, 5))
         
         # Descrição com wrap
         desc_label = tk.Label(
-            content_frame,
+            card.content_frame,
             text=description,
             font=(theme.fonts['primary'], theme.font_sizes['small']),
             bg=theme.colors['bg_white'],
             fg=theme.colors['text_secondary'],
             justify='center',
-            wraplength=theme.sizes['hero_card_width'] - 50  # Texto não corta
+            wraplength=theme.sizes['hero_card_width'] - 50
         )
         desc_label.pack(pady=(0, 10), padx=10)
         
         # Indicador "clique aqui"
         action_label = tk.Label(
-            content_frame,
+            card.content_frame,
             text="Clique para começar →",
             font=(theme.fonts['primary'], theme.font_sizes['small'], 'bold'),
             bg=theme.colors['bg_white'],
@@ -786,37 +764,37 @@ class DashboardScreen:
         )
         action_label.pack(pady=(0, 10))
         
-        # Efeito hover aprimorado
-        def on_enter(e):
-            card.config(bg=theme.colors['bg_tertiary'])
-            content_frame.config(bg=theme.colors['bg_tertiary'])
-            icon_container.config(bg=theme.colors['bg_tertiary'])
-            icon_bg.config(bg=color)
-            icon_label.config(bg=color, fg=theme.colors['text_light'])
-            title_label.config(bg=theme.colors['bg_tertiary'], 
-                             font=(theme.fonts['primary'], theme.font_sizes['card_title'], 'bold underline'))
-            desc_label.config(bg=theme.colors['bg_tertiary'])
-            action_label.config(bg=theme.colors['bg_tertiary'])
-            card.config(highlightbackground=color, highlightthickness=3)
+        # Efeito hover personalizado para os elementos internos
+        def update_elements_on_hover(hovering):
+            if hovering:
+                icon_bg.config(bg=color)
+                icon_label.config(bg=color, fg=theme.colors['text_light'])
+                title_label.config(font=(theme.fonts['primary'], theme.font_sizes['card_title'], 'bold underline'))
+            else:
+                icon_bg.config(bg=theme.colors['bg_secondary'])
+                icon_label.config(bg=theme.colors['bg_secondary'], fg=color)
+                title_label.config(font=(theme.fonts['primary'], theme.font_sizes['card_title'], 'bold'))
         
-        def on_leave(e):
-            card.config(bg=theme.colors['bg_white'])
-            content_frame.config(bg=theme.colors['bg_white'])
-            icon_container.config(bg=theme.colors['bg_white'])
-            icon_bg.config(bg=theme.colors['bg_secondary'])
-            icon_label.config(bg=theme.colors['bg_secondary'], fg=color)
-            title_label.config(bg=theme.colors['bg_white'],
-                             font=(theme.fonts['primary'], theme.font_sizes['card_title'], 'bold'))
-            desc_label.config(bg=theme.colors['bg_white'])
-            action_label.config(bg=theme.colors['bg_white'])
-            card.config(highlightbackground=theme.colors['border_light'], highlightthickness=2)
+        # Sobrescrever os eventos do AnimatedCard para incluir efeitos customizados
+        original_on_enter = card._on_enter
+        original_on_leave = card._on_leave
         
-        # Bind eventos para todos os widgets
-        for widget in [card, content_frame, icon_container, icon_bg, icon_label, 
-                      title_label, desc_label, action_label, top_bar]:
-            widget.bind('<Enter>', on_enter)
-            widget.bind('<Leave>', on_leave)
+        def custom_on_enter(event):
+            original_on_enter(event)
+            update_elements_on_hover(True)
+        
+        def custom_on_leave(event):
+            original_on_leave(event)
+            update_elements_on_hover(False)
+        
+        card.bind('<Enter>', custom_on_enter)
+        card.bind('<Leave>', custom_on_leave)
+        
+        # Propagar eventos de clique nos elementos internos
+        for widget in [top_bar, icon_container, icon_bg, icon_label, title_label, desc_label, action_label]:
             widget.bind('<Button-1>', lambda e: command())
+            widget.bind('<Enter>', custom_on_enter)
+            widget.bind('<Leave>', custom_on_leave)
         
         return card_wrapper
     
