@@ -1,6 +1,6 @@
 """
 Sistema de Geração de Planilhas de Treinamento Esportivo
-Modalidades: Triathlon, Corrida, Natação e Ciclismo
+Modalidades: Triathlon, Corrida, Natação, Ciclismo, Duathlon Natação e Corrida, Duathlon Ciclismo e Corrida
 """
 
 import pandas as pd
@@ -736,19 +736,32 @@ class TrainingPlanGenerator:
         
         # Configurações de distância
         self.distance_config = {
+            # Triathlon
             'Sprint': {'semanas': 8, 'volume': 'baixo'},
             'Olímpico': {'semanas': 12, 'volume': 'médio'},
             'Meio Ironman': {'semanas': 16, 'volume': 'alto'},
             'Ironman': {'semanas': 20, 'volume': 'muito alto'},
+            # Corrida
             '5K': {'semanas': 8, 'volume': 'baixo'},
             '10K': {'semanas': 10, 'volume': 'médio'},
             'Meia Maratona': {'semanas': 14, 'volume': 'alto'},
             'Maratona': {'semanas': 18, 'volume': 'muito alto'},
+            # Natação
             '1500m': {'semanas': 8, 'volume': 'baixo'},
             '3000m': {'semanas': 10, 'volume': 'médio'},
+            # Ciclismo
             '40K': {'semanas': 10, 'volume': 'médio'},
             '80K': {'semanas': 14, 'volume': 'alto'},
-            '160K': {'semanas': 16, 'volume': 'muito alto'}
+            '160K': {'semanas': 16, 'volume': 'muito alto'},
+            # Duathlon Natação e Corrida (Aquathlon)
+            'Aquathlon Sprint': {'semanas': 8, 'volume': 'baixo'},
+            'Aquathlon Olímpico': {'semanas': 12, 'volume': 'médio'},
+            'Aquathlon Longo': {'semanas': 14, 'volume': 'alto'},
+            # Duathlon Ciclismo e Corrida
+            'Duathlon Sprint': {'semanas': 8, 'volume': 'baixo'},
+            'Duathlon Olímpico': {'semanas': 12, 'volume': 'médio'},
+            'Duathlon Longo': {'semanas': 14, 'volume': 'alto'},
+            'Duathlon Ironman': {'semanas': 18, 'volume': 'muito alto'}
         }
     
     def get_weekly_training(self, numero_semana: int = 1) -> List[Dict]:
@@ -757,16 +770,22 @@ class TrainingPlanGenerator:
         info_semana = self.periodization.get_info_semana(numero_semana)
         
         # Gerar treinos base
-        if self.athlete.esporte.lower() == 'triathlon':
+        esporte_lower = self.athlete.esporte.lower()
+        
+        if esporte_lower == 'triathlon':
             treinos = self._generate_triathlon_week(info_semana)
-        elif self.athlete.esporte.lower() == 'corrida':
+        elif esporte_lower == 'corrida':
             treinos = self._generate_running_week(info_semana)
-        elif self.athlete.esporte.lower() == 'natação':
+        elif esporte_lower == 'natação':
             treinos = self._generate_swimming_week(info_semana)
-        elif self.athlete.esporte.lower() == 'ciclismo':
+        elif esporte_lower == 'ciclismo':
             treinos = self._generate_cycling_week(info_semana)
+        elif esporte_lower in ['duathlon natação e corrida', 'aquathlon']:
+            treinos = self._generate_duathlon_swim_run_week(info_semana)
+        elif esporte_lower in ['duathlon ciclismo e corrida', 'duathlon']:
+            treinos = self._generate_duathlon_bike_run_week(info_semana)
         else:
-            raise ValueError("Esporte não reconhecido")
+            raise ValueError(f"Esporte não reconhecido: {self.athlete.esporte}")
         
         # Adicionar informação da semana em cada treino
         for treino in treinos:
@@ -816,7 +835,7 @@ class TrainingPlanGenerator:
         
         return treinos_ajustados
     
-    def _generate_triathlon_week(self, info_semana: Dict = None) -> List[Dict]:
+    def _generate_triathlon_week(self, info_semana: Optional[Dict] = None) -> List[Dict]:
         """Gera treinos de triathlon"""
         if info_semana is None:
             info_semana = {
@@ -855,7 +874,7 @@ class TrainingPlanGenerator:
         
         return treinos[:self.athlete.dias_semana]
     
-    def _generate_running_week(self, info_semana: Dict = None) -> List[Dict]:
+    def _generate_running_week(self, info_semana: Optional[Dict] = None) -> List[Dict]:
         """Gera treinos de corrida"""
         # Usar info da semana se fornecida, senão usar padrão
         if info_semana is None:
@@ -935,7 +954,7 @@ class TrainingPlanGenerator:
         
         return treinos[:self.athlete.dias_semana]
     
-    def _generate_swimming_week(self, info_semana: Dict = None) -> List[Dict]:
+    def _generate_swimming_week(self, info_semana: Optional[Dict] = None) -> List[Dict]:
         """Gera treinos de natação"""
         if info_semana is None:
             info_semana = {'volume_multiplicador': 1.0}
@@ -965,7 +984,7 @@ class TrainingPlanGenerator:
         
         return treinos[:self.athlete.dias_semana]
     
-    def _generate_cycling_week(self, info_semana: Dict = None) -> List[Dict]:
+    def _generate_cycling_week(self, info_semana: Optional[Dict] = None) -> List[Dict]:
         """Gera treinos de ciclismo"""
         if info_semana is None:
             info_semana = {'volume_multiplicador': 1.0}
@@ -994,22 +1013,122 @@ class TrainingPlanGenerator:
             ]
         
         return treinos[:self.athlete.dias_semana]
+    
+    def _generate_duathlon_swim_run_week(self, info_semana: Optional[Dict] = None) -> List[Dict]:
+        """Gera treinos de Duathlon Natação e Corrida (Aquathlon)"""
+        if info_semana is None:
+            info_semana = {
+                'fase': 'base',
+                'is_recuperacao': False,
+                'volume_multiplicador': 1.0
+            }
+        
+        volume_mult = info_semana['volume_multiplicador']
+        volume = self.distance_config.get(self.athlete.distancia_prova, {}).get('volume', 'médio')
+        
+        # Templates baseados nos dias disponíveis
+        if self.athlete.dias_semana >= 6:
+            treinos = [
+                {'dia': 'Segunda', 'modalidade': 'Natação', 'duracao': f"{int(50 * volume_mult)} min", 'tipo': 'Técnica', 'zona': 'Z2 - Aeróbico', 'descricao': '800m aquecimento + 6x100m técnica + 400m volta à calma'},
+                {'dia': 'Terça', 'modalidade': 'Corrida', 'duracao': f"{int(40 * volume_mult)} min", 'tipo': 'Base', 'zona': 'Z2 - Aeróbico', 'descricao': 'Corrida contínua confortável'},
+                {'dia': 'Quarta', 'modalidade': 'Natação', 'duracao': f"{int(50 * volume_mult)} min", 'tipo': 'Intervalado', 'zona': 'Z4 - Limiar', 'descricao': '500m aquec + 8x200m (rec 30s) + 300m desaq'},
+                {'dia': 'Quinta', 'modalidade': 'Corrida', 'duracao': f"{int(45 * volume_mult)} min", 'tipo': 'Intervalado', 'zona': 'Z4 - Limiar', 'descricao': '15min aquec + 5x1km (rec 2min) + 10min desaq'},
+                {'dia': 'Sexta', 'modalidade': 'Natação', 'duracao': f"{int(40 * volume_mult)} min", 'tipo': 'Recuperação', 'zona': 'Z1 - Recuperação', 'descricao': '1800m contínuo suave'},
+                {'dia': 'Sábado', 'modalidade': 'Corrida', 'duracao': f"{int(35 * volume_mult)} min", 'tipo': 'Recuperação', 'zona': 'Z1 - Recuperação', 'descricao': 'Corrida leve opcional'},
+                {'dia': 'Domingo', 'modalidade': 'Brick', 'duracao': f"{int(75 * volume_mult)} min", 'tipo': 'Combinado', 'zona': 'Z3 - Tempo', 'descricao': '35min natação Z2 + transição + 40min corrida Z3'}
+            ]
+        elif self.athlete.dias_semana >= 4:
+            treinos = [
+                {'dia': 'Segunda', 'modalidade': 'Natação', 'duracao': f"{int(50 * volume_mult)} min", 'tipo': 'Técnica', 'zona': 'Z2 - Aeróbico', 'descricao': '800m aquecimento + 5x100m técnica + 300m volta à calma'},
+                {'dia': 'Quarta', 'modalidade': 'Corrida', 'duracao': f"{int(45 * volume_mult)} min", 'tipo': 'Intervalado', 'zona': 'Z4 - Limiar', 'descricao': '15min aquec + 4x1200m (rec 2min) + 10min desaq'},
+                {'dia': 'Sexta', 'modalidade': 'Natação', 'duracao': f"{int(50 * volume_mult)} min", 'tipo': 'Intervalado', 'zona': 'Z3 - Tempo', 'descricao': '500m aquec + 10x100m (rec 20s) + 300m desaq'},
+                {'dia': 'Domingo', 'modalidade': 'Brick', 'duracao': f"{int(70 * volume_mult)} min", 'tipo': 'Combinado', 'zona': 'Z2 - Aeróbico', 'descricao': '30min natação Z2 + transição + 40min corrida Z2-Z3'}
+            ]
+        else:
+            treinos = [
+                {'dia': 'Terça', 'modalidade': 'Natação', 'duracao': f"{int(45 * volume_mult)} min", 'tipo': 'Técnica', 'zona': 'Z2 - Aeróbico', 'descricao': '700m aquecimento + 4x100m técnica + 300m volta à calma'},
+                {'dia': 'Quinta', 'modalidade': 'Corrida', 'duracao': f"{int(40 * volume_mult)} min", 'tipo': 'Base', 'zona': 'Z2 - Aeróbico', 'descricao': 'Corrida contínua em ritmo confortável'},
+                {'dia': 'Domingo', 'modalidade': 'Brick', 'duracao': f"{int(65 * volume_mult)} min", 'tipo': 'Combinado', 'zona': 'Z2 - Aeróbico', 'descricao': '30min natação Z2 + transição + 35min corrida Z2'}
+            ]
+        
+        return treinos[:self.athlete.dias_semana]
+    
+    def _generate_duathlon_bike_run_week(self, info_semana: Optional[Dict] = None) -> List[Dict]:
+        """Gera treinos de Duathlon Ciclismo e Corrida"""
+        if info_semana is None:
+            info_semana = {
+                'fase': 'base',
+                'is_recuperacao': False,
+                'volume_multiplicador': 1.0
+            }
+        
+        volume_mult = info_semana['volume_multiplicador']
+        volume = self.distance_config.get(self.athlete.distancia_prova, {}).get('volume', 'médio')
+        
+        # Templates baseados nos dias disponíveis
+        if self.athlete.dias_semana >= 6:
+            treinos = [
+                {'dia': 'Segunda', 'modalidade': 'Corrida', 'duracao': f"{int(40 * volume_mult)} min", 'tipo': 'Recuperação', 'zona': 'Z1 - Recuperação', 'descricao': 'Corrida leve e regenerativa'},
+                {'dia': 'Terça', 'modalidade': 'Ciclismo', 'duracao': f"{int(70 * volume_mult)} min", 'tipo': 'Base', 'zona': 'Z2 - Aeróbico', 'descricao': 'Ritmo constante em terreno plano'},
+                {'dia': 'Quarta', 'modalidade': 'Corrida', 'duracao': f"{int(45 * volume_mult)} min", 'tipo': 'Intervalado', 'zona': 'Z4 - Limiar', 'descricao': '15min aquec + 6x800m (rec 2min) + 10min desaq'},
+                {'dia': 'Quinta', 'modalidade': 'Ciclismo', 'duracao': f"{int(80 * volume_mult)} min", 'tipo': 'Intervalado', 'zona': 'Z4 - Limiar', 'descricao': '20min aquec + 4x10min alta intensidade (rec 3min) + 15min desaq'},
+                {'dia': 'Sexta', 'modalidade': 'Corrida', 'duracao': f"{int(35 * volume_mult)} min", 'tipo': 'Recuperação', 'zona': 'Z1 - Recuperação', 'descricao': 'Corrida leve opcional'},
+                {'dia': 'Sábado', 'modalidade': 'Ciclismo', 'duracao': f"{int(100 * volume_mult)} min", 'tipo': 'Long Ride', 'zona': 'Z2 - Aeróbico', 'descricao': 'Pedal longo com simulação de prova'},
+                {'dia': 'Domingo', 'modalidade': 'Brick', 'duracao': f"{int(90 * volume_mult)} min", 'tipo': 'Combinado', 'zona': 'Z3 - Tempo', 'descricao': '60min bike Z2-Z3 + transição + 30min corrida Z3'}
+            ]
+        elif self.athlete.dias_semana >= 4:
+            treinos = [
+                {'dia': 'Segunda', 'modalidade': 'Corrida', 'duracao': f"{int(40 * volume_mult)} min", 'tipo': 'Base', 'zona': 'Z2 - Aeróbico', 'descricao': 'Corrida contínua moderada'},
+                {'dia': 'Quarta', 'modalidade': 'Ciclismo', 'duracao': f"{int(75 * volume_mult)} min", 'tipo': 'Intervalado', 'zona': 'Z4 - Limiar', 'descricao': '20min aquec + 3x12min alta intensidade (rec 4min) + 15min desaq'},
+                {'dia': 'Sexta', 'modalidade': 'Corrida', 'duracao': f"{int(45 * volume_mult)} min", 'tipo': 'Intervalado', 'zona': 'Z4 - Limiar', 'descricao': '15min aquec + 5x1km (rec 2min) + 10min desaq'},
+                {'dia': 'Domingo', 'modalidade': 'Brick', 'duracao': f"{int(100 * volume_mult)} min", 'tipo': 'Combinado', 'zona': 'Z2 - Aeróbico', 'descricao': '70min bike Z2 + transição + 30min corrida Z2-Z3'}
+            ]
+        else:
+            treinos = [
+                {'dia': 'Terça', 'modalidade': 'Ciclismo', 'duracao': f"{int(70 * volume_mult)} min", 'tipo': 'Base', 'zona': 'Z2 - Aeróbico', 'descricao': 'Ritmo constante em terreno variado'},
+                {'dia': 'Quinta', 'modalidade': 'Corrida', 'duracao': f"{int(40 * volume_mult)} min", 'tipo': 'Base', 'zona': 'Z2 - Aeróbico', 'descricao': 'Corrida contínua em ritmo confortável'},
+                {'dia': 'Domingo', 'modalidade': 'Brick', 'duracao': f"{int(90 * volume_mult)} min", 'tipo': 'Combinado', 'zona': 'Z2 - Aeróbico', 'descricao': '60min bike Z2 + transição + 30min corrida Z2'}
+            ]
+        
+        return treinos[:self.athlete.dias_semana]
 
 
 class ExcelExporter:
     """Exporta planilhas de treinamento para Excel"""
     
-    def __init__(self, athlete: Athlete, training_plan: List[Dict], is_full_plan: bool = False):
+    def __init__(self, athlete: Athlete, training_plan: List[Dict], is_full_plan: bool = False, output_dir: Optional[str] = None):
         self.athlete = athlete
         self.training_plan = training_plan
         self.zones = TrainingZones(athlete.limiar_lactato, athlete.vo2_max)
         self.is_full_plan = is_full_plan
+        self.output_dir = output_dir
     
-    def export_to_excel(self, filename: str = None):
-        """Exporta o plano para Excel com formatação profissional"""
-        if filename is None:
+    def export_to_excel(self, filename: Optional[str] = None) -> str:
+        """Exporta o plano para Excel com formatação profissional.
+        
+        Args:
+            filename: Nome do arquivo (opcional)
+        
+        Returns:
+            Caminho completo do arquivo gerado
+        """
+        if not filename or filename == "":
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"Plano_Treinamento_{self.athlete.nome.replace(' ', '_')}_{timestamp}.xlsx"
+        
+        # Determinar diretório de saída
+        if self.output_dir:
+            filepath = os.path.join(self.output_dir, filename)
+        else:
+            # Comportamento padrão: data/exports
+            from pathlib import Path
+            project_root = Path(__file__).parent
+            export_dir = project_root / "data" / "exports"
+            export_dir.mkdir(parents=True, exist_ok=True)
+            filepath = str(export_dir / filename)
+        
+        # Usar filepath em vez de filename no código abaixo
+        filename = filepath
         
         # Criar DataFrame principal
         df_treinos = pd.DataFrame(self.training_plan)
@@ -1169,7 +1288,8 @@ class ExcelExporter:
                     adjusted_width = min(max_length + 2, 60)
                     worksheet.column_dimensions[column_letter].width = adjusted_width
         
-        return filename
+        # Retornar caminho absoluto
+        return os.path.abspath(filename)
 
 
 def main():
@@ -1705,7 +1825,7 @@ def main():
         if filename_custom and not filename_custom.endswith('.xlsx'):
             filename_custom += '.xlsx'
         
-        filename = exporter.export_to_excel(filename_custom if filename_custom else None)
+        filename = exporter.export_to_excel(filename_custom if filename_custom else "")
         print(f"\n✅ Planilha exportada com sucesso: {filename}")
         print(f"📂 Local: {os.path.abspath(filename)}")
     else:

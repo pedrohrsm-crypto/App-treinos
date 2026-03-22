@@ -172,7 +172,9 @@ class DistanciaStep(tk.Frame):
             'Triathlon': ['Sprint', 'Olímpico', 'Meio Ironman', 'Ironman'],
             'Corrida': ['5K', '10K', 'Meia Maratona', 'Maratona'],
             'Natação': ['1500m', '3000m', '5000m'],
-            'Ciclismo': ['40K', '80K', '160K']
+            'Ciclismo': ['40K', '80K', '160K'],
+            'Duathlon Natação e Corrida': ['Aquathlon Sprint', 'Aquathlon Olímpico', 'Aquathlon Longo'],
+            'Duathlon Ciclismo e Corrida': ['Duathlon Sprint', 'Duathlon Olímpico', 'Duathlon Longo', 'Duathlon Ironman']
         }
         
         # Distância

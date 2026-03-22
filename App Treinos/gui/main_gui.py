@@ -19,6 +19,12 @@ from gui.theme import theme
 from core.database import db_manager
 from gui.register_screen import RegisterScreen
 from gui.admin_panel import AdminPanel
+from gui.training_wizard import TrainingWizard
+from gui.training_list import TrainingListScreen
+from training_planner import TrainerInfo
+from pdf_exporter import PDFExporter
+from tkinter import filedialog
+from pathlib import Path
 
 
 class SplashScreen:
@@ -475,72 +481,101 @@ class DashboardScreen:
         self._create_content()
     
     def _create_header(self):
-        """Cria cabeçalho do dashboard."""
-        header = tk.Frame(self.frame, bg=theme.colors['bg_white'], height=100)
+        """Cria cabeçalho do dashboard com layout responsivo."""
+        # Header com altura ajustada
+        header = tk.Frame(self.frame, bg=theme.colors['bg_white'], height=120)
         header.pack(fill='x', side='top')
         header.pack_propagate(False)
         
-        # Container interno com padding
+        # Linha de separação inferior (sombra sutil)
+        separator = tk.Frame(header, bg=theme.colors['border_light'], height=2)
+        separator.pack(fill='x', side='bottom')
+        
+        # Container interno com padding adequado
         header_content = tk.Frame(header, bg=theme.colors['bg_white'])
-        header_content.pack(fill='both', expand=True, padx=40, pady=20)
+        header_content.pack(fill='both', expand=True, padx=40, pady=15)
         
-        # Logo e título à esquerda
+        # === LADO ESQUERDO: Logo e Título ===
         left_frame = tk.Frame(header_content, bg=theme.colors['bg_white'])
-        left_frame.pack(side='left')
+        left_frame.pack(side='left', fill='y')
         
-        tk.Label(
-            left_frame,
+        # Container para centralização vertical
+        left_content = tk.Frame(left_frame, bg=theme.colors['bg_white'])
+        left_content.pack(expand=True)
+        
+        # Logo
+        logo_label = tk.Label(
+            left_content,
             text="🏃",
-            font=(theme.fonts['primary'], 40),
+            font=(theme.fonts['primary'], 45),
             bg=theme.colors['bg_white'],
             fg=theme.colors['primary']
-        ).pack(side='left', padx=(0, 15))
+        )
+        logo_label.pack(side='left', padx=(0, 20))
         
-        title_frame = tk.Frame(left_frame, bg=theme.colors['bg_white'])
-        title_frame.pack(side='left')
+        # Títulos
+        title_frame = tk.Frame(left_content, bg=theme.colors['bg_white'])
+        title_frame.pack(side='left', fill='y')
+        
+        # Container para centralização vertical dos textos
+        title_content = tk.Frame(title_frame, bg=theme.colors['bg_white'])
+        title_content.pack(expand=True)
         
         tk.Label(
-            title_frame,
+            title_content,
             text="App Treinos",
             font=(theme.fonts['primary'], theme.font_sizes['heading'], 'bold'),
             bg=theme.colors['bg_white'],
             fg=theme.colors['text_primary']
-        ).pack(anchor='w')
+        ).pack(anchor='w', pady=(0, 2))
         
         tk.Label(
-            title_frame,
-            text="Sistema Profissional de Planejamento",
+            title_content,
+            text="Sistema Profissional de Planejamento Esportivo",
             font=(theme.fonts['primary'], theme.font_sizes['small']),
             bg=theme.colors['bg_white'],
             fg=theme.colors['text_secondary']
         ).pack(anchor='w')
         
-        # Info do usuário à direita
-        user_frame = tk.Frame(header_content, bg=theme.colors['bg_white'])
-        user_frame.pack(side='right')
+        # === LADO DIREITO: Info do Usuário e Logout ===
+        right_frame = tk.Frame(header_content, bg=theme.colors['bg_white'])
+        right_frame.pack(side='right', fill='y')
         
+        # Container para centralização vertical
+        right_content = tk.Frame(right_frame, bg=theme.colors['bg_white'])
+        right_content.pack(expand=True)
+        
+        # Informações do usuário
+        user_info_container = tk.Frame(right_content, bg=theme.colors['bg_white'])
+        user_info_container.pack(side='left', padx=(0, 25))
+        
+        # Ícone do usuário
         tk.Label(
-            user_frame,
+            user_info_container,
             text="👤",
-            font=(theme.fonts['primary'], 24),
+            font=(theme.fonts['primary'], 28),
             bg=theme.colors['bg_white'],
             fg=theme.colors['primary']
-        ).pack(side='left', padx=(0, 10))
+        ).pack(side='left', padx=(0, 12))
         
-        user_info = tk.Frame(user_frame, bg=theme.colors['bg_white'])
+        # Textos do usuário
+        user_info = tk.Frame(user_info_container, bg=theme.colors['bg_white'])
         user_info.pack(side='left')
         
         # Exibir nome do usuário ou credencial
         nome_usuario = self.credential.get('nome', 'Usuário') if isinstance(self.credential, dict) else 'Usuário'
         cref_usuario = self.credential.get('cref', '') if isinstance(self.credential, dict) else self.credential
         
+        # Truncar nome se muito longo
+        nome_exibicao = nome_usuario if len(nome_usuario) <= 30 else nome_usuario[:27] + '...'
+        
         tk.Label(
             user_info,
-            text=nome_usuario,
+            text=nome_exibicao,
             font=(theme.fonts['primary'], theme.font_sizes['body'], 'bold'),
             bg=theme.colors['bg_white'],
             fg=theme.colors['text_primary']
-        ).pack(anchor='e')
+        ).pack(anchor='e', pady=(0, 2))
         
         tk.Label(
             user_info,
@@ -549,124 +584,425 @@ class DashboardScreen:
             bg=theme.colors['bg_white'],
             fg=theme.colors['text_secondary']
         ).pack(anchor='e')
+        
+        # Separador vertical
+        separator_v = tk.Frame(
+            right_content, 
+            bg=theme.colors['border_medium'], 
+            width=2
+        )
+        separator_v.pack(side='left', fill='y', padx=15, pady=10)
+        
+        # Botão de logout com melhor alinhamento
+        logout_container = tk.Frame(right_content, bg=theme.colors['bg_white'])
+        logout_container.pack(side='left')
+        
+        logout_btn = tk.Button(
+            logout_container,
+            text="🚪  Sair",
+            font=(theme.fonts['primary'], theme.font_sizes['small'], 'bold'),
+            bg=theme.colors['bg_white'],
+            fg=theme.colors['error'],
+            activebackground=theme.colors['bg_secondary'],
+            activeforeground=theme.colors['error'],
+            relief='solid',
+            bd=1,
+            cursor='hand2',
+            command=self._logout
+        )
+        logout_btn.pack(side='left', padx=8, ipadx=15, ipady=8)
+        logout_btn.config(highlightbackground=theme.colors['error'], highlightthickness=0)
+        
+        # Efeito hover no botão logout
+        def on_logout_enter(e):
+            logout_btn.config(bg=theme.colors['error'], fg=theme.colors['text_light'])
+        
+        def on_logout_leave(e):
+            logout_btn.config(bg=theme.colors['bg_white'], fg=theme.colors['error'])
+        
+        logout_btn.bind('<Enter>', on_logout_enter)
+        logout_btn.bind('<Leave>', on_logout_leave)
     
     def _create_content(self):
         """Cria conteúdo principal com hero cards."""
         content = tk.Frame(self.frame, bg=theme.colors['bg_secondary'])
         content.pack(fill='both', expand=True, padx=40, pady=40)
         
-        # Título da seção
+        # Título da seção com saudação personalizada
+        nome_usuario = self.credential.get('nome', 'Profissional') if isinstance(self.credential, dict) else 'Profissional'
+        primeiro_nome = nome_usuario.split()[0] if nome_usuario else 'Profissional'
+        
         tk.Label(
             content,
-            text="O que você deseja fazer?",
+            text=f"Olá, {primeiro_nome}! O que você deseja fazer hoje?",
             font=(theme.fonts['primary'], theme.font_sizes['title'], 'bold'),
             bg=theme.colors['bg_secondary'],
             fg=theme.colors['text_primary']
-        ).pack(pady=(0, 30))
+        ).pack(pady=(0, 15))
+        
+        tk.Label(
+            content,
+            text="Escolha uma opção abaixo para começar",
+            font=(theme.fonts['primary'], theme.font_sizes['body']),
+            bg=theme.colors['bg_secondary'],
+            fg=theme.colors['text_secondary']
+        ).pack(pady=(0, 40))
         
         # Container para os cards
         cards_container = tk.Frame(content, bg=theme.colors['bg_secondary'])
         cards_container.pack(expand=True)
         
-        # Hero Card 1: Criar Treino
+        # Hero Card 1: Novo Plano
         self._create_hero_card(
             cards_container,
-            title="Criar Treino",
-            icon="➕",
-            description="Crie um novo plano de\ntreinamento personalizado",
+            title="Novo Plano",
+            icon="📋",
+            description="Crie um novo plano de treinamento personalizado para seu atleta",
             color=theme.colors['primary'],
             command=lambda: self._on_card_click('create')
-        ).pack(side='left', padx=20)
+        ).pack(side='left', padx=15)
         
-        # Hero Card 2: Editar Treino
+        # Hero Card 2: Editar Plano
         self._create_hero_card(
             cards_container,
-            title="Editar Treino",
-            icon="✏️",
-            description="Edite ou visualize planos\nde treinamento existentes",
-            color=theme.colors['analogous_2'],
+            title="Editar Plano",
+            icon="📝",
+            description="Visualize, edite ou exporte planos de treinamento já criados",
+            color=theme.colors['analogous_1'],
             command=lambda: self._on_card_click('edit')
-        ).pack(side='left', padx=20)
+        ).pack(side='left', padx=15)
+        
+        # Hero Card 3: Exportar PDF
+        self._create_hero_card(
+            cards_container,
+            title="Exportar PDF",
+            icon="📄",
+            description="Exporte planos de treinamento em formato PDF profissional",
+            color=theme.colors['triadic_1'],
+            command=lambda: self._on_card_click('export_pdf')
+        ).pack(side='left', padx=15)
+        
+        # Hero Card 3: Exportar PDF
+        self._create_hero_card(
+            cards_container,
+            title="Exportar PDF",
+            icon="📄",
+            description="Exporte planos de treinamento em formato PDF profissional",
+            color=theme.colors['triadic_1'],
+            command=lambda: self._on_card_click('export_pdf')
+        ).pack(side='left', padx=15)
     
     def _create_hero_card(self, parent, title, icon, description, color, command):
-        """Cria um hero card."""
+        """Cria um hero card moderno e interativo."""
+        # Container externo para sombra
+        card_wrapper = tk.Frame(
+            parent,
+            bg=theme.colors['bg_secondary'],
+            relief='flat',
+            bd=0
+        )
+        
         # Container do card
         card = tk.Frame(
-            parent,
+            card_wrapper,
             bg=theme.colors['bg_white'],
             relief='flat',
             bd=0,
             cursor='hand2'
         )
+        card.pack(padx=4, pady=4)  # Espaço para sombra
         
         # Configurar tamanho fixo
         card.config(width=theme.sizes['hero_card_width'], 
                    height=theme.sizes['hero_card_height'])
         card.pack_propagate(False)
         
-        # Adicionar sombra
-        card.config(highlightbackground=theme.colors['shadow_strong'],
+        # Borda arredondada (simulada)
+        card.config(highlightbackground=theme.colors['border_light'],
                    highlightthickness=2)
         
-        # Ícone
+        # Barra colorida no topo
+        top_bar = tk.Frame(card, bg=color, height=8)
+        top_bar.pack(fill='x', side='top')
+        top_bar.pack_propagate(False)
+        
+        # Container do conteúdo
+        content_frame = tk.Frame(card, bg=theme.colors['bg_white'])
+        content_frame.pack(fill='both', expand=True)
+        
+        # Ícone com círculo de fundo
+        icon_container = tk.Frame(content_frame, bg=theme.colors['bg_white'])
+        icon_container.pack(pady=(25, 10))
+        
+        # Círculo de fundo para o ícone
+        icon_bg = tk.Frame(
+            icon_container,
+            bg=theme.colors['bg_secondary'],
+            width=90,
+            height=90
+        )
+        icon_bg.pack_propagate(False)
+        icon_bg.pack()
+        
         icon_label = tk.Label(
-            card,
+            icon_bg,
             text=icon,
-            font=(theme.fonts['primary'], 64),
-            bg=theme.colors['bg_white'],
+            font=(theme.fonts['primary'], 48),
+            bg=theme.colors['bg_secondary'],
             fg=color
         )
-        icon_label.pack(pady=(30, 10))
+        icon_label.place(relx=0.5, rely=0.5, anchor='center')
         
         # Título
         title_label = tk.Label(
-            card,
+            content_frame,
             text=title,
             font=(theme.fonts['primary'], theme.font_sizes['card_title'], 'bold'),
             bg=theme.colors['bg_white'],
-            fg=theme.colors['text_primary']
+            fg=theme.colors['text_primary'],
+            wraplength=theme.sizes['hero_card_width'] - 40  # Deixa margem
         )
-        title_label.pack()
+        title_label.pack(pady=(5, 5))
         
-        # Descrição
+        # Descrição com wrap
         desc_label = tk.Label(
-            card,
+            content_frame,
             text=description,
             font=(theme.fonts['primary'], theme.font_sizes['small']),
             bg=theme.colors['bg_white'],
             fg=theme.colors['text_secondary'],
-            justify='center'
+            justify='center',
+            wraplength=theme.sizes['hero_card_width'] - 50  # Texto não corta
         )
-        desc_label.pack(pady=(5, 20))
+        desc_label.pack(pady=(0, 10), padx=10)
         
-        # Efeito hover
+        # Indicador "clique aqui"
+        action_label = tk.Label(
+            content_frame,
+            text="Clique para começar →",
+            font=(theme.fonts['primary'], theme.font_sizes['small'], 'bold'),
+            bg=theme.colors['bg_white'],
+            fg=color
+        )
+        action_label.pack(pady=(0, 10))
+        
+        # Efeito hover aprimorado
         def on_enter(e):
             card.config(bg=theme.colors['bg_tertiary'])
-            icon_label.config(bg=theme.colors['bg_tertiary'])
-            title_label.config(bg=theme.colors['bg_tertiary'])
+            content_frame.config(bg=theme.colors['bg_tertiary'])
+            icon_container.config(bg=theme.colors['bg_tertiary'])
+            icon_bg.config(bg=color)
+            icon_label.config(bg=color, fg=theme.colors['text_light'])
+            title_label.config(bg=theme.colors['bg_tertiary'], 
+                             font=(theme.fonts['primary'], theme.font_sizes['card_title'], 'bold underline'))
             desc_label.config(bg=theme.colors['bg_tertiary'])
+            action_label.config(bg=theme.colors['bg_tertiary'])
+            card.config(highlightbackground=color, highlightthickness=3)
         
         def on_leave(e):
             card.config(bg=theme.colors['bg_white'])
-            icon_label.config(bg=theme.colors['bg_white'])
-            title_label.config(bg=theme.colors['bg_white'])
+            content_frame.config(bg=theme.colors['bg_white'])
+            icon_container.config(bg=theme.colors['bg_white'])
+            icon_bg.config(bg=theme.colors['bg_secondary'])
+            icon_label.config(bg=theme.colors['bg_secondary'], fg=color)
+            title_label.config(bg=theme.colors['bg_white'],
+                             font=(theme.fonts['primary'], theme.font_sizes['card_title'], 'bold'))
             desc_label.config(bg=theme.colors['bg_white'])
+            action_label.config(bg=theme.colors['bg_white'])
+            card.config(highlightbackground=theme.colors['border_light'], highlightthickness=2)
         
-        # Bind eventos
-        for widget in [card, icon_label, title_label, desc_label]:
+        # Bind eventos para todos os widgets
+        for widget in [card, content_frame, icon_container, icon_bg, icon_label, 
+                      title_label, desc_label, action_label, top_bar]:
             widget.bind('<Enter>', on_enter)
             widget.bind('<Leave>', on_leave)
             widget.bind('<Button-1>', lambda e: command())
         
-        return card
+        return card_wrapper
     
     def _on_card_click(self, action):
         """Trata clique nos cards."""
-        self.frame.destroy()
         if action == 'create':
+            self.frame.destroy()
             self.on_create_training()
-        else:
+        elif action == 'edit':
+            self.frame.destroy()
             self.on_edit_training()
+        elif action == 'export_pdf':
+            self._show_pdf_export_dialog()
+    
+    def _logout(self):
+        """Realiza logout e volta para tela de login."""
+        resposta = messagebox.askyesno(
+            "Confirmar Logout",
+            "Tem certeza que deseja sair?\n\nVocê será redirecionado para a tela de login."
+        )
+        
+        if resposta:
+            self.frame.destroy()
+            LoginScreen(self.parent, lambda credential: DashboardScreen(
+                self.parent,
+                credential,
+                self.on_create_training,
+                self.on_edit_training
+            ))
+    
+    def _show_pdf_export_dialog(self):
+        """Mostra diálogo para exportação em PDF."""
+        # Criar janela de diálogo
+        dialog = tk.Toplevel(self.parent)
+        dialog.title("Exportar Plano em PDF")
+        dialog.geometry("600x400")
+        dialog.configure(bg=theme.colors['bg_secondary'])
+        dialog.resizable(False, False)
+        
+        # Centralizar janela
+        dialog.transient(self.parent)
+        dialog.grab_set()
+        
+        # Header
+        header = tk.Frame(dialog, bg=theme.colors['primary'], height=80)
+        header.pack(fill='x')
+        header.pack_propagate(False)
+        
+        tk.Label(
+            header,
+            text="📄 Exportar Plano em PDF",
+            font=(theme.fonts['primary'], theme.font_sizes['heading'], 'bold'),
+            bg=theme.colors['primary'],
+            fg=theme.colors['text_light']
+        ).pack(expand=True)
+        
+        # Content
+        content = tk.Frame(dialog, bg=theme.colors['bg_secondary'])
+        content.pack(fill='both', expand=True, padx=40, pady=30)
+        
+        tk.Label(
+            content,
+            text="Como deseja exportar o plano de treinamento?",
+            font=(theme.fonts['primary'], theme.font_sizes['body']),
+            bg=theme.colors['bg_secondary'],
+            fg=theme.colors['text_primary']
+        ).pack(pady=(0, 30))
+        
+        # Opção 1: Criar novo plano em PDF
+        option1_frame = tk.Frame(content, bg=theme.colors['bg_white'])
+        option1_frame.pack(fill='x', pady=(0, 15))
+        option1_frame.config(highlightbackground=theme.colors['border_light'], highlightthickness=1)
+        
+        option1_content = tk.Frame(option1_frame, bg=theme.colors['bg_white'])
+        option1_content.pack(fill='x', padx=20, pady=20)
+        
+        tk.Label(
+            option1_content,
+            text="🆕 Criar Novo Plano em PDF",
+            font=(theme.fonts['primary'], theme.font_sizes['body'], 'bold'),
+            bg=theme.colors['bg_white'],
+            fg=theme.colors['text_primary']
+        ).pack(anchor='w')
+        
+        tk.Label(
+            option1_content,
+            text="Crie um novo plano de treinamento e exporte diretamente em formato PDF profissional",
+            font=(theme.fonts['primary'], theme.font_sizes['small']),
+            bg=theme.colors['bg_white'],
+            fg=theme.colors['text_secondary'],
+            wraplength=480,
+            justify='left'
+        ).pack(anchor='w', pady=(5, 10))
+        
+        btn_new = tk.Button(
+            option1_content,
+            text="Criar Novo →",
+            font=(theme.fonts['primary'], theme.font_sizes['button']),
+            bg=theme.colors['primary'],
+            fg=theme.colors['text_light'],
+            activebackground=theme.colors['accent_hover'],
+            relief='flat',
+            cursor='hand2',
+            command=lambda: self._start_pdf_creation_wizard(dialog)
+        )
+        btn_new.pack(anchor='w', ipadx=15, ipady=5)
+        
+        # Opção 2: Converter Excel para PDF
+        option2_frame = tk.Frame(content, bg=theme.colors['bg_white'])
+        option2_frame.pack(fill='x', pady=(0, 15))
+        option2_frame.config(highlightbackground=theme.colors['border_light'], highlightthickness=1)
+        
+        option2_content = tk.Frame(option2_frame, bg=theme.colors['bg_white'])
+        option2_content.pack(fill='x', padx=20, pady=20)
+        
+        tk.Label(
+            option2_content,
+            text="🔄 Converter Plano Existente",
+            font=(theme.fonts['primary'], theme.font_sizes['body'], 'bold'),
+            bg=theme.colors['bg_white'],
+            fg=theme.colors['text_primary']
+        ).pack(anchor='w')
+        
+        tk.Label(
+            option2_content,
+            text="Selecione um plano Excel já criado e converta para PDF (em desenvolvimento)",
+            font=(theme.fonts['primary'], theme.font_sizes['small']),
+            bg=theme.colors['bg_white'],
+            fg=theme.colors['text_secondary'],
+            wraplength=480,
+            justify='left'
+        ).pack(anchor='w', pady=(5, 10))
+        
+        btn_convert = tk.Button(
+            option2_content,
+            text="Em breve",
+            font=(theme.fonts['primary'], theme.font_sizes['button']),
+            bg=theme.colors['text_light'],
+            fg=theme.colors['text_light'],
+            relief='flat',
+            state='disabled'
+        )
+        btn_convert.pack(anchor='w', ipadx=15, ipady=5)
+        
+        # Footer
+        footer = tk.Frame(dialog, bg=theme.colors['bg_secondary'])
+        footer.pack(fill='x', padx=40, pady=(0, 20))
+        
+        tk.Button(
+            footer,
+            text="Cancelar",
+            font=(theme.fonts['primary'], theme.font_sizes['button']),
+            bg=theme.colors['bg_white'],
+            fg=theme.colors['text_secondary'],
+            activebackground=theme.colors['bg_secondary'],
+            relief='solid',
+            bd=1,
+            cursor='hand2',
+            command=dialog.destroy
+        ).pack(side='right', ipadx=20, ipady=8)
+    
+    def _start_pdf_creation_wizard(self, dialog_window):
+        """Inicia wizard de criação com exportação em PDF."""
+        dialog_window.destroy()
+        
+        # Destruir dashboard atual
+        self.frame.destroy()
+        
+        # Criar TrainerInfo a partir das credenciais
+        trainer = TrainerInfo(
+            nome=self.credential['nome'],
+            cref=self.credential['cref'],
+            email=self.credential.get('email', '')
+        )
+        
+        # Criar wizard - na última etapa o usuário poderá escolher PDF
+        TrainingWizard(
+            self.parent,
+            trainer,
+            lambda: DashboardScreen(
+                self.parent,
+                self.credential,
+                self.on_create_training,
+                self.on_edit_training
+            )
+        )
 
 
 class AppTreinosGUI:
@@ -719,38 +1055,44 @@ class AppTreinosGUI:
     
     def _show_dashboard(self, credential):
         """Mostra dashboard."""
+        self.credential = credential
         DashboardScreen(
             self.root,
             credential,
-            self._show_create_training_wizard,
+            lambda: self._show_create_training_wizard(credential),
             self._show_edit_training
         )
     
-    def _show_create_training_wizard(self):
+    def _show_create_training_wizard(self, credential):
         """Mostra wizard de criação de treino."""
-        # TODO: Implementar wizard completo
-        # Por enquanto, mostrar mensagem
-        messagebox.showinfo(
-            "Criar Treino",
-            "O wizard completo de criação de treino será carregado aqui.\n\n"
-            "Incluirá as etapas:\n"
-            "1. Dados do Atleta\n"
-            "2. Modalidade e Disponibilidade\n"
-            "3. Objetivos e Metas\n"
-            "4. Geração do Plano"
+        # Criar TrainerInfo a partir das credenciais
+        trainer = TrainerInfo(
+            nome=credential['nome'],
+            cref=credential['cref'],
+            email=credential.get('email', '')
+        )
+        
+        # Criar wizard
+        TrainingWizard(
+            self.root,
+            trainer,
+            lambda: self._show_dashboard(credential)
         )
     
     def _show_edit_training(self):
-        """Mostra tela de edição de treino."""
-        # TODO: Implementar lista de treinos e edição
-        messagebox.showinfo(
-            "Editar Treino",
-            "A funcionalidade de edição será implementada em breve.\n\n"
-            "Permitirá:\n"
-            "• Listar treinos criados\n"
-            "• Editar treinos existentes\n"
-            "• Visualizar histórico\n"
-            "• Exportar relatórios"
+        """Mostra tela de listagem e edição de treinos."""
+        # Criar TrainerInfo a partir das credenciais
+        trainer_info = TrainerInfo(
+            nome=self.credential['nome'],
+            cref=self.credential['cref'],
+            email=self.credential.get('email', '')
+        )
+        
+        # Mostrar tela de listagem de treinos
+        TrainingListScreen(
+            self.root,
+            trainer_info,
+            lambda: self._show_dashboard(self.credential)
         )
     
     def run(self):

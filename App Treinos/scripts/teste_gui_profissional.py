@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
-from core.training_engine import TrainerInfo
+from training_planner import TrainerInfo
 
 
 def teste_validacao_cpf():

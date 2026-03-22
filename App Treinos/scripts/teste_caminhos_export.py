@@ -11,7 +11,7 @@ import sys
 # Adicionar diretório raiz ao path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from core.training_engine import Athlete, TrainingPlanGenerator, ExcelExporter
+from training_planner import Athlete, TrainingPlanGenerator, ExcelExporter
 
 
 def testar_caminhos():
