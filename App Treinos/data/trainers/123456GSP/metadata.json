@@ -1,0 +1,23 @@
+{
+  "plans": [
+    {
+      "id": "20260321_184323",
+      "athlete_name": "Maria Silva Atleta Teste",
+      "athlete_data": {
+        "nome": "Maria Silva Atleta Teste",
+        "idade": 30,
+        "genero": "Feminino",
+        "peso": 65.0,
+        "altura": 170.0,
+        "imc": 22.5
+      },
+      "sport": "Triathlon",
+      "distance": "Olímpica",
+      "weeks": 1,
+      "created_at": "2026-03-21T18:43:23.065275",
+      "excel_path": "D:\\GitHub\\App Treinos\\Python\\App Treinos\\data\\trainers\\123456GSP\\plans\\teste_export.xlsx",
+      "pdf_path": "D:\\GitHub\\App Treinos\\Python\\App Treinos\\data\\trainers\\123456GSP\\plans\\teste_export.pdf",
+      "last_modified": "2026-03-21T18:43:23.065280"
+    }
+  ]
+}
