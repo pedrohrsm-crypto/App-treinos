@@ -134,7 +134,8 @@ D:\GitHub\App Treinos\Python\App Treinos\
 | 27/03/2026 | `b1ee6ce` | — | Suite completa de testes (84 testes) |
 | 27/03/2026 | `468c3d5` | **v3.0.0** | Migração completa para Flet — UI atleta-cêntrica |
 | 28/03/2026 | `09c2897` | — | Fix: register_training no wizard + entry.details |
-| 28/03/2026 | *pendente* | — | Organização raiz, ícone, build executável ← **HEAD** |
+| 28/03/2026 | `71f1357` | — | Organização raiz, ícone, build executável |
+| 28/03/2026 | *pendente* | — | Limpeza: remover gui/ legado, scripts/docs redundantes, fix theme ← **HEAD** |
 
 ---
 
@@ -161,16 +162,25 @@ D:\GitHub\App Treinos\Python\App Treinos\
 - [x] Biblioteca de templates reutilizáveis
 - [x] Painel de administração de utilizadores
 - [x] Suporte multiplataforma (Windows, Linux, macOS)
-- [x] 189 testes automatizados passando (pytest)
+- [x] 192 testes automatizados passando (pytest)
 - [x] Ícone profissional (.ico + .png, múltiplas resoluções)
 - [x] Launchers: Windows (.bat), Linux/macOS (.sh), .desktop
 - [x] Build system (flet pack + PyInstaller) com ícone
-- [x] Documentação extensa (23+ arquivos em docs/)
+- [x] Documentação curada (9 documentos técnicos essenciais em docs/)
 
 ### Correções aplicadas em 28/03/2026
 
 - **training_wizard.py**: `register_training` era chamado com kwargs inválidos e retorno tratado como tuple — corrigido para `register_training(trainer_info, athlete)` → `TrainingRecord`
 - **progress.py**: campo `entry.detail` (sem 's') era sempre vazio — corrigido para `entry.details`
+
+### Limpeza aplicada em 28/03/2026
+
+- **gui/ removido** — Interface Tkinter legada (preservada em histórico Git)
+- **scripts/ limpo** — 15 scripts redundantes removidos (mantido `generate_icon.py`)
+- **docs/ limpo** — 13 documentos obsoletos removidos (mantidos 9 essenciais)
+- **core/archived/, docs/archived/, scripts/archived/ removidos** — Backups antigos
+- **theme.py corrigido** — Removido `surface_variant` (deprecated em Flet 0.83)
+- **Testes atualizados** — Referências a `gui/` migradas para `flet_app/` (192 testes)
 
 ---
 

@@ -448,13 +448,13 @@ class TestEstruturaProjeto:
     """Testes de integridade da estrutura de diretórios."""
 
     @pytest.mark.parametrize("subdir", [
-        "gui", "core", "data", "docs", "scripts", "linux", "macos",
+        "flet_app", "core", "data", "docs", "scripts", "linux", "macos", "assets",
     ])
     def test_diretorio_existe(self, subdir):
         assert (PROJECT_ROOT / subdir).is_dir()
 
     @pytest.mark.parametrize("arquivo", [
-        "App_Treinos_GUI.py",
+        "App_Treinos_Flet.py",
         "training_planner.py",
         "training_manager.py",
         "pdf_exporter.py",
@@ -463,10 +463,11 @@ class TestEstruturaProjeto:
     def test_arquivo_raiz_existe(self, arquivo):
         assert (PROJECT_ROOT / arquivo).is_file()
 
-    def test_gui_init_exporta_classes(self):
-        from gui import AppTreinosGUI, AccessibleTheme
-        assert AppTreinosGUI is not None
-        assert AccessibleTheme is not None
+    def test_flet_app_exporta_tema(self):
+        from flet_app.theme import LIGHT, DARK, build_theme
+        assert isinstance(LIGHT, dict)
+        assert isinstance(DARK, dict)
+        assert callable(build_theme)
 
     def test_core_init_exporta_classes(self):
         from core import Athlete, TrainerInfo, TrainingPlanGenerator

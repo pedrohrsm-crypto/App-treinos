@@ -118,7 +118,6 @@ def build_theme(dark: bool = False) -> ft.Theme:
             on_error=palette["text_light"],
             surface=palette["bg_white"],
             on_surface=palette["text_primary"],
-            surface_variant=palette["bg_secondary"],
             on_surface_variant=palette["text_secondary"],
         ),
         text_theme=ft.TextTheme(

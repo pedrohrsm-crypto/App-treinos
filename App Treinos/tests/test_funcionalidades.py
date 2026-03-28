@@ -405,56 +405,53 @@ class TestI18n:
 # ═══════════════════════════════════════════════════════════════════
 
 class TestModoEscuro:
-    """Toggle de tema e persistência de cores."""
+    """Toggle de tema e persistência de cores (Flet theme dicts)."""
 
     @pytest.fixture(autouse=True)
-    def fresh_theme(self):
-        """Cria theme limpo para cada teste."""
-        from gui.theme import AccessibleTheme
-        self.theme = AccessibleTheme()
+    def load_palettes(self):
+        """Carrega paletas LIGHT e DARK do tema Flet."""
+        from flet_app.theme import LIGHT, DARK, c, build_theme
+        self.light = LIGHT
+        self.dark = DARK
+        self.c = c
+        self.build_theme = build_theme
         yield
 
-    def test_tema_inicia_claro(self):
-        assert self.theme.is_dark() is False
+    def test_paleta_light_tem_chaves_essenciais(self):
+        for key in ['primary', 'bg_primary', 'text_primary', 'bg_secondary']:
+            assert key in self.light, f"Chave '{key}' ausente em LIGHT"
 
-    def test_toggle_para_escuro(self):
-        self.theme.toggle_dark_mode()
-        assert self.theme.is_dark() is True
-        assert self.theme.colors['bg_primary'] == '#1e2a30'
+    def test_paleta_dark_tem_chaves_essenciais(self):
+        for key in ['primary', 'bg_primary', 'text_primary', 'bg_secondary']:
+            assert key in self.dark, f"Chave '{key}' ausente em DARK"
 
-    def test_toggle_de_volta_claro(self):
-        original_bg = self.theme.colors['bg_primary']
-        self.theme.toggle_dark_mode()
-        self.theme.toggle_dark_mode()
-        assert self.theme.is_dark() is False
-        assert self.theme.colors['bg_primary'] == original_bg
+    def test_light_dark_mesmas_chaves(self):
+        assert set(self.light.keys()) == set(self.dark.keys())
 
-    def test_set_dark_mode_true(self):
-        self.theme.set_dark_mode(True)
-        assert self.theme.is_dark() is True
+    def test_dark_bg_primary_correto(self):
+        assert self.dark['bg_primary'] == '#1e2a30'
 
-    def test_set_dark_mode_false_nao_altera(self):
-        original_bg = self.theme.colors['bg_primary']
-        self.theme.set_dark_mode(False)
-        assert self.theme.is_dark() is False
-        assert self.theme.colors['bg_primary'] == original_bg
+    def test_light_bg_primary_diferente_dark(self):
+        assert self.light['bg_primary'] != self.dark['bg_primary']
 
     def test_cores_escuras_tem_contraste_minimo(self):
         """Cores de texto no modo escuro devem ter contraste suficiente contra bg."""
-        self.theme.toggle_dark_mode()
-        bg = self.theme.colors['bg_secondary']
-        fg = self.theme.colors['text_primary']
-        # Verificar que são cores razoavelmente distintas
+        bg = self.dark['bg_secondary']
+        fg = self.dark['text_primary']
         bg_r = int(bg[1:3], 16)
         fg_r = int(fg[1:3], 16)
         assert abs(fg_r - bg_r) > 100, "Contraste insuficiente no modo escuro"
 
-    def test_double_toggle_restaura_todas_cores(self):
-        original_colors = dict(self.theme.colors)
-        self.theme.toggle_dark_mode()
-        self.theme.toggle_dark_mode()
-        for key in ['primary', 'bg_primary', 'text_primary']:
-            assert self.theme.colors[key] == original_colors[key], f"Cor '{key}' não restaurada"
+    def test_funcao_c_retorna_cor_light(self):
+        assert self.c('primary', dark=False) == self.light['primary']
+
+    def test_funcao_c_retorna_cor_dark(self):
+        assert self.c('primary', dark=True) == self.dark['primary']
+
+    def test_build_theme_retorna_ft_theme(self):
+        import flet as ft
+        theme = self.build_theme(dark=False)
+        assert isinstance(theme, ft.Theme)
 
 
 # ═══════════════════════════════════════════════════════════════════

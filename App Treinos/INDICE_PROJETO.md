@@ -9,6 +9,7 @@
 - `build.py` — Gera executável standalone (flet pack + PyInstaller)
 - `AppTreinos.spec` — Spec PyInstaller
 - `training_planner.py` — CLI (modo terminal)
+- `dist/AppTreinos.exe` — Executável Windows (standalone)
 
 ### 🎨 Assets
 - `assets/icon.ico` — Ícone Windows (16–256px)
@@ -58,9 +59,6 @@
 - `i18n.py` — Internacionalização (PT-BR, EN, ES)
 - `version.py` — Versão semântica
 
-#### GUI Tkinter (Interface v2.0 — legado)
-- `gui/` — Interface anterior (mantido para referência)
-
 ### 📊 Dados
 - `data/exports/` — Planilhas exportadas
 - `data/trainers/` — Diretórios por treinador (CREF)
@@ -69,28 +67,19 @@
 ### 📖 Documentação
 - `HISTORICO_CONTEXTO.md` — Histórico completo do projeto
 - `README.md` — Visão geral
-- `docs/` — 23 documentos técnicos (periodização, ciclo menstrual, etc.)
+- `docs/` — Documentação técnica (periodização, ciclo menstrual, etc.)
 
-### 🧪 Testes Automatizados (189 testes)
-- `tests/test_app_treinos.py` — Testes de integração (74 testes)
-- `tests/test_funcionalidades.py` — Funcionalidades completas (84 testes)
-- `tests/test_flet_backend.py` — Backend Flet (31 testes)
+### 🧪 Testes Automatizados (192 testes)
+- `tests/test_app_treinos.py` — Testes de integração
+- `tests/test_funcionalidades.py` — Funcionalidades completas
+- `tests/test_flet_backend.py` — Backend Flet
 
-### 🧪 Scripts de Teste (Manuais)
-- `scripts/teste_estrutura.py` - Valida estrutura de pastas
-- `scripts/teste_validacao_profissional.py` - Testa validação CPF/CREF
-- `scripts/teste_gui_final.py` - Testa GUI completa
-- `scripts/teste_calculo_semanas.py` - Testa cálculo de datas
+### 🔧 Scripts Utilitários
+- `scripts/generate_icon.py` — Gerador de ícone do aplicativo
 
-### 🧪 Scripts de Demonstração
-- `scripts/demo_execucao_rapida.py` - Demo de uso rápido
-- `scripts/demo_melhorias_entrada.py` - Demo de validações
-- `scripts/exemplo_periodizacao.py` - Exemplo de periodização
-- `scripts/exemplo_calculo_automatico.py` - Exemplo de cálculo
-
-### 📦 Arquivados
-- `docs/archived/` - Documentação antiga (referência)
-- `scripts/archived/` - Scripts antigos (referência)
+### 🖥️ Plataformas
+- `linux/App_Treinos.desktop` — Atalho desktop Linux
+- `macos/` — Recursos macOS
 
 ## 🎯 Como Começar
 
@@ -104,60 +93,43 @@ pip install -r requirements.txt
 python App_Treinos_Flet.py
 ```
 
-### Executar GUI Tkinter (v2.0)
-```bash
-python gui/main_gui.py
-```
-ou duplo-clique em:
-- Windows: `App_Treinos_GUI.bat`
-- macOS: `App_Treinos.command`
-- Linux: `linux/App_Treinos.sh`
+### Executar como Software (Windows)
+Duplo clique em `AppTreinos.bat` ou `dist/AppTreinos.exe`
 
 ### Executar CLI
 ```bash
 python training_planner.py
 ```
 
+### Gerar Executável
+```bash
+python build.py --onefile
+```
+
 ## 📚 Documentação por Tópico
 
 ### Para Usuários
-1. **Como Executar** → `docs/COMO_EXECUTAR.md`
-2. **Interface Visual** → `docs/GUI_V2_DESIGN.md`
-3. **Identificação Profissional** → `docs/IDENTIFICACAO_PROFISSIONAL.md`
+1. **Identificação Profissional** → `docs/IDENTIFICACAO_PROFISSIONAL.md`
+2. **Periodização** → `docs/PERIODIZACAO_COMPLETA.md`
+3. **Ciclo Menstrual** → `docs/CICLO_MENSTRUAL.md`
 
 ### Para Desenvolvedores
-1. **Estrutura do Projeto** → `docs/ESTRUTURA_DIRETORIOS.md`
-2. **Compatibilidade** → `docs/COMPATIBILIDADE_MULTIPLATAFORMA.md`
-3. **Periodização** → `docs/PERIODIZACAO_COMPLETA.md`
-4. **Validações** → `docs/MENSAGENS_LIMITE_SISTEMA.md`
+1. **Novas Funcionalidades** → `docs/NOVAS_FUNCIONALIDADES.md`
+2. **Sistema de Autenticação** → `docs/SISTEMA_AUTENTICACAO.md`
+3. **Validações** → `docs/MENSAGENS_LIMITE_SISTEMA.md`
 
 ## 🔧 Manutenção
 
 ### Testes
 ```bash
-# Executar todos os testes (189)
-python -m pytest tests/ test_cli.py -v
+# Executar todos os testes (192)
+python -m pytest tests/ -v
 
-# Apenas testes do backend Flet (31)
+# Apenas testes do backend Flet
 python -m pytest tests/test_flet_backend.py -v
-
-# Testar estrutura
-python scripts/teste_estrutura.py
-
-# Testar validações
-python scripts/teste_validacao_profissional.py
-
-# Testar GUI
-python scripts/teste_gui_final.py
-```
-
-### Limpeza
-```bash
-# Remover cache Python
-python scripts/otimizar_projeto.py
 ```
 
 ---
 
 **Última atualização:** Julho 2025  
-**Versão:** 3.0
+**Versão:** 3.0.0
