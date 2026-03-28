@@ -24,6 +24,7 @@ from gui.training_list import TrainingListScreen
 from gui.modern_widgets import AnimatedButton, RoundedFrame, AnimatedCard, FadeTransition
 from training_planner import TrainerInfo
 from pdf_exporter import PDFExporter
+from version import __version__
 from tkinter import filedialog
 from pathlib import Path
 
@@ -988,7 +989,7 @@ class AppTreinosGUI:
     
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("App Treinos - Sistema de Planejamento Esportivo")
+        self.root.title(f"App Treinos v{__version__} - Sistema de Planejamento Esportivo")
         
         # Configurar tema
         theme.configure_ttk_style(self.root)
