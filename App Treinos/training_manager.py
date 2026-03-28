@@ -61,7 +61,13 @@ class TrainingManager:
         
         Returns:
             CREF normalizado (apenas números e letras)
+        
+        Raises:
+            ValueError: Se trainer_info for None ou CREF estiver vazio
         """
+        if trainer_info is None:
+            raise ValueError("trainer_info não pode ser None")
+        
         if hasattr(trainer_info, 'cref'):
             cref = trainer_info.cref
         elif isinstance(trainer_info, dict):
@@ -70,7 +76,12 @@ class TrainingManager:
             cref = str(trainer_info)
         
         # Normalizar CREF (remover caracteres especiais)
-        return ''.join(filter(str.isalnum, cref))
+        trainer_id = ''.join(filter(str.isalnum, cref))
+        
+        if not trainer_id:
+            raise ValueError("CREF do treinador não pode ser vazio")
+        
+        return trainer_id
     
     def _get_trainer_dir(self, trainer_info) -> Path:
         """

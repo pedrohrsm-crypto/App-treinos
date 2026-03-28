@@ -34,3 +34,6 @@ Thumbs.db
 # Exports (dados gerados)
 data/exports/*.xlsx
 data/exports/*.pdf
+
+# Dados de treinadores (gerados em runtime)
+data/trainers/
