@@ -259,6 +259,113 @@ _translations: Dict[str, Dict[str, str]] = {
         "en": "weeks",
         "es": "semanas",
     },
+
+    # ── Fitness / Integrações ────────────────────────────────────
+    "card_fitness": {
+        "pt": "Fitness & Saúde",
+        "en": "Fitness & Health",
+        "es": "Fitness y Salud",
+    },
+    "card_fitness_desc": {
+        "pt": "Conecte Strava ou Garmin e importe atividades dos seus atletas",
+        "en": "Connect Strava or Garmin and import your athletes' activities",
+        "es": "Conecta Strava o Garmin e importa actividades de tus atletas",
+    },
+    "fitness_title": {
+        "pt": "Integrações de Fitness",
+        "en": "Fitness Integrations",
+        "es": "Integraciones de Fitness",
+    },
+    "fitness_connected": {
+        "pt": "Conectado",
+        "en": "Connected",
+        "es": "Conectado",
+    },
+    "fitness_not_connected": {
+        "pt": "Não conectado",
+        "en": "Not connected",
+        "es": "No conectado",
+    },
+    "fitness_strava_desc": {
+        "pt": "Importe corridas, pedaladas e natação do Strava. Necessita de um app registado em strava.com/settings/api.",
+        "en": "Import runs, rides and swims from Strava. Requires an app registered at strava.com/settings/api.",
+        "es": "Importa carreras, pedaleos y natación de Strava. Requiere una app registrada en strava.com/settings/api.",
+    },
+    "fitness_connect_strava": {
+        "pt": "Conectar Strava",
+        "en": "Connect Strava",
+        "es": "Conectar Strava",
+    },
+    "fitness_import_activities": {
+        "pt": "Importar Atividades",
+        "en": "Import Activities",
+        "es": "Importar Actividades",
+    },
+    "fitness_strava_help": {
+        "pt": "ℹ️  Como obter Client ID e Secret? Acesse strava.com/settings/api",
+        "en": "ℹ️  How to get Client ID and Secret? Visit strava.com/settings/api",
+        "es": "ℹ️  ¿Cómo obtener Client ID y Secret? Visita strava.com/settings/api",
+    },
+    "fitness_garmin_desc": {
+        "pt": "Integração com Garmin Connect para importar atividades de relógios Garmin. A API oficial requer parceria comercial — em desenvolvimento.",
+        "en": "Garmin Connect integration to import activities from Garmin watches. Official API requires commercial partnership — in development.",
+        "es": "Integración con Garmin Connect para importar actividades de relojes Garmin. La API oficial requiere asociación comercial — en desarrollo.",
+    },
+    "fitness_coming_soon": {
+        "pt": "Em breve",
+        "en": "Coming soon",
+        "es": "Próximamente",
+    },
+    "fitness_imported_activities": {
+        "pt": "Atividades Importadas",
+        "en": "Imported Activities",
+        "es": "Actividades Importadas",
+    },
+    "fitness_auth_title": {
+        "pt": "Autorização Strava",
+        "en": "Strava Authorization",
+        "es": "Autorización Strava",
+    },
+    "fitness_auth_instructions": {
+        "pt": "Uma página do Strava foi aberta no navegador. Autorize o acesso e copie o código da URL de retorno (parâmetro 'code').",
+        "en": "A Strava page was opened in your browser. Authorize access and copy the code from the return URL ('code' parameter).",
+        "es": "Se abrió una página de Strava en el navegador. Autoriza el acceso y copia el código de la URL de retorno (parámetro 'code').",
+    },
+    "fitness_auth_code_label": {
+        "pt": "Código de autorização:",
+        "en": "Authorization code:",
+        "es": "Código de autorización:",
+    },
+    "fitness_error_title": {
+        "pt": "Erro",
+        "en": "Error",
+        "es": "Error",
+    },
+    "fitness_error_credentials": {
+        "pt": "Preencha o Client ID e Client Secret do Strava.",
+        "en": "Please fill in the Strava Client ID and Client Secret.",
+        "es": "Rellena el Client ID y Client Secret de Strava.",
+    },
+    "fitness_success_title": {
+        "pt": "Sucesso",
+        "en": "Success",
+        "es": "Éxito",
+    },
+    "fitness_success_connected": {
+        "pt": "Strava conectado com sucesso! Agora pode importar atividades.",
+        "en": "Strava connected successfully! You can now import activities.",
+        "es": "¡Strava conectado con éxito! Ahora puedes importar actividades.",
+    },
+    "fitness_import_success": {
+        "pt": "{count} atividades importadas com sucesso!",
+        "en": "{count} activities imported successfully!",
+        "es": "¡{count} actividades importadas con éxito!",
+    },
+    "fitness_no_activities": {
+        "pt": "Nenhuma atividade encontrada no Strava.",
+        "en": "No activities found on Strava.",
+        "es": "No se encontraron actividades en Strava.",
+    },
 }
 
 SUPPORTED_LANGUAGES = ("pt", "en", "es")

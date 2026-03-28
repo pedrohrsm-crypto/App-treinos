@@ -27,6 +27,7 @@ from pdf_exporter import PDFExporter
 from version import __version__
 from i18n import t
 from gui.progress_dashboard import ProgressDashboard
+from gui.fitness_screen import FitnessScreen
 from tkinter import filedialog
 from pathlib import Path
 
@@ -711,6 +712,16 @@ class DashboardScreen:
             color=theme.colors['triadic_2'],
             command=lambda: self._on_card_click('progress')
         ).pack(side='left', padx=15)
+
+        # Hero Card 5: Fitness & Saúde
+        self._create_hero_card(
+            cards_container,
+            title=t('card_fitness'),
+            icon="⌚",
+            description=t('card_fitness_desc'),
+            color=theme.colors['complementary'],
+            command=lambda: self._on_card_click('fitness')
+        ).pack(side='left', padx=15)
     
     def _create_hero_card(self, parent, title, icon, description, color, command):
         """Cria um hero card moderno e interativo com AnimatedCard."""
@@ -841,6 +852,8 @@ class DashboardScreen:
             self._show_pdf_export_dialog()
         elif action == 'progress':
             self._show_progress_dashboard()
+        elif action == 'fitness':
+            self._show_fitness_screen()
 
     def _show_progress_dashboard(self):
         """Abre o dashboard de progresso."""
@@ -851,6 +864,26 @@ class DashboardScreen:
         )
         self.frame.destroy()
         ProgressDashboard(
+            self.parent,
+            trainer_info,
+            self.credential,
+            lambda: DashboardScreen(
+                self.parent,
+                self.credential,
+                self.on_create_training,
+                self.on_edit_training,
+            ),
+        )
+
+    def _show_fitness_screen(self):
+        """Abre a tela de integração com APIs de fitness."""
+        trainer_info = TrainerInfo(
+            nome=self.credential.get('nome', ''),
+            cref=self.credential.get('cref', ''),
+            email=self.credential.get('email', ''),
+        )
+        self.frame.destroy()
+        FitnessScreen(
             self.parent,
             trainer_info,
             self.credential,

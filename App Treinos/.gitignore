@@ -37,3 +37,7 @@ data/exports/*.pdf
 
 # Dados de treinadores (gerados em runtime)
 data/trainers/
+
+# Tokens de APIs de fitness
+data/.strava_token.json
+data/.garmin_token.json
