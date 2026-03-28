@@ -146,7 +146,7 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
                 ),
                 width=130,
                 height=100,
-                alignment=ft.alignment.center,
+                alignment=ft.Alignment.CENTER,
                 border_radius=12,
                 bgcolor=color + "18",
                 on_click=_select,

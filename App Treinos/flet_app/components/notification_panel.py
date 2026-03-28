@@ -36,7 +36,7 @@ def build_notification_icon(page: ft.Page, dark: bool = False) -> ft.Container:
         border_radius=8,
         width=16,
         height=16,
-        alignment=ft.alignment.center,
+        alignment=ft.Alignment.CENTER,
         visible=count > 0,
     )
 

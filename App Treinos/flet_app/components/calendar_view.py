@@ -102,7 +102,7 @@ def calendar_view_screen(page: ft.Page, route: str) -> ft.View:
 
         # Header dos dias da semana
         header_row = ft.Row(
-            [ft.Container(ft.Text(d, size=12, weight=ft.FontWeight.W_600, text_align=ft.TextAlign.CENTER, color=c("text_secondary", dark)), width=90, alignment=ft.alignment.center) for d in DAY_HEADERS],
+            [ft.Container(ft.Text(d, size=12, weight=ft.FontWeight.W_600, text_align=ft.TextAlign.CENTER, color=c("text_secondary", dark)), width=90, alignment=ft.Alignment.CENTER) for d in DAY_HEADERS],
             spacing=2,
         )
         grid_column.controls.append(header_row)
@@ -253,7 +253,7 @@ def calendar_view_screen(page: ft.Page, route: str) -> ft.View:
                     content=cell_content,
                     width=90,
                     height=80,
-                    alignment=ft.alignment.top_center,
+                    alignment=ft.Alignment.TOP_CENTER,
                     border_radius=8,
                     bgcolor=bg,
                     border=ft.border.all(2, c("primary", dark)) if is_today else ft.border.all(1, c("border_light", dark)),
@@ -269,7 +269,7 @@ def calendar_view_screen(page: ft.Page, route: str) -> ft.View:
                 content=cell_content,
                 width=90,
                 height=80,
-                alignment=ft.alignment.top_center,
+                alignment=ft.Alignment.TOP_CENTER,
                 border_radius=8,
                 bgcolor=bg,
                 padding=ft.padding.only(top=4),

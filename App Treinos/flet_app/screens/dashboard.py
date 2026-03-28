@@ -73,7 +73,7 @@ def dashboard_view(page: ft.Page, route: str) -> ft.View:
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                         spacing=8,
                     ),
-                    alignment=ft.alignment.center,
+                    alignment=ft.Alignment.CENTER,
                     expand=True,
                 )
             )
