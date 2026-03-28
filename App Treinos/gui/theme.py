@@ -213,6 +213,73 @@ class AccessibleTheme:
         """Retorna cor para validação de campo."""
         return self.colors['success'] if is_valid else self.colors['error']
 
+    # ── Modo claro / escuro ──────────────────────────────────────
+
+    _dark_colors = {
+        # Cores principais mantidas — saturação reduzida para conforto
+        'primary': '#5fa8b8',
+        'complementary': '#b87060',
+        'analogous_1': '#5fb8a0',
+        'analogous_2': '#607db8',
+        'triadic_1': '#7060b8',
+        'triadic_2': '#b860a8',
+
+        # Fundos escuros
+        'bg_primary': '#1e2a30',
+        'bg_secondary': '#232f36',
+        'bg_tertiary': '#2a383f',
+        'bg_white': '#2e3c44',
+        'bg_card': '#2e3c44',
+
+        # Texto — mínimo 7:1 contraste sobre bg_secondary
+        'text_primary': '#e8eef0',
+        'text_secondary': '#a8bcc4',
+        'text_disabled': '#5c7078',
+        'text_light': '#e8eef0',
+
+        # Destaques
+        'accent_primary': '#5fa8b8',
+        'accent_hover': '#4e96a6',
+        'accent_active': '#3e8494',
+
+        # Estados
+        'success': '#5fb8a0',
+        'warning': '#b87060',
+        'error': '#b86060',
+        'info': '#607db8',
+
+        # Bordas e sombras
+        'border_light': '#3a4e58',
+        'border_medium': '#4a6068',
+        'border_dark': '#5fa8b8',
+        'shadow': '#182228',
+        'shadow_strong': '#101a1e',
+    }
+
+    _light_colors = None  # Inicializado no primeiro toggle
+
+    def is_dark(self) -> bool:
+        """Retorna True se o tema escuro está ativo."""
+        return getattr(self, '_is_dark', False)
+
+    def toggle_dark_mode(self):
+        """Alterna entre modo claro e escuro."""
+        if not self.is_dark():
+            # Salvar cores claras para restaurar depois
+            if self._light_colors is None:
+                AccessibleTheme._light_colors = dict(self.colors)
+            self.colors.update(self._dark_colors)
+            self._is_dark = True
+        else:
+            if self._light_colors is not None:
+                self.colors.update(self._light_colors)
+            self._is_dark = False
+
+    def set_dark_mode(self, dark: bool):
+        """Define modo claro (False) ou escuro (True)."""
+        if dark != self.is_dark():
+            self.toggle_dark_mode()
+
 
 # Instância global do tema
 theme = AccessibleTheme()

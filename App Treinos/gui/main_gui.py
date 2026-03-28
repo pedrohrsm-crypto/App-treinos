@@ -624,6 +624,24 @@ class DashboardScreen:
             command=self._logout
         )
         logout_btn.pack(side='left', padx=8)
+
+        # Botão de modo escuro
+        dark_icon = "🌙" if not theme.is_dark() else "☀️"
+        dark_btn = AnimatedButton(
+            logout_container,
+            text=dark_icon,
+            font=(theme.fonts['primary'], theme.font_sizes['body']),
+            bg_color=theme.colors['bg_white'],
+            fg_color=theme.colors['text_secondary'],
+            hover_bg=theme.colors['bg_tertiary'],
+            hover_fg=theme.colors['text_primary'],
+            active_bg=theme.colors['bg_tertiary'],
+            corner_radius=8,
+            padding_x=10,
+            padding_y=8,
+            command=self._toggle_theme
+        )
+        dark_btn.pack(side='left', padx=4)
     
     def _create_content(self):
         """Cria conteúdo principal com hero cards."""
@@ -843,7 +861,18 @@ class DashboardScreen:
                 self.on_edit_training,
             ),
         )
-    
+
+    def _toggle_theme(self):
+        """Alterna entre modo claro e escuro recriando o dashboard."""
+        theme.toggle_dark_mode()
+        self.frame.destroy()
+        DashboardScreen(
+            self.parent,
+            self.credential,
+            self.on_create_training,
+            self.on_edit_training,
+        )
+
     def _logout(self):
         """Realiza logout e volta para tela de login."""
         resposta = messagebox.askyesno(
