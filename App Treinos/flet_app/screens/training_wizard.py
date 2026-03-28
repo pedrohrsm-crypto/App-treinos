@@ -542,42 +542,21 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
             full_plan = generator.get_full_training_plan()
 
             # Register via training_manager
-            success, result = training_manager.register_training(
-                trainer=app_state.trainer_info(),
-                athlete_name=athlete.nome,
-                athlete_data={
-                    "idade": athlete.idade,
-                    "peso": athlete.peso,
-                    "altura": athlete.altura,
-                    "genero": athlete.genero,
-                    "imc": athlete.imc,
-                },
-                sport=athlete.esporte,
-                distance=athlete.distancia_prova,
-                weeks=athlete.semanas_ate_prova,
-                sessions=full_plan,
+            record = training_manager.register_training(trainer_info, athlete)
+
+            # Map to calendar
+            training_manager.map_sessions_to_calendar(
+                trainer_info, record.id, full_plan,
+                datetime.now().strftime("%Y-%m-%d"),
             )
 
-            if success:
-                # Map to calendar
-                plan_id = result  # register_training returns plan_id on success
-                training_manager.map_sessions_to_calendar(
-                    trainer=app_state.trainer_info(),
-                    plan_id=plan_id,
-                    sessions=full_plan,
-                    start_date=datetime.now().strftime("%Y-%m-%d"),
-                )
-
-                page.open(ft.SnackBar(
-                    ft.Text(f"✅ Plano criado com sucesso! ({len(full_plan)} sessões)"),
-                    bgcolor=c("success", dark),
-                ))
-                # Navigate to athlete dashboard
-                app_state.selected_athlete = athlete.nome
-                page.go(f"/athlete/{athlete.nome}")
-            else:
-                error_text.value = f"Erro ao registar: {result}"
-                page.update()
+            page.open(ft.SnackBar(
+                ft.Text(f"✅ Plano criado com sucesso! ({len(full_plan)} sessões)"),
+                bgcolor=c("success", dark),
+            ))
+            # Navigate to athlete dashboard
+            app_state.selected_athlete = athlete.nome
+            page.go(f"/athlete/{athlete.nome}")
 
         except Exception as ex:
             error_text.value = f"Erro: {ex}"

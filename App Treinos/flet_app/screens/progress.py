@@ -72,7 +72,7 @@ def progress_view(page: ft.Page, route: str) -> ft.View:
     for entry in changelog[:20]:
         action = entry.action if hasattr(entry, "action") else str(entry)
         ts = entry.timestamp if hasattr(entry, "timestamp") else ""
-        detail = entry.detail if hasattr(entry, "detail") else ""
+        detail = entry.details if hasattr(entry, "details") else ""
         log_items.append(
             ft.Container(
                 content=ft.Row([
