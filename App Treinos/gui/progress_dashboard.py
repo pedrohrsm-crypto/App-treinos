@@ -111,6 +111,7 @@ class ProgressDashboard:
         self._create_stats_row(self.scroll_frame)
         self._create_sports_chart(self.scroll_frame)
         self._create_recent_plans(self.scroll_frame)
+        self._create_changelog_section(self.scroll_frame)
 
         if not self.plans:
             self._create_empty_state(self.scroll_frame)
@@ -344,6 +345,69 @@ class ProgressDashboard:
             fg=theme.colors['text_secondary'],
         ).pack(side='right')
 
+    # ── Histórico de alterações ──────────────────────────────────
+
+    def _create_changelog_section(self, parent):
+        changelog = training_manager.get_changelog(self.trainer_info, limit=20)
+        if not changelog:
+            return
+
+        section = RoundedFrame(
+            parent,
+            bg_color=theme.colors['bg_white'],
+            corner_radius=12,
+            shadow_color=theme.colors['shadow'],
+            shadow_offset=3,
+        )
+        section.pack(fill='x', pady=(0, 20), padx=8)
+
+        inner = tk.Frame(section.frame, bg=theme.colors['bg_white'])
+        inner.pack(fill='x', padx=25, pady=20)
+
+        tk.Label(
+            inner,
+            text="Histórico de Alterações",
+            font=(theme.fonts['primary'], theme.font_sizes['subheading'], 'bold'),
+            bg=theme.colors['bg_white'],
+            fg=theme.colors['text_primary'],
+        ).pack(anchor='w', pady=(0, 15))
+
+        action_icons = {
+            'created': '🆕',
+            'deleted': '🗑️',
+            'exported': '📤',
+            'updated': '✏️',
+        }
+
+        for entry in changelog:
+            row = tk.Frame(inner, bg=theme.colors['bg_secondary'], padx=12, pady=8)
+            row.pack(fill='x', pady=2)
+
+            icon = action_icons.get(entry.action, '📝')
+            tk.Label(
+                row,
+                text=icon,
+                font=(theme.fonts['primary'], 14),
+                bg=theme.colors['bg_secondary'],
+            ).pack(side='left', padx=(0, 10))
+
+            tk.Label(
+                row,
+                text=entry.details,
+                font=(theme.fonts['primary'], theme.font_sizes['small']),
+                bg=theme.colors['bg_secondary'],
+                fg=theme.colors['text_primary'],
+                anchor='w',
+            ).pack(side='left', fill='x', expand=True)
+
+            tk.Label(
+                row,
+                text=self._format_datetime(entry.timestamp),
+                font=(theme.fonts['primary'], theme.font_sizes['small']),
+                bg=theme.colors['bg_secondary'],
+                fg=theme.colors['text_secondary'],
+            ).pack(side='right')
+
     # ── Estado vazio ─────────────────────────────────────────────
 
     def _create_empty_state(self, parent):
@@ -381,6 +445,15 @@ class ProgressDashboard:
         try:
             dt = datetime.fromisoformat(iso_str)
             return dt.strftime("%d/%m/%Y")
+        except (ValueError, TypeError):
+            return "—"
+
+    def _format_datetime(self, iso_str):
+        if not iso_str:
+            return "—"
+        try:
+            dt = datetime.fromisoformat(iso_str)
+            return dt.strftime("%d/%m/%Y %H:%M")
         except (ValueError, TypeError):
             return "—"
 

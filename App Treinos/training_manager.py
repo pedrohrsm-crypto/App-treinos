@@ -34,6 +34,18 @@ class TrainingRecord:
         return asdict(self)
 
 
+@dataclass
+class ChangeLogEntry:
+    """Entrada no histórico de alterações de um plano."""
+    timestamp: str
+    action: str       # 'created', 'updated', 'exported', 'deleted'
+    details: str
+    plan_id: Optional[str] = None
+
+    def to_dict(self):
+        return asdict(self)
+
+
 class TrainingManager:
     """Gerenciador de treinos por profissional."""
     
@@ -163,7 +175,51 @@ class TrainingManager:
                 json.dump(metadata, f, indent=2, ensure_ascii=False)
         except Exception as e:
             print(f"❌ Erro ao salvar metadados: {e}")
-    
+
+    def _get_changelog_path(self, trainer_info) -> Path:
+        """Obtém caminho do arquivo de changelog."""
+        trainer_dir = self._get_trainer_dir(trainer_info)
+        return trainer_dir / "changelog.json"
+
+    def _log_change(self, trainer_info, action: str, details: str, plan_id: Optional[str] = None):
+        """Registra uma entrada no histórico de alterações."""
+        path = self._get_changelog_path(trainer_info)
+        entries = []
+        if path.exists():
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    entries = json.load(f)
+            except Exception:
+                entries = []
+
+        entry = ChangeLogEntry(
+            timestamp=datetime.now().isoformat(),
+            action=action,
+            details=details,
+            plan_id=plan_id,
+        )
+        entries.append(entry.to_dict())
+
+        try:
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(entries, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"⚠️ Erro ao salvar changelog: {e}")
+
+    def get_changelog(self, trainer_info, limit: int = 50) -> List[ChangeLogEntry]:
+        """Obtém as últimas entradas do histórico de alterações."""
+        path = self._get_changelog_path(trainer_info)
+        if not path.exists():
+            return []
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                raw = json.load(f)
+            entries = [ChangeLogEntry(**e) for e in raw]
+            entries.sort(key=lambda e: e.timestamp, reverse=True)
+            return entries[:limit]
+        except Exception:
+            return []
+
     def register_training(self, trainer_info, athlete, excel_path: Optional[str] = None, 
                          pdf_path: Optional[str] = None) -> TrainingRecord:
         """
@@ -210,6 +266,13 @@ class TrainingManager:
         
         # Salvar metadados
         self._save_metadata(trainer_info, metadata)
+
+        self._log_change(
+            trainer_info,
+            action='created',
+            details=f"Plano criado para {athlete.nome} ({athlete.esporte}, {athlete.distancia_prova})",
+            plan_id=training_id,
+        )
         
         return record
     
@@ -307,6 +370,14 @@ class TrainingManager:
         
         # Salvar metadados atualizados
         self._save_metadata(trainer_info, metadata)
+
+        athlete_name = plan_found.get('athlete_name', 'desconhecido')
+        self._log_change(
+            trainer_info,
+            action='deleted',
+            details=f"Plano de {athlete_name} removido",
+            plan_id=plan_id,
+        )
         
         return True, "Plano deletado com sucesso!"
     
@@ -343,6 +414,18 @@ class TrainingManager:
         
         # Salvar metadados
         self._save_metadata(trainer_info, metadata)
+
+        parts = []
+        if excel_path:
+            parts.append('Excel')
+        if pdf_path:
+            parts.append('PDF')
+        self._log_change(
+            trainer_info,
+            action='exported',
+            details=f"Exportado {', '.join(parts)} do plano",
+            plan_id=plan_id,
+        )
         
         return True
     
