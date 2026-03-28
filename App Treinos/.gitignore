@@ -41,3 +41,8 @@ data/trainers/
 # Tokens de APIs de fitness
 data/.strava_token.json
 data/.garmin_token.json
+
+# Build artifacts (PyInstaller)
+build/
+dist/
+*.spec.bak
