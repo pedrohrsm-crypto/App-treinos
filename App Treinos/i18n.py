@@ -366,6 +366,201 @@ _translations: Dict[str, Dict[str, str]] = {
         "en": "No activities found on Strava.",
         "es": "No se encontraron actividades en Strava.",
     },
+
+    # ── Calendário ───────────────────────────────────────────────
+    "calendar_title": {
+        "pt": "Calendário de Treino",
+        "en": "Training Calendar",
+        "es": "Calendario de Entrenamiento",
+    },
+    "calendar_today": {
+        "pt": "Hoje",
+        "en": "Today",
+        "es": "Hoy",
+    },
+    "calendar_sessions": {
+        "pt": "{count} sessão(ões)",
+        "en": "{count} session(s)",
+        "es": "{count} sesión(es)",
+    },
+    "calendar_no_data": {
+        "pt": "Nenhum treino mapeado para este mês.",
+        "en": "No training mapped for this month.",
+        "es": "Ningún entrenamiento mapeado para este mes.",
+    },
+
+    # ── Editor de treino ─────────────────────────────────────────
+    "editor_title": {
+        "pt": "Editar Treino",
+        "en": "Edit Workout",
+        "es": "Editar Entrenamiento",
+    },
+    "editor_save": {
+        "pt": "Salvar",
+        "en": "Save",
+        "es": "Guardar",
+    },
+    "editor_cancel": {
+        "pt": "Cancelar",
+        "en": "Cancel",
+        "es": "Cancelar",
+    },
+    "editor_reset": {
+        "pt": "Restaurar gerado",
+        "en": "Reset to generated",
+        "es": "Restaurar generado",
+    },
+    "editor_copy": {
+        "pt": "Copiar para outro dia",
+        "en": "Copy to another day",
+        "es": "Copiar a otro día",
+    },
+    "editor_saved": {
+        "pt": "Treino atualizado.",
+        "en": "Workout updated.",
+        "es": "Entrenamiento actualizado.",
+    },
+    "editor_deleted": {
+        "pt": "Sessão removida.",
+        "en": "Session removed.",
+        "es": "Sesión eliminada.",
+    },
+    "workout_moved": {
+        "pt": "Treino movido.",
+        "en": "Workout moved.",
+        "es": "Entrenamiento movido.",
+    },
+    "workout_undo": {
+        "pt": "Desfazer",
+        "en": "Undo",
+        "es": "Deshacer",
+    },
+
+    # ── Templates ────────────────────────────────────────────────
+    "templates_title": {
+        "pt": "Templates de Treino",
+        "en": "Workout Templates",
+        "es": "Plantillas de Entrenamiento",
+    },
+    "templates_my": {
+        "pt": "Meus Templates",
+        "en": "My Templates",
+        "es": "Mis Plantillas",
+    },
+    "templates_system": {
+        "pt": "Templates do Sistema",
+        "en": "System Templates",
+        "es": "Plantillas del Sistema",
+    },
+    "templates_new": {
+        "pt": "Novo Template",
+        "en": "New Template",
+        "es": "Nueva Plantilla",
+    },
+    "templates_created": {
+        "pt": "Template criado.",
+        "en": "Template created.",
+        "es": "Plantilla creada.",
+    },
+    "templates_deleted": {
+        "pt": "Template removido.",
+        "en": "Template removed.",
+        "es": "Plantilla eliminada.",
+    },
+    "templates_use": {
+        "pt": "Usar template",
+        "en": "Use template",
+        "es": "Usar plantilla",
+    },
+
+    # ── Notificações ─────────────────────────────────────────────
+    "notifications_title": {
+        "pt": "Notificações",
+        "en": "Notifications",
+        "es": "Notificaciones",
+    },
+    "notifications_empty": {
+        "pt": "Sem notificações pendentes.",
+        "en": "No pending notifications.",
+        "es": "Sin notificaciones pendientes.",
+    },
+    "notification_training_today": {
+        "pt": "Treino hoje — {athlete}",
+        "en": "Training today — {athlete}",
+        "es": "Entrenamiento hoy — {athlete}",
+    },
+    "notification_training_tomorrow": {
+        "pt": "Treino amanhã — {athlete}",
+        "en": "Training tomorrow — {athlete}",
+        "es": "Entrenamiento mañana — {athlete}",
+    },
+    "notification_deadline": {
+        "pt": "Prova próxima — {athlete}",
+        "en": "Race approaching — {athlete}",
+        "es": "Competencia próxima — {athlete}",
+    },
+    "notification_inactive": {
+        "pt": "Atleta inativo — {athlete}",
+        "en": "Inactive athlete — {athlete}",
+        "es": "Atleta inactivo — {athlete}",
+    },
+
+    # ── Wizard ───────────────────────────────────────────────────
+    "wizard_title": {
+        "pt": "Novo Plano de Treino",
+        "en": "New Training Plan",
+        "es": "Nuevo Plan de Entrenamiento",
+    },
+    "wizard_step_athlete": {
+        "pt": "Dados do Atleta",
+        "en": "Athlete Data",
+        "es": "Datos del Atleta",
+    },
+    "wizard_step_sport": {
+        "pt": "Desporto",
+        "en": "Sport",
+        "es": "Deporte",
+    },
+    "wizard_step_period": {
+        "pt": "Período",
+        "en": "Period",
+        "es": "Período",
+    },
+    "wizard_step_distance": {
+        "pt": "Distância",
+        "en": "Distance",
+        "es": "Distancia",
+    },
+    "wizard_step_days": {
+        "pt": "Dias",
+        "en": "Days",
+        "es": "Días",
+    },
+    "wizard_step_review": {
+        "pt": "Revisão",
+        "en": "Review",
+        "es": "Revisión",
+    },
+    "wizard_generate": {
+        "pt": "Gerar Plano",
+        "en": "Generate Plan",
+        "es": "Generar Plan",
+    },
+    "wizard_plan_created": {
+        "pt": "Plano criado com sucesso! ({count} sessões)",
+        "en": "Plan created successfully! ({count} sessions)",
+        "es": "¡Plan creado con éxito! ({count} sesiones)",
+    },
+    "wizard_next": {
+        "pt": "Próximo",
+        "en": "Next",
+        "es": "Siguiente",
+    },
+    "wizard_back": {
+        "pt": "Voltar",
+        "en": "Back",
+        "es": "Volver",
+    },
 }
 
 SUPPORTED_LANGUAGES = ("pt", "en", "es")

@@ -469,6 +469,300 @@ class TrainingManager:
             'latest_plan': plans[0].created_at if plans else None
         }
 
+    def get_athletes_summary(self, trainer_info) -> List[Dict]:
+        """
+        Agrupa planos por atleta para exibição em hero cards.
+
+        Returns:
+            Lista de dicts, um por atleta, ordenada por última atividade:
+            {
+                'athlete_name': str,
+                'athlete_data': dict,          # dados do plano mais recente
+                'plans': [TrainingRecord, ...], # todos os planos do atleta
+                'latest_sport': str,
+                'total_weeks': int,             # soma de semanas de todos os planos
+                'current_week': int,            # semana atual do plano mais recente
+                'status': str,                  # 'active' | 'completed'
+            }
+        """
+        plans = self.get_trainer_plans(trainer_info)
+
+        groups: Dict[str, List[TrainingRecord]] = {}
+        for p in plans:
+            groups.setdefault(p.athlete_name, []).append(p)
+
+        result = []
+        now = datetime.now()
+        for name, athlete_plans in groups.items():
+            # planos já ordenados (mais recente primeiro)
+            latest = athlete_plans[0]
+            total_weeks = sum(p.weeks for p in athlete_plans)
+
+            # Calcular semana atual do plano mais recente
+            try:
+                created = datetime.fromisoformat(latest.created_at)
+                elapsed_days = (now - created).days
+                current_week = min(max(elapsed_days // 7 + 1, 1), latest.weeks)
+            except (ValueError, TypeError):
+                current_week = 1
+
+            status = "completed" if current_week >= latest.weeks else "active"
+
+            result.append({
+                'athlete_name': name,
+                'athlete_data': latest.athlete_data,
+                'plans': athlete_plans,
+                'latest_sport': latest.sport,
+                'total_weeks': total_weeks,
+                'current_week': current_week,
+                'status': status,
+            })
+
+        # Ordenar: ativos primeiro, depois por data do plano mais recente
+        result.sort(key=lambda a: (a['status'] != 'active', a['plans'][0].created_at), reverse=False)
+        # inverter para que ativos (False < True) fiquem primeiro
+        result.sort(key=lambda a: (a['status'] != 'active',))
+
+        return result
+
+    # ── Calendário & Overrides ───────────────────────────────────
+
+    def _get_calendar_path(self, trainer_info, plan_id: str) -> Path:
+        """Caminho do ficheiro de calendário de um plano."""
+        return self._get_plans_dir(trainer_info) / f"{plan_id}_calendar.json"
+
+    def _get_overrides_path(self, trainer_info, plan_id: str) -> Path:
+        """Caminho do ficheiro de overrides de treinos."""
+        return self._get_plans_dir(trainer_info) / f"{plan_id}_overrides.json"
+
+    def map_sessions_to_calendar(
+        self, trainer_info, plan_id: str,
+        sessions: List[Dict], start_date: str
+    ) -> Dict[str, List[Dict]]:
+        """
+        Mapeia sessões de treino para datas concretas de calendário.
+
+        Args:
+            trainer_info: Informações do treinador
+            plan_id: ID do plano
+            sessions: Lista de sessões de get_full_training_plan()
+                      Cada sessão: {dia, modalidade, duracao, tipo, zona, descricao, semana, fase, tipo_semana}
+            start_date: Data de início no formato ISO (YYYY-MM-DD)
+
+        Returns:
+            Dict[str(YYYY-MM-DD), List[session_dict]]
+        """
+        from datetime import date, timedelta
+
+        day_map = {
+            'Segunda': 0, 'Terça': 1, 'Quarta': 2,
+            'Quinta': 3, 'Sexta': 4, 'Sábado': 5, 'Domingo': 6,
+        }
+
+        base = date.fromisoformat(start_date)
+        # Alinhar ao início da semana (segunda)
+        base_monday = base - timedelta(days=base.weekday())
+
+        calendar: Dict[str, List[Dict]] = {}
+
+        for session in sessions:
+            week_num = session.get('semana', 1)
+            day_name = session.get('dia', 'Segunda')
+            day_offset = day_map.get(day_name, 0)
+
+            target_date = base_monday + timedelta(weeks=week_num - 1, days=day_offset)
+            key = target_date.isoformat()
+
+            calendar.setdefault(key, []).append(session)
+
+        # Persistir
+        cal_path = self._get_calendar_path(trainer_info, plan_id)
+        try:
+            with open(cal_path, 'w', encoding='utf-8') as f:
+                json.dump(calendar, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"⚠️ Erro ao salvar calendário: {e}")
+
+        return calendar
+
+    def get_calendar(self, trainer_info, plan_id: str) -> Dict[str, List[Dict]]:
+        """Carrega calendário persistido de um plano."""
+        cal_path = self._get_calendar_path(trainer_info, plan_id)
+        if cal_path.exists():
+            try:
+                with open(cal_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return {}
+
+    def save_workout_override(
+        self, trainer_info, plan_id: str, date_key: str, session_index: int, data: Dict
+    ) -> bool:
+        """
+        Salva uma edição manual (override) de um treino num dia específico.
+
+        Args:
+            date_key: 'YYYY-MM-DD'
+            session_index: índice da sessão nesse dia
+            data: dict com campos editados (tipo, zona, duracao, descricao, modalidade)
+        """
+        path = self._get_overrides_path(trainer_info, plan_id)
+        overrides = {}
+        if path.exists():
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    overrides = json.load(f)
+            except Exception:
+                overrides = {}
+
+        overrides.setdefault(date_key, {})
+        overrides[date_key][str(session_index)] = data
+
+        try:
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(overrides, f, indent=2, ensure_ascii=False)
+            return True
+        except Exception:
+            return False
+
+    def get_workout_for_date(
+        self, trainer_info, plan_id: str, date_key: str
+    ) -> List[Dict]:
+        """
+        Retorna sessões de um dia, aplicando overrides sobre o calendário base.
+        """
+        calendar = self.get_calendar(trainer_info, plan_id)
+        base_sessions = [dict(s) for s in calendar.get(date_key, [])]
+
+        # Aplicar overrides
+        path = self._get_overrides_path(trainer_info, plan_id)
+        if path.exists():
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    overrides = json.load(f)
+                day_overrides = overrides.get(date_key, {})
+                for idx_str, changes in day_overrides.items():
+                    idx = int(idx_str)
+                    if 0 <= idx < len(base_sessions):
+                        base_sessions[idx].update(changes)
+            except Exception:
+                pass
+
+        return base_sessions
+
+    def reset_workout_override(
+        self, trainer_info, plan_id: str, date_key: str, session_index: Optional[int] = None
+    ) -> bool:
+        """
+        Remove override(s) de um dia (volta ao treino gerado automaticamente).
+
+        Se session_index é None, remove todos os overrides do dia.
+        """
+        path = self._get_overrides_path(trainer_info, plan_id)
+        if not path.exists():
+            return True
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                overrides = json.load(f)
+        except Exception:
+            return True
+
+        if date_key not in overrides:
+            return True
+
+        if session_index is None:
+            del overrides[date_key]
+        else:
+            overrides[date_key].pop(str(session_index), None)
+            if not overrides[date_key]:
+                del overrides[date_key]
+
+        try:
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(overrides, f, indent=2, ensure_ascii=False)
+            return True
+        except Exception:
+            return False
+
+    def move_workout(
+        self, trainer_info, plan_id: str,
+        from_date: str, session_index: int, to_date: str
+    ) -> bool:
+        """
+        Move uma sessão de um dia para outro (drag & drop).
+
+        Persiste como overrides: remove sessão do dia origem,
+        adiciona ao dia destino.
+        """
+        calendar = self.get_calendar(trainer_info, plan_id)
+        from_sessions = calendar.get(from_date, [])
+
+        if session_index < 0 or session_index >= len(from_sessions):
+            return False
+
+        session = from_sessions.pop(session_index)
+        calendar.setdefault(to_date, []).append(session)
+
+        # Re-persistir calendário completo
+        cal_path = self._get_calendar_path(trainer_info, plan_id)
+        try:
+            with open(cal_path, 'w', encoding='utf-8') as f:
+                json.dump(calendar, f, indent=2, ensure_ascii=False)
+            return True
+        except Exception:
+            return False
+
+    # ── Templates de Treino ──────────────────────────────────────
+
+    def _get_templates_path(self, trainer_info) -> Path:
+        """Caminho do ficheiro de templates do treinador."""
+        return self._get_plans_dir(trainer_info) / "templates.json"
+
+    def get_templates(self, trainer_info) -> List[Dict]:
+        """Carrega todos os templates do treinador."""
+        path = self._get_templates_path(trainer_info)
+        if path.exists():
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return []
+
+    def save_template(self, trainer_info, template: Dict) -> bool:
+        """
+        Salva um novo template de treino.
+
+        template: {name, sport, type, zone, duration, modality, description}
+        """
+        templates = self.get_templates(trainer_info)
+        template["id"] = f"tmpl_{datetime.now().strftime('%Y%m%d%H%M%S')}_{len(templates)}"
+        template["created_at"] = datetime.now().isoformat()
+        templates.append(template)
+
+        path = self._get_templates_path(trainer_info)
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(templates, f, indent=2, ensure_ascii=False)
+            return True
+        except Exception:
+            return False
+
+    def delete_template(self, trainer_info, template_id: str) -> bool:
+        """Remove um template pelo ID."""
+        templates = self.get_templates(trainer_info)
+        templates = [t for t in templates if t.get("id") != template_id]
+
+        path = self._get_templates_path(trainer_info)
+        try:
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(templates, f, indent=2, ensure_ascii=False)
+            return True
+        except Exception:
+            return False
+
 
 # Instância global
 training_manager = TrainingManager()

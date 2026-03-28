@@ -3,21 +3,54 @@
 ## 📁 Estrutura Principal
 
 ### 🚀 Executáveis
-- `App_Treinos_GUI.bat` - Executável Windows (GUI)
-- `App_Treinos_GUI.py` - Launcher Python (GUI)
+- `App_Treinos_Flet.py` - Launcher Flet (v3.0 — recomendado)
+- `App_Treinos_GUI.bat` - Executável Windows (GUI Tkinter)
+- `App_Treinos_GUI.py` - Launcher Python (GUI Tkinter)
 - `App_Treinos.bat` - Executável Windows (CLI)
 - `training_planner.py` - Aplicação CLI principal
 
 ### 💻 Código Fonte
 
-#### GUI (Interface Gráfica)
-- `gui/main_gui.py` - **Interface principal unificada**
+#### Flet (Interface v3.0)
+- `flet_app/main.py` - **Ponto de entrada + rotas**
+- `flet_app/theme.py` - Tema visual (cores, tipografia)
+- `flet_app/state.py` - Estado global (AppState)
+- `flet_app/router.py` - Navegação entre ecrãs
+
+##### Ecrãs (`flet_app/screens/`)
+- `splash.py` - Splash screen
+- `login.py` - Autenticação de treinador
+- `register.py` - Registo de novo treinador
+- `dashboard.py` - Painel principal (hero cards)
+- `athlete_dashboard.py` - Dashboard individual do atleta
+- `training_wizard.py` - Wizard de criação de plano (6 passos)
+- `templates.py` - Biblioteca de templates
+- `progress.py` - Estatísticas e changelog
+- `fitness.py` - Integração Strava/Garmin
+- `config.py` - Configurações
+- `admin.py` - Administração
+
+##### Componentes (`flet_app/components/`)
+- `nav_bar.py` - Barra de navegação inferior
+- `athlete_card.py` - Hero card de atleta
+- `plan_card.py` - Card de plano de treino
+- `calendar_view.py` - Calendário mensal + drag & drop
+- `workout_editor.py` - Editor inline de treino
+- `template_card.py` - Card de template
+- `notification_panel.py` - Painel de notificações
+
+##### Serviços (`flet_app/services/`)
+- `notification_engine.py` - Motor de notificações
+
+#### GUI Tkinter (Interface v2.0 — legado)
+- `gui/main_gui.py` - Interface principal unificada
 - `gui/theme.py` - Paleta de cores e estilos
-- `gui/wizard_steps.py` - Etapas do wizard (placeholder)
+- `gui/wizard_steps.py` - Etapas do wizard
 
 #### Core (Lógica de Negócio)
 - `core/training_engine.py` - Engine de geração de treinos
 - `training_planner.py` - CLI e lógica principal
+- `training_manager.py` - Gestão de planos, calendário, templates
 
 ### 📊 Dados
 - `data/exports/` - Planilhas exportadas
@@ -41,7 +74,12 @@
 - `docs/ESTRUTURA_DIRETORIOS.md` - Organização de pastas
 - `docs/UNIFICACAO_GUI.md` - Unificação da interface
 
-### 🧪 Scripts de Teste (Ativos)
+### 🧪 Testes Automatizados
+- `tests/test_funcionalidades.py` - 158 testes (inserção, i18n, modo escuro, fitness, etc.)
+- `tests/test_flet_backend.py` - 31 testes (summary, calendário, overrides, templates, notificações)
+- `tests/test_app_treinos.py` - Testes de integração
+
+### 🧪 Scripts de Teste (Manuais)
 - `scripts/teste_estrutura.py` - Valida estrutura de pastas
 - `scripts/teste_validacao_profissional.py` - Testa validação CPF/CREF
 - `scripts/teste_gui_final.py` - Testa GUI completa
@@ -64,7 +102,12 @@
 pip install -r requirements.txt
 ```
 
-### Executar GUI
+### Executar Interface Flet (v3.0)
+```bash
+python App_Treinos_Flet.py
+```
+
+### Executar GUI Tkinter (v2.0)
 ```bash
 python gui/main_gui.py
 ```
@@ -95,6 +138,12 @@ python training_planner.py
 
 ### Testes
 ```bash
+# Executar todos os testes (189)
+python -m pytest tests/ test_cli.py -v
+
+# Apenas testes do backend Flet (31)
+python -m pytest tests/test_flet_backend.py -v
+
 # Testar estrutura
 python scripts/teste_estrutura.py
 
@@ -113,5 +162,5 @@ python scripts/otimizar_projeto.py
 
 ---
 
-**Última atualização:** 18/03/2026  
-**Versão:** 2.0
+**Última atualização:** Julho 2025  
+**Versão:** 3.0
