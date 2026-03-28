@@ -1,83 +1,80 @@
-# 📚 Índice do Projeto - App Treinos
+# 📚 Índice do Projeto — App Treinos v3.0.0
 
 ## 📁 Estrutura Principal
 
-### 🚀 Executáveis
-- `App_Treinos_Flet.py` - Launcher Flet (v3.0 — recomendado)
-- `App_Treinos_GUI.bat` - Executável Windows (GUI Tkinter)
-- `App_Treinos_GUI.py` - Launcher Python (GUI Tkinter)
-- `App_Treinos.bat` - Executável Windows (CLI)
-- `training_planner.py` - Aplicação CLI principal
+### 🚀 Executáveis e Launchers
+- `App_Treinos_Flet.py` — **Launcher principal** (Flet v3.0)
+- `AppTreinos.bat` — Launcher Windows (duplo clique)
+- `AppTreinos.sh` — Launcher Linux/macOS
+- `build.py` — Gera executável standalone (flet pack + PyInstaller)
+- `AppTreinos.spec` — Spec PyInstaller
+- `training_planner.py` — CLI (modo terminal)
+
+### 🎨 Assets
+- `assets/icon.ico` — Ícone Windows (16–256px)
+- `assets/icon.png` — Ícone alta resolução (512px)
+- `assets/icon-192.png` — Ícone web/mobile (192px)
 
 ### 💻 Código Fonte
 
-#### Flet (Interface v3.0)
-- `flet_app/main.py` - **Ponto de entrada + rotas**
-- `flet_app/theme.py` - Tema visual (cores, tipografia)
-- `flet_app/state.py` - Estado global (AppState)
-- `flet_app/router.py` - Navegação entre ecrãs
+#### Flet (Interface v3.0 — ativa)
+- `flet_app/main.py` — **Ponto de entrada + 13 rotas**
+- `flet_app/theme.py` — Tema visual (cores, tipografia, modo escuro)
+- `flet_app/state.py` — Estado global (AppState)
+- `flet_app/router.py` — Navegação entre ecrãs
 
 ##### Ecrãs (`flet_app/screens/`)
-- `splash.py` - Splash screen
-- `login.py` - Autenticação de treinador
-- `register.py` - Registo de novo treinador
-- `dashboard.py` - Painel principal (hero cards)
-- `athlete_dashboard.py` - Dashboard individual do atleta
-- `training_wizard.py` - Wizard de criação de plano (6 passos)
-- `templates.py` - Biblioteca de templates
-- `progress.py` - Estatísticas e changelog
-- `fitness.py` - Integração Strava/Garmin
-- `config.py` - Configurações
-- `admin.py` - Administração
+- `splash.py` — Splash screen animado
+- `login.py` — Autenticação de treinador
+- `register.py` — Registo de novo treinador
+- `dashboard.py` — Painel principal (hero cards + busca)
+- `athlete_dashboard.py` — Dashboard individual do atleta
+- `training_wizard.py` — Wizard de criação de plano (6 passos)
+- `templates.py` — Biblioteca de templates
+- `progress.py` — Estatísticas e changelog
+- `fitness.py` — Integração Strava/Garmin
+- `config.py` — Configurações (tema, idioma, logout)
+- `admin.py` — Administração de utilizadores
 
 ##### Componentes (`flet_app/components/`)
-- `nav_bar.py` - Barra de navegação inferior
-- `athlete_card.py` - Hero card de atleta
-- `plan_card.py` - Card de plano de treino
-- `calendar_view.py` - Calendário mensal + drag & drop
-- `workout_editor.py` - Editor inline de treino
-- `template_card.py` - Card de template
-- `notification_panel.py` - Painel de notificações
+- `nav_bar.py` — Barra de navegação inferior
+- `athlete_card.py` — Hero card de atleta
+- `plan_card.py` — Card de plano de treino
+- `calendar_view.py` — Calendário mensal + drag & drop
+- `workout_editor.py` — Editor modal de treino
+- `template_card.py` — Card de template
+- `notification_panel.py` — Painel de notificações (bell icon + BottomSheet)
 
 ##### Serviços (`flet_app/services/`)
-- `notification_engine.py` - Motor de notificações
-
-#### GUI Tkinter (Interface v2.0 — legado)
-- `gui/main_gui.py` - Interface principal unificada
-- `gui/theme.py` - Paleta de cores e estilos
-- `gui/wizard_steps.py` - Etapas do wizard
+- `notification_engine.py` — Motor de notificações inteligente
 
 #### Core (Lógica de Negócio)
-- `core/training_engine.py` - Engine de geração de treinos
-- `training_planner.py` - CLI e lógica principal
-- `training_manager.py` - Gestão de planos, calendário, templates
+- `core/training_engine.py` — Engine de geração de treinos
+- `core/database.py` — SQLite/MySQL + autenticação
+- `training_planner.py` — CLI + classes base (Athlete, TrainerInfo, HealthIssue)
+- `training_manager.py` — Gestão de planos, calendário, templates, changelog
+- `fitness_connectors.py` — Conectores Strava/Garmin
+- `pdf_exporter.py` — Exportação PDF profissional (reportlab)
+- `i18n.py` — Internacionalização (PT-BR, EN, ES)
+- `version.py` — Versão semântica
+
+#### GUI Tkinter (Interface v2.0 — legado)
+- `gui/` — Interface anterior (mantido para referência)
 
 ### 📊 Dados
-- `data/exports/` - Planilhas exportadas
-- `requirements.txt` - Dependências Python
+- `data/exports/` — Planilhas exportadas
+- `data/trainers/` — Diretórios por treinador (CREF)
+- `requirements.txt` — Dependências Python
 
-### 📖 Documentação Ativa
+### 📖 Documentação
+- `HISTORICO_CONTEXTO.md` — Histórico completo do projeto
+- `README.md` — Visão geral
+- `docs/` — 23 documentos técnicos (periodização, ciclo menstrual, etc.)
 
-#### Guias de Uso
-- `docs/COMO_EXECUTAR.md` - Como executar o app
-- `docs/GUI_V2_DESIGN.md` - Design da interface v2.0
-- `docs/IDENTIFICACAO_PROFISSIONAL.md` - Sistema de autenticação
-
-#### Funcionalidades
-- `docs/PERIODIZACAO_COMPLETA.md` - Sistema de periodização
-- `docs/CICLO_MENSTRUAL.md` - Adaptação ao ciclo menstrual
-- `docs/CALCULO_AUTOMATICO_SEMANAS.md` - Cálculo de semanas
-- `docs/MENSAGENS_LIMITE_SISTEMA.md` - Validações e limites
-
-#### Técnicos
-- `docs/COMPATIBILIDADE_MULTIPLATAFORMA.md` - Windows, macOS, Linux
-- `docs/ESTRUTURA_DIRETORIOS.md` - Organização de pastas
-- `docs/UNIFICACAO_GUI.md` - Unificação da interface
-
-### 🧪 Testes Automatizados
-- `tests/test_funcionalidades.py` - 158 testes (inserção, i18n, modo escuro, fitness, etc.)
-- `tests/test_flet_backend.py` - 31 testes (summary, calendário, overrides, templates, notificações)
-- `tests/test_app_treinos.py` - Testes de integração
+### 🧪 Testes Automatizados (189 testes)
+- `tests/test_app_treinos.py` — Testes de integração (74 testes)
+- `tests/test_funcionalidades.py` — Funcionalidades completas (84 testes)
+- `tests/test_flet_backend.py` — Backend Flet (31 testes)
 
 ### 🧪 Scripts de Teste (Manuais)
 - `scripts/teste_estrutura.py` - Valida estrutura de pastas

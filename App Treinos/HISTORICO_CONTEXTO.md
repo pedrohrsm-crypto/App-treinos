@@ -1,15 +1,15 @@
 # Histórico de Contexto — App Treinos
 
 **Última atualização:** 28/03/2026  
-**Versão atual:** 2.0  
+**Versão atual:** 3.0.0  
 **Branch:** main  
-**Último commit:** `e0cc841` — "Add GUI modernization documentation" (22/03/2026)
+**Último commit:** `09c2897` — "fix: corrigir chamada register_training no wizard e typo entry.details no progress" (28/03/2026)
 
 ---
 
 ## 1. O Que É o Projeto
 
-App Treinos é um **planejador inteligente de treinos esportivos** com interface gráfica, voltado para profissionais de Educação Física. Gera planilhas personalizadas de treinamento para 6 modalidades:
+App Treinos é um **planejador inteligente de treinos esportivos** com interface gráfica moderna (Flet/Flutter), voltado para profissionais de Educação Física. Gera planilhas personalizadas de treinamento para 6 modalidades:
 
 - Corrida
 - Ciclismo
@@ -19,13 +19,20 @@ App Treinos é um **planejador inteligente de treinos esportivos** com interface
 - Duathlon (Ciclismo + Corrida)
 
 ### Diferenciais
-- Interface gráfica acessível (WCAG AAA, contraste 21:1)
+- Interface Flet moderna (material design, animações, mobile-ready)
 - Wizard de 6 passos para criação de treinos
+- Dashboard atleta-cêntrico com hero cards
+- Calendário mensal interativo com drag & drop
 - Adaptação automática ao ciclo menstrual
 - Sistema de saúde com IA (HealthAdvisor)
 - Periodização de 1 a 52 semanas
 - Isolamento de dados por profissional (CREF)
 - Exportação para Excel e PDF profissional
+- Integração Strava/Garmin
+- Sistema de notificações inteligente
+- Modo escuro / claro
+- Internacionalização (PT-BR, EN, ES)
+- Empacotamento como executável standalone
 
 ---
 
@@ -33,93 +40,137 @@ App Treinos é um **planejador inteligente de treinos esportivos** com interface
 
 ```
 D:\GitHub\App Treinos\Python\App Treinos\
-├── App_Treinos_GUI.py          # Launcher principal (GUI)
-├── App_Treinos_GUI.bat         # Launcher Windows (duplo clique)
-├── App_Treinos.bat             # Launcher CLI (Windows)
-├── App_Treinos.command         # Launcher CLI (macOS)
-├── training_planner.py         # Motor CLI + classes base (Athlete, TrainerInfo, HealthIssue, etc.)
-├── training_manager.py         # Gerenciador de treinos por profissional
-├── pdf_exporter.py             # Exportação PDF profissional (reportlab)
-├── test_cli.py                 # Testes CLI
-├── requirements.txt            # pandas, openpyxl, reportlab
 │
-├── core/
-│   ├── training_engine.py      # Motor de geração de treinos (duplicado do training_planner.py)
-│   ├── database.py             # Banco de dados SQLite/MySQL + autenticação
-│   └── archived/               # Backup do engine anterior
+├── App_Treinos_Flet.py         # ★ Launcher principal (Flet v3.0)
+├── AppTreinos.bat              # Launcher Windows (duplo clique)
+├── AppTreinos.sh               # Launcher Linux/macOS
+├── build.py                    # Script de build (flet pack + PyInstaller)
+├── AppTreinos.spec             # Spec PyInstaller
+├── version.py                  # Versão semântica (3.0.0)
+├── requirements.txt            # Dependências Python
 │
-├── gui/
-│   ├── main_gui.py             # Janela principal (AppTreinosGUI)
-│   ├── theme.py                # Tema acessível (AccessibleTheme)
-│   ├── wizard_steps.py         # Passos do wizard (6 etapas)
-│   ├── training_wizard.py      # Controlador do wizard
-│   ├── modern_widgets.py       # Widgets modernos (AnimatedButton, AnimatedCard, etc.)
-│   ├── training_list.py        # Lista de treinos
-│   ├── register_screen.py      # Tela de cadastro
-│   └── admin_panel.py          # Painel administrativo
+├── assets/                     # ★ Ícones e assets visuais
+│   ├── icon.ico                # Ícone Windows (16-256px)
+│   ├── icon.png                # Ícone alta resolução (512px)
+│   └── icon-192.png            # Ícone web/mobile (192px)
+│
+├── flet_app/                   # ★ Interface Flet (v3.0)
+│   ├── main.py                 # Ponto de entrada + 13 rotas
+│   ├── theme.py                # Tema visual (cores, tipografia)
+│   ├── state.py                # Estado global (AppState)
+│   ├── router.py               # Navegação entre ecrãs
+│   ├── screens/                # 11 ecrãs
+│   │   ├── splash.py           # Splash screen animado
+│   │   ├── login.py            # Autenticação
+│   │   ├── register.py         # Registo de treinador
+│   │   ├── dashboard.py        # Painel principal (hero cards)
+│   │   ├── athlete_dashboard.py# Dashboard individual do atleta
+│   │   ├── training_wizard.py  # Wizard 6 passos
+│   │   ├── templates.py        # Biblioteca de templates
+│   │   ├── progress.py         # Estatísticas e changelog
+│   │   ├── fitness.py          # Integração Strava/Garmin
+│   │   ├── config.py           # Configurações (tema, idioma)
+│   │   └── admin.py            # Administração de utilizadores
+│   ├── components/             # 7 componentes reutilizáveis
+│   │   ├── nav_bar.py          # Barra de navegação inferior
+│   │   ├── athlete_card.py     # Hero card de atleta
+│   │   ├── plan_card.py        # Card de plano de treino
+│   │   ├── calendar_view.py    # Calendário mensal + drag & drop
+│   │   ├── workout_editor.py   # Editor inline de treino
+│   │   ├── template_card.py    # Card de template
+│   │   └── notification_panel.py # Painel de notificações
+│   └── services/
+│       └── notification_engine.py # Motor de notificações
+│
+├── core/                       # Lógica de negócio
+│   ├── training_engine.py      # Motor de geração de treinos
+│   └── database.py             # SQLite/MySQL + autenticação
+│
+├── training_planner.py         # CLI + classes base (Athlete, TrainerInfo, etc.)
+├── training_manager.py         # Gestão de planos, calendário, templates
+├── pdf_exporter.py             # Exportação PDF (reportlab)
+├── fitness_connectors.py       # Conectores Strava/Garmin
+├── i18n.py                     # Internacionalização (PT-BR, EN, ES)
+│
+├── gui/                        # Interface Tkinter (v2.0 — legado)
+│   ├── main_gui.py, theme.py, wizard_steps.py, ...
+│
+├── tests/                      # ★ 189 testes automatizados
+│   ├── test_app_treinos.py     # Testes de integração
+│   ├── test_funcionalidades.py # 84 testes funcionalidades
+│   └── test_flet_backend.py    # 31 testes backend Flet
 │
 ├── data/
-│   ├── app_treinos.db          # Banco SQLite
-│   ├── exports/                # Planilhas exportadas (7 arquivos de exemplo)
+│   ├── exports/                # Planilhas exportadas
 │   └── trainers/               # Diretórios por treinador (CREF)
-│       └── 123456GSP/          # Exemplo: CREF 123456-G/SP
 │
-├── docs/                       # 23 arquivos de documentação
-├── scripts/                    # 16 scripts de teste e utilidades
-├── linux/                      # Scripts de instalação/execução Linux
-└── macos/                      # Scripts de instalação/execução macOS
+├── docs/                       # 23 documentos técnicos
+├── scripts/                    # Scripts utilitários + gerador de ícone
+├── linux/                      # Launcher + .desktop Linux
+└── macos/                      # Scripts macOS
 ```
 
 ---
 
 ## 3. Histórico de Commits
 
-| Data | Commit | Descrição |
-|---|---|---|
-| 12/03/2026 | `e252a92` | Arquivos base — estrutura inicial do projeto |
-| 13/03/2026 | `5cf00a0` | Atualizações de 13/03 |
-| 19/03/2026 | `bd9cade` | GUI e sistema de identificação profissional |
-| 22/03/2026 | `2f68ba7` | Refatoração completa: remover duplicação, adicionar novos recursos |
-| 22/03/2026 | `1d576e7` | Modernização GUI: animações, bordas arredondadas, efeitos hover |
-| 22/03/2026 | `599a271` | Modernização GUI (continuação) |
-| 22/03/2026 | `e0cc841` | Documentação da modernização da GUI ← **HEAD** |
+| Data | Commit | Versão | Descrição |
+|---|---|---|---|
+| 12/03/2026 | `e252a92` | — | Arquivos base — estrutura inicial |
+| 13/03/2026 | `5cf00a0` | — | Atualizações de 13/03 |
+| 19/03/2026 | `bd9cade` | — | GUI e sistema de identificação profissional |
+| 22/03/2026 | `2f68ba7` | — | Refatoração completa: remover duplicação |
+| 22/03/2026 | `1d576e7` | — | Modernização GUI: animações, bordas arredondadas |
+| 22/03/2026 | `599a271` | — | Modernização GUI (continuação) |
+| 22/03/2026 | `e0cc841` | — | Documentação da modernização da GUI |
+| 27/03/2026 | `6fdcb21` | — | Dívida técnica: unificação, testes, .gitignore |
+| 27/03/2026 | `7489aee` | **v2.0.0** | CI/CD pipeline e versionamento semântico |
+| 27/03/2026 | `05f922f` | — | Dashboard de progresso com estatísticas |
+| 27/03/2026 | `c9eaa01` | — | Histórico de alterações (changelog) |
+| 27/03/2026 | `11c04e5` | — | Internacionalização (PT-BR, EN, ES) |
+| 27/03/2026 | `4610042` | — | Modo escuro acessível |
+| 27/03/2026 | `c733bac` | — | Integração Strava/Garmin |
+| 27/03/2026 | `b69cf9f` | **v2.1.0** | Empacotamento PyInstaller + bump v2.1.0 |
+| 27/03/2026 | `b1ee6ce` | — | Suite completa de testes (84 testes) |
+| 27/03/2026 | `468c3d5` | **v3.0.0** | Migração completa para Flet — UI atleta-cêntrica |
+| 28/03/2026 | `09c2897` | — | Fix: register_training no wizard + entry.details |
+| 28/03/2026 | *pendente* | — | Organização raiz, ícone, build executável ← **HEAD** |
 
 ---
 
-## 4. Estado Atual (Onde Paramos)
+## 4. Estado Atual (28/03/2026)
 
 ### O que está PRONTO (✅)
 
 - [x] Motor de geração de treinos (6 modalidades, periodização completa)
-- [x] Interface gráfica com wizard de 6 passos
-- [x] Tema acessível WCAG AAA (contraste 21:1)
-- [x] Widgets modernos com animações (AnimatedButton, AnimatedCard, RoundedFrame, FadeTransition)
+- [x] Interface Flet v3.0 com 11 ecrãs e 7 componentes reutilizáveis
+- [x] Dashboard atleta-cêntrico com hero cards e busca
+- [x] Calendário mensal interativo com drag & drop
+- [x] Wizard de 6 passos para criação de planos
+- [x] Sistema de notificações inteligente
+- [x] Tema material com modo escuro/claro
 - [x] Sistema de autenticação (CPF + CREF + senha)
 - [x] Banco de dados SQLite com suporte a MySQL
 - [x] Isolamento de dados por profissional (diretórios por CREF)
-- [x] Exportação Excel (openpyxl)
-- [x] Exportação PDF profissional (reportlab)
+- [x] Exportação Excel (openpyxl) e PDF profissional (reportlab)
 - [x] Adaptação ao ciclo menstrual
-- [x] Sistema de saúde com IA (HealthAdvisor — problemas ortopédicos e sistêmicos)
+- [x] Sistema de saúde com IA (HealthAdvisor)
 - [x] Cálculo automático de semanas até a prova
+- [x] Integração Strava/Garmin
+- [x] Internacionalização (PT-BR, EN, ES)
+- [x] Biblioteca de templates reutilizáveis
+- [x] Painel de administração de utilizadores
 - [x] Suporte multiplataforma (Windows, Linux, macOS)
-- [x] 8/8 testes automatizados passando (relatório de 21/03/2026)
-- [x] Documentação extensa (23 arquivos em docs/)
-- [x] 16 scripts de teste/utilidade
+- [x] 189 testes automatizados passando (pytest)
+- [x] Ícone profissional (.ico + .png, múltiplas resoluções)
+- [x] Launchers: Windows (.bat), Linux/macOS (.sh), .desktop
+- [x] Build system (flet pack + PyInstaller) com ícone
+- [x] Documentação extensa (23+ arquivos em docs/)
 
-### O que pode precisar de atenção (⚠️)
+### Correções aplicadas em 28/03/2026
 
-- [ ] **Duplicação de código:** `training_planner.py` e `core/training_engine.py` contêm código muito similar — a refatoração do commit `2f68ba7` pode não ter sido completa
-- [ ] **Arquivo `data/app_treinos.db` modificado** — há alteração não commitada no banco de dados
-- [ ] **Diretório `data/trainers/None/`** — indica que algum treino foi salvo sem treinador identificado
-- [ ] **test_cli.py** é apenas informativo (não executa testes reais) — testes reais estão dispersos em `scripts/`
-
-### Funcionalidades documentadas mas não verificadas recentemente
-
-- Painel administrativo (`gui/admin_panel.py`)
-- Tela de registro de novos usuários (`gui/register_screen.py`)
-- Lista de treinos salvos (`gui/training_list.py`)
-- Suporte MySQL (configurado mas sem credenciais reais)
+- **training_wizard.py**: `register_training` era chamado com kwargs inválidos e retorno tratado como tuple — corrigido para `register_training(trainer_info, athlete)` → `TrainingRecord`
+- **progress.py**: campo `entry.detail` (sem 's') era sempre vazio — corrigido para `entry.details`
 
 ---
 
@@ -127,27 +178,42 @@ D:\GitHub\App Treinos\Python\App Treinos\
 
 | Componente | Tecnologia | Versão Requerida |
 |---|---|---|
-| Linguagem | Python | 3.8+ |
-| GUI | Tkinter | (nativo) |
+| Linguagem | Python | 3.10+ |
+| GUI | **Flet** (Flutter) | >= 0.25.0 |
 | Dados tabulares | pandas | >= 2.0.0 |
 | Export Excel | openpyxl | >= 3.1.0 |
 | Export PDF | reportlab | >= 4.0.0 |
 | Banco de dados | SQLite | (nativo) |
 | Banco de dados (prod) | MySQL | opcional |
+| Build executável | PyInstaller / flet pack | >= 6.0.0 |
 
 ---
 
 ## 6. Como Executar
 
+### Desenvolvimento (Python)
 ```bash
 # Windows (duplo clique)
-App_Treinos_GUI.bat
+AppTreinos.bat
 
 # Windows (terminal)
-python App_Treinos_GUI.py
+python App_Treinos_Flet.py
 
 # Linux / macOS
-python3 App_Treinos_GUI.py
+./AppTreinos.sh
+# ou: python3 App_Treinos_Flet.py
+```
+
+### Gerar Executável
+```bash
+# Executável em pasta (mais rápido de gerar)
+python build.py
+
+# Executável único (um só ficheiro .exe)
+python build.py --onefile
+
+# Limpar artefatos de build
+python build.py --clean
 ```
 
 ---
@@ -165,25 +231,27 @@ python3 App_Treinos_GUI.py
 
 ## 8. Sugestões de Próximos Passos
 
-Estas são sugestões baseadas na análise do estado atual do projeto. A prioridade e a direção devem ser definidas pelo responsável do projeto.
-
 ### Correções e Melhorias Técnicas
-1. **Resolver duplicação** entre `training_planner.py` e `core/training_engine.py`
-2. **Consolidar testes** — unificar os 16 scripts de teste em uma suíte com pytest
-3. **Limpar diretório `data/trainers/None/`** — investigar origem e prevenir recorrência
-4. **Commit do `app_treinos.db`** ou adicioná-lo ao `.gitignore`
+1. ~~**Resolver duplicação** entre `training_planner.py` e `core/training_engine.py`~~ (mitigado — Flet usa `training_planner.py` diretamente)
+2. ~~**Consolidar testes** — suíte com pytest~~ ✅ 189 testes em `tests/`
+3. ~~**Dashboard de progresso**~~ ✅ `flet_app/screens/progress.py`
+4. ~~**Histórico de alterações**~~ ✅ Changelog system
+5. ~~**Integração com APIs de saúde**~~ ✅ Strava/Garmin
+6. ~~**Multi-idioma**~~ ✅ PT-BR, EN, ES (i18n.py)
+7. ~~**Modo escuro**~~ ✅ Dark/Light toggle
+8. ~~**Empacotamento executável**~~ ✅ build.py + flet pack + ícone
 
 ### Funcionalidades Potenciais
-5. **Dashboard de progresso** — visualização de treinos realizados vs. planejados
-6. **Histórico de alterações** — log de modificações em cada plano de treino
-7. **Integração com APIs de saúde** — importação de dados de dispositivos (Garmin, Strava)
-8. **Multi-idioma** — interface em inglês e espanhol além do português
-9. **Modo escuro** — tema alternativo mantendo acessibilidade
+9. **Sincronização cloud** — backup e sincronização de dados entre dispositivos
+10. **Relatórios avançados** — gráficos de evolução e comparação de períodos
+11. **Publicação como app mobile** — Flet suporta compilação para Android/iOS
+12. **Marketplace de templates** — partilha de templates entre treinadores
 
 ### Infraestrutura
-10. **CI/CD** — pipeline de testes automáticos no GitHub Actions
-11. **Empacotamento** — criar executável standalone (PyInstaller ou cx_Freeze)
-12. **Versionamento semântico** — tags de release (v2.0.0, v2.1.0, etc.)
+13. ~~**CI/CD**~~ ✅ GitHub Actions pipeline
+14. ~~**Versionamento semântico**~~ ✅ v3.0.0
+15. **Publicação PyPI** — distribuição via `pip install app-treinos`
+16. **Assinatura de código** — codesign para distribuição Windows/macOS
 
 ---
 
