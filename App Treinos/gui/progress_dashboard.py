@@ -12,6 +12,7 @@ from datetime import datetime
 from gui.theme import theme
 from gui.modern_widgets import AnimatedButton, RoundedFrame
 from training_manager import training_manager
+from i18n import t
 
 
 class ProgressDashboard:
@@ -58,7 +59,7 @@ class ProgressDashboard:
         # Botão voltar
         back_btn = AnimatedButton(
             inner,
-            text="← Voltar",
+            text=t('btn_back'),
             font=(theme.fonts['primary'], theme.font_sizes['small'], 'bold'),
             bg_color=theme.colors['bg_secondary'],
             fg_color=theme.colors['text_primary'],
@@ -74,7 +75,7 @@ class ProgressDashboard:
 
         tk.Label(
             inner,
-            text="📊  Dashboard de Progresso",
+            text=f"📊  {t('progress_title')}",
             font=(theme.fonts['primary'], theme.font_sizes['heading'], 'bold'),
             bg=theme.colors['bg_white'],
             fg=theme.colors['text_primary'],
@@ -123,18 +124,18 @@ class ProgressDashboard:
         row.pack(fill='x', pady=(0, 20))
 
         stats = [
-            ("📋", str(self.stats['total_plans']), "Planos Criados", theme.colors['primary']),
-            ("👥", str(self.stats['unique_athletes']), "Atletas Únicos", theme.colors['analogous_1']),
+            ("📋", str(self.stats['total_plans']), t('progress_plans_created'), theme.colors['primary']),
+            ("👥", str(self.stats['unique_athletes']), t('progress_unique_athletes'), theme.colors['analogous_1']),
             (
                 "🏅",
                 str(len(self.stats['sports_distribution'])),
-                "Modalidades",
+                t('progress_sports'),
                 theme.colors['analogous_2'],
             ),
             (
                 "📅",
                 self._format_date(self.stats.get('latest_plan')),
-                "Último Plano",
+                t('progress_latest'),
                 theme.colors['triadic_1'],
             ),
         ]
@@ -204,7 +205,7 @@ class ProgressDashboard:
 
         tk.Label(
             inner,
-            text="Distribuição por Modalidade",
+            text=t('progress_distribution'),
             font=(theme.fonts['primary'], theme.font_sizes['subheading'], 'bold'),
             bg=theme.colors['bg_white'],
             fg=theme.colors['text_primary'],
@@ -277,7 +278,7 @@ class ProgressDashboard:
 
         tk.Label(
             inner,
-            text="Planos Recentes",
+            text=t('progress_recent'),
             font=(theme.fonts['primary'], theme.font_sizes['subheading'], 'bold'),
             bg=theme.colors['bg_white'],
             fg=theme.colors['text_primary'],
@@ -366,7 +367,7 @@ class ProgressDashboard:
 
         tk.Label(
             inner,
-            text="Histórico de Alterações",
+            text=t('progress_changelog'),
             font=(theme.fonts['primary'], theme.font_sizes['subheading'], 'bold'),
             bg=theme.colors['bg_white'],
             fg=theme.colors['text_primary'],
@@ -423,7 +424,7 @@ class ProgressDashboard:
 
         tk.Label(
             container,
-            text="Nenhum treino criado ainda",
+            text=t('progress_empty'),
             font=(theme.fonts['primary'], theme.font_sizes['subheading'], 'bold'),
             bg=theme.colors['bg_secondary'],
             fg=theme.colors['text_primary'],
@@ -431,7 +432,7 @@ class ProgressDashboard:
 
         tk.Label(
             container,
-            text="Crie seu primeiro plano de treino para ver estatísticas aqui!",
+            text=t('progress_empty_hint'),
             font=(theme.fonts['primary'], theme.font_sizes['body']),
             bg=theme.colors['bg_secondary'],
             fg=theme.colors['text_secondary'],

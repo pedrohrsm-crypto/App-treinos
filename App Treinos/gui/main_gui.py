@@ -25,6 +25,7 @@ from gui.modern_widgets import AnimatedButton, RoundedFrame, AnimatedCard, FadeT
 from training_planner import TrainerInfo
 from pdf_exporter import PDFExporter
 from version import __version__
+from i18n import t
 from gui.progress_dashboard import ProgressDashboard
 from tkinter import filedialog
 from pathlib import Path
@@ -635,7 +636,7 @@ class DashboardScreen:
         
         tk.Label(
             content,
-            text=f"Olá, {primeiro_nome}! O que você deseja fazer hoje?",
+            text=t('dashboard_greeting', name=primeiro_nome),
             font=(theme.fonts['primary'], theme.font_sizes['title'], 'bold'),
             bg=theme.colors['bg_secondary'],
             fg=theme.colors['text_primary']
@@ -643,7 +644,7 @@ class DashboardScreen:
         
         tk.Label(
             content,
-            text="Escolha uma opção abaixo para começar",
+            text=t('dashboard_choose'),
             font=(theme.fonts['primary'], theme.font_sizes['body']),
             bg=theme.colors['bg_secondary'],
             fg=theme.colors['text_secondary']
@@ -656,9 +657,9 @@ class DashboardScreen:
         # Hero Card 1: Novo Plano
         self._create_hero_card(
             cards_container,
-            title="Novo Plano",
+            title=t('card_new_plan'),
             icon="📋",
-            description="Crie um novo plano de treinamento personalizado para seu atleta",
+            description=t('card_new_plan_desc'),
             color=theme.colors['primary'],
             command=lambda: self._on_card_click('create')
         ).pack(side='left', padx=15)
@@ -666,9 +667,9 @@ class DashboardScreen:
         # Hero Card 2: Editar Plano
         self._create_hero_card(
             cards_container,
-            title="Editar Plano",
+            title=t('card_edit_plan'),
             icon="📝",
-            description="Visualize, edite ou exporte planos de treinamento já criados",
+            description=t('card_edit_plan_desc'),
             color=theme.colors['analogous_1'],
             command=lambda: self._on_card_click('edit')
         ).pack(side='left', padx=15)
@@ -676,9 +677,9 @@ class DashboardScreen:
         # Hero Card 3: Exportar PDF
         self._create_hero_card(
             cards_container,
-            title="Exportar PDF",
+            title=t('card_export_pdf'),
             icon="📄",
-            description="Exporte planos de treinamento em formato PDF profissional",
+            description=t('card_export_pdf_desc'),
             color=theme.colors['triadic_1'],
             command=lambda: self._on_card_click('export_pdf')
         ).pack(side='left', padx=15)
@@ -686,9 +687,9 @@ class DashboardScreen:
         # Hero Card 4: Meu Progresso
         self._create_hero_card(
             cards_container,
-            title="Meu Progresso",
+            title=t('card_progress'),
             icon="📊",
-            description="Visualize estatísticas e histórico dos seus treinamentos",
+            description=t('card_progress_desc'),
             color=theme.colors['triadic_2'],
             command=lambda: self._on_card_click('progress')
         ).pack(side='left', padx=15)
@@ -769,7 +770,7 @@ class DashboardScreen:
         # Indicador "clique aqui"
         action_label = tk.Label(
             card.content_frame,
-            text="Clique para começar →",
+            text=t('card_click_hint'),
             font=(theme.fonts['primary'], theme.font_sizes['small'], 'bold'),
             bg=theme.colors['bg_white'],
             fg=color
@@ -846,8 +847,8 @@ class DashboardScreen:
     def _logout(self):
         """Realiza logout e volta para tela de login."""
         resposta = messagebox.askyesno(
-            "Confirmar Logout",
-            "Tem certeza que deseja sair?\n\nVocê será redirecionado para a tela de login."
+            t('confirm_logout_title'),
+            t('confirm_logout'),
         )
         
         if resposta:
