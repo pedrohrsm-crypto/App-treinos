@@ -25,6 +25,7 @@ from gui.modern_widgets import AnimatedButton, RoundedFrame, AnimatedCard, FadeT
 from training_planner import TrainerInfo
 from pdf_exporter import PDFExporter
 from version import __version__
+from gui.progress_dashboard import ProgressDashboard
 from tkinter import filedialog
 from pathlib import Path
 
@@ -681,6 +682,16 @@ class DashboardScreen:
             color=theme.colors['triadic_1'],
             command=lambda: self._on_card_click('export_pdf')
         ).pack(side='left', padx=15)
+
+        # Hero Card 4: Meu Progresso
+        self._create_hero_card(
+            cards_container,
+            title="Meu Progresso",
+            icon="📊",
+            description="Visualize estatísticas e histórico dos seus treinamentos",
+            color=theme.colors['triadic_2'],
+            command=lambda: self._on_card_click('progress')
+        ).pack(side='left', padx=15)
     
     def _create_hero_card(self, parent, title, icon, description, color, command):
         """Cria um hero card moderno e interativo com AnimatedCard."""
@@ -809,6 +820,28 @@ class DashboardScreen:
             self.on_edit_training()
         elif action == 'export_pdf':
             self._show_pdf_export_dialog()
+        elif action == 'progress':
+            self._show_progress_dashboard()
+
+    def _show_progress_dashboard(self):
+        """Abre o dashboard de progresso."""
+        trainer_info = TrainerInfo(
+            nome=self.credential.get('nome', ''),
+            cref=self.credential.get('cref', ''),
+            email=self.credential.get('email', ''),
+        )
+        self.frame.destroy()
+        ProgressDashboard(
+            self.parent,
+            trainer_info,
+            self.credential,
+            lambda: DashboardScreen(
+                self.parent,
+                self.credential,
+                self.on_create_training,
+                self.on_edit_training,
+            ),
+        )
     
     def _logout(self):
         """Realiza logout e volta para tela de login."""
