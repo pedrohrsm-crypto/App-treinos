@@ -1,14 +1,15 @@
 """
-Router — Navegação por rotas nomeadas
-======================================
+Router — Navegação por rotas nomeadas com transição fade
+=========================================================
 
-Encapsula a troca de telas (Views) e o histórico de navegação.
-Cada rota mapeia para uma função-fábrica que recebe (page, app_state)
-e retorna um ft.View.
+Encapsula a troca de telas (Views) com animação cross-fade (300 ms).
 """
 
+import asyncio
 import flet as ft
 from typing import Callable, Dict
+
+_FADE_MS = 300
 
 
 class Router:
@@ -17,6 +18,7 @@ class Router:
     def __init__(self, page: ft.Page):
         self.page = page
         self._routes: Dict[str, Callable] = {}
+        self._animating = False
         page.on_route_change = self._on_route_change
         page.on_view_pop = self._on_view_pop
 
@@ -60,9 +62,22 @@ class Router:
             return
 
         view = builder(self.page, route)
+
+        # Configurar animação de opacidade na view
+        view.opacity = 0
+        view.animate_opacity = ft.Animation(_FADE_MS, ft.AnimationCurve.EASE_IN_OUT)
+
         self.page.views.clear()
         self.page.views.append(view)
         self.page.update()
+
+        # Disparar fade-in
+        async def _fade_in():
+            await asyncio.sleep(0.02)  # aguardar render
+            view.opacity = 1
+            self.page.update()
+
+        self.page.run_task(_fade_in)
 
     def _on_view_pop(self, e: ft.ViewPopEvent):
         if len(self.page.views) > 1:

@@ -25,6 +25,7 @@ def config_view(page: ft.Page, route: str) -> ft.View:
         app_state.dark_mode = e.control.value
         page.theme_mode = ft.ThemeMode.DARK if app_state.dark_mode else ft.ThemeMode.LIGHT
         page.theme = build_theme(dark=app_state.dark_mode)
+        app_state.save_preferences()
         page.go("/config")  # reload view
 
     dark_switch = ft.Switch(
@@ -38,6 +39,7 @@ def config_view(page: ft.Page, route: str) -> ft.View:
         code = e.control.data
         set_language(code)
         app_state.language = code
+        app_state.save_preferences()
         page.go("/config")  # reload view com novo idioma
 
     lang_chips = ft.Row(

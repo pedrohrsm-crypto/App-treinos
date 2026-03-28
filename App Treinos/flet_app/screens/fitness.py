@@ -41,6 +41,15 @@ def fitness_view(page: ft.Page, route: str) -> ft.View:
             ))
 
     def _load_activities(e):
+        # Mostrar spinner enquanto carrega
+        activities_col.controls.clear()
+        activities_col.controls.append(
+            ft.Row(
+                [ft.ProgressRing(width=20, height=20, stroke_width=2), ft.Text("Carregando atividades…", size=13)],
+                spacing=8, alignment=ft.MainAxisAlignment.CENTER,
+            )
+        )
+        page.update()
         try:
             from fitness_connectors import StravaConnector
             connector = StravaConnector(

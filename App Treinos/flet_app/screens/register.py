@@ -9,10 +9,6 @@ import flet as ft
 from i18n import t
 from flet_app.theme import c
 from flet_app.state import app_state
-from core.database import DatabaseManager
-
-
-_db = DatabaseManager()
 
 
 def register_view(page: ft.Page, route: str) -> ft.View:
@@ -49,7 +45,7 @@ def register_view(page: ft.Page, route: str) -> ft.View:
             page.update()
             return
 
-        ok, resp = _db.cadastrar_usuario(
+        ok, resp = app_state.db.cadastrar_usuario(
             cpf=cpf.value.strip(),
             cref=cref.value.strip(),
             nome=nome.value.strip(),

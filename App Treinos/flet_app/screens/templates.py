@@ -3,13 +3,16 @@ Templates — Biblioteca de templates de treino
 ==============================================
 
 Grid de templates (do sistema + do treinador) com criação e uso.
+Dados carregados assincronamente com spinner.
 """
 
+import asyncio
 import flet as ft
 from flet_app.theme import c, SPORT_COLORS
 from flet_app.state import app_state
 from flet_app.components.template_card import build_template_card
 from flet_app.components.nav_bar import build_nav_bar
+from flet_app.components.loading_overlay import build_loading
 from training_manager import training_manager
 
 
@@ -32,12 +35,14 @@ def templates_view(page: ft.Page, route: str) -> ft.View:
     dark = app_state.dark_mode
     trainer = app_state.trainer_info()
 
-    # ── Carregar templates do treinador ──────────────────────────
-    user_templates = training_manager.get_templates(trainer) if trainer else []
-
     # ── Listas ───────────────────────────────────────────────────
     user_list = ft.Column(spacing=8)
     system_list = ft.Column(spacing=8)
+
+    user_templates = []  # preenchido assincronamente
+
+    # Body com spinner inicial
+    body = ft.Container(content=build_loading("Carregando templates…", dark), expand=True, padding=ft.padding.all(16))
 
     def _refresh():
         nonlocal user_templates
@@ -139,6 +144,28 @@ def templates_view(page: ft.Page, route: str) -> ft.View:
 
     _populate()
 
+    # ── Carregamento assíncrono ──────────────────────────────────
+    async def _load_data():
+        nonlocal user_templates
+        await asyncio.sleep(0.01)
+        user_templates = training_manager.get_templates(trainer) if trainer else []
+        _populate()
+        body.content = ft.Column(
+            [
+                ft.Text("📋 Meus Templates", size=18, weight=ft.FontWeight.BOLD),
+                user_list,
+                ft.Divider(height=20),
+                ft.Text("📦 Templates do Sistema", size=18, weight=ft.FontWeight.BOLD),
+                system_list,
+            ],
+            spacing=12,
+            scroll=ft.ScrollMode.AUTO,
+            expand=True,
+        )
+        page.update()
+
+    page.run_task(_load_data)
+
     # ── FAB ──────────────────────────────────────────────────────
     fab = ft.FloatingActionButton(
         icon=ft.Icons.ADD,
@@ -150,24 +177,7 @@ def templates_view(page: ft.Page, route: str) -> ft.View:
 
     return ft.View(
         route="/templates",
-        controls=[
-            ft.Container(
-                content=ft.Column(
-                    [
-                        ft.Text("📋 Meus Templates", size=18, weight=ft.FontWeight.BOLD),
-                        user_list,
-                        ft.Divider(height=20),
-                        ft.Text("📦 Templates do Sistema", size=18, weight=ft.FontWeight.BOLD),
-                        system_list,
-                    ],
-                    spacing=12,
-                    scroll=ft.ScrollMode.AUTO,
-                    expand=True,
-                ),
-                padding=ft.padding.all(16),
-                expand=True,
-            )
-        ],
+        controls=[body],
         navigation_bar=build_nav_bar(page, selected_index=0),
         floating_action_button=fab,
         bgcolor=c("bg_secondary", dark),

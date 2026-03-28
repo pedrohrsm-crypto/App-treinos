@@ -4,14 +4,17 @@ Dashboard — Grid de Hero Cards de Atletas
 
 Tela principal pós-login. Mostra saudação, barra de pesquisa,
 grid responsivo de athlete cards e FAB para criar novo plano.
+Dados carregados assincronamente com spinner.
 """
 
+import asyncio
 import flet as ft
 from i18n import t
 from flet_app.theme import c
 from flet_app.state import app_state
 from flet_app.components.nav_bar import build_nav_bar
 from flet_app.components.athlete_card import build_athlete_card
+from flet_app.components.loading_overlay import build_loading
 from training_manager import training_manager
 
 
@@ -20,9 +23,6 @@ def dashboard_view(page: ft.Page, route: str) -> ft.View:
 
     dark = app_state.dark_mode
     trainer = app_state.trainer_info()
-
-    # ── Dados ────────────────────────────────────────────────────
-    athletes = training_manager.get_athletes_summary(trainer) if trainer else []
 
     # ── Pesquisa ─────────────────────────────────────────────────
     search_field = ft.TextField(
@@ -45,6 +45,11 @@ def dashboard_view(page: ft.Page, route: str) -> ft.View:
         padding=ft.padding.symmetric(horizontal=16),
         expand=True,
     )
+
+    # Container que começa com spinner e será substituído pelo grid
+    body = ft.Container(content=build_loading("Carregando atletas…", dark), expand=True)
+
+    athletes = []  # preenchido assincronamente
 
     def _populate(filter_text: str = ""):
         grid.controls.clear()
@@ -89,7 +94,16 @@ def dashboard_view(page: ft.Page, route: str) -> ft.View:
     def _go_wizard(_):
         page.go("/wizard")
 
-    _populate()
+    # ── Carregamento assíncrono ──────────────────────────────────
+    async def _load_data():
+        nonlocal athletes
+        await asyncio.sleep(0.01)  # liberar thread
+        athletes = training_manager.get_athletes_summary(trainer) if trainer else []
+        _populate()
+        body.content = grid
+        page.update()
+
+    page.run_task(_load_data)
 
     # ── Header ───────────────────────────────────────────────────
     greeting = t("dashboard_greeting", name=app_state.trainer_name or "")
@@ -115,7 +129,7 @@ def dashboard_view(page: ft.Page, route: str) -> ft.View:
 
     return ft.View(
         route="/dashboard",
-        controls=[header, grid],
+        controls=[header, body],
         navigation_bar=build_nav_bar(page, selected_index=0),
         floating_action_button=fab,
     )

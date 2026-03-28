@@ -3,11 +3,21 @@ Estado Global da Aplicação
 ===========================
 
 Armazena sessão do utilizador logado, atleta selecionado,
-e outras preferências partilhadas entre telas.
+e preferências partilhadas entre telas.
+Inclui persistência de preferências e sessão via JSON local.
 """
 
+import json
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Optional, Dict
+
+
+def _prefs_path() -> Path:
+    """Retorna caminho do ficheiro de preferências."""
+    p = Path(__file__).parent.parent / "data"
+    p.mkdir(exist_ok=True)
+    return p / "preferences.json"
 
 
 @dataclass
@@ -28,6 +38,9 @@ class AppState:
     dark_mode: bool = False
     language: str = "pt"
 
+    # ── DB singleton (inicializado no splash) ────────────────────
+    db: object = None  # DatabaseManager instance
+
     # ── Helpers ──────────────────────────────────────────────────
 
     def login(self, user_data: Dict):
@@ -45,6 +58,7 @@ class AppState:
         self.is_admin = False
         self.selected_athlete = None
         self.selected_plan_id = None
+        self.clear_session()
 
     @property
     def is_logged_in(self) -> bool:
@@ -53,6 +67,57 @@ class AppState:
     def trainer_info(self):
         """Retorna dict compatível com training_manager (precisa de 'cref')."""
         return {"cref": self.trainer_cref} if self.trainer_cref else None
+
+    # ── Persistência de preferências ─────────────────────────────
+
+    def save_preferences(self):
+        """Persiste dark_mode e language em JSON."""
+        data = self._read_prefs_file()
+        key = self.trainer_cref or "_global"
+        data[key] = {"dark_mode": self.dark_mode, "language": self.language}
+        self._write_prefs_file(data)
+
+    def load_preferences(self) -> Optional[Dict]:
+        """Carrega preferências do treinador logado (ou _global)."""
+        data = self._read_prefs_file()
+        key = self.trainer_cref or "_global"
+        return data.get(key)
+
+    # ── Persistência de sessão (auto-login) ──────────────────────
+
+    def save_session(self, credential: str, password_raw: str):
+        """Guarda credenciais para auto-login (ficheiro local)."""
+        data = self._read_prefs_file()
+        data["_session"] = {"credential": credential, "password_raw": password_raw}
+        self._write_prefs_file(data)
+
+    def load_session(self) -> Optional[Dict]:
+        """Carrega sessão guardada."""
+        data = self._read_prefs_file()
+        return data.get("_session")
+
+    def clear_session(self):
+        """Remove sessão guardada."""
+        data = self._read_prefs_file()
+        data.pop("_session", None)
+        self._write_prefs_file(data)
+
+    # ── I/O helpers ──────────────────────────────────────────────
+
+    def _read_prefs_file(self) -> dict:
+        path = _prefs_path()
+        if path.exists():
+            try:
+                return json.loads(path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                return {}
+        return {}
+
+    def _write_prefs_file(self, data: dict):
+        path = _prefs_path()
+        path.write_text(
+            json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
 
 
 # Instância global

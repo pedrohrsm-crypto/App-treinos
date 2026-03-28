@@ -1,49 +1,47 @@
 """
-Splash Screen — Animação de abertura
-=====================================
+Splash Screen — Inicialização com progresso real
+==================================================
 
-Exibe logo + nome da app por 2 s e redireciona para /login.
+Exibe logo, barra de progresso e texto de status enquanto
+inicializa DB, carrega preferências e verifica sessão.
 """
 
+import asyncio
 import flet as ft
-from i18n import t
-from flet_app.theme import c
-from flet_app.state import app_state
+from i18n import t, set_language
+from flet_app.theme import c, build_theme
 
 
 def splash_view(page: ft.Page, route: str) -> ft.View:
-    """Constrói a View de splash."""
+    """Constrói a View de splash com inicialização real."""
 
+    from flet_app.state import app_state
     dark = app_state.dark_mode
 
+    # ── Elementos visuais ────────────────────────────────────────
     logo = ft.Text(
-        "🏃",
-        size=80,
-        text_align=ft.TextAlign.CENTER,
-        opacity=0,
-        animate_opacity=ft.Animation(600, ft.AnimationCurve.EASE_OUT),
+        "🏃", size=80, text_align=ft.TextAlign.CENTER,
+        opacity=0, animate_opacity=ft.Animation(500, ft.AnimationCurve.EASE_OUT),
     )
     title = ft.Text(
-        t("app_name"),
-        size=40,
-        weight=ft.FontWeight.BOLD,
-        color=c("text_light", dark),
-        text_align=ft.TextAlign.CENTER,
-        opacity=0,
-        animate_opacity=ft.Animation(800, ft.AnimationCurve.EASE_OUT),
+        t("app_name"), size=40, weight=ft.FontWeight.BOLD,
+        color=c("text_light", dark), text_align=ft.TextAlign.CENTER,
+        opacity=0, animate_opacity=ft.Animation(600, ft.AnimationCurve.EASE_OUT),
     )
-    subtitle = ft.Text(
-        t("splash_subtitle"),
-        size=16,
-        color=c("text_light", dark),
+    status_text = ft.Text(
+        "", size=14, color=c("text_light", dark),
         text_align=ft.TextAlign.CENTER,
-        opacity=0,
-        animate_opacity=ft.Animation(1000, ft.AnimationCurve.EASE_OUT),
+        opacity=0, animate_opacity=ft.Animation(400, ft.AnimationCurve.EASE_OUT),
+    )
+    progress_bar = ft.ProgressBar(
+        value=0, width=280, color=c("text_light", dark),
+        bgcolor=c("accent_hover", dark),
+        opacity=0, animate_opacity=ft.Animation(400, ft.AnimationCurve.EASE_OUT),
     )
 
     content = ft.Container(
         content=ft.Column(
-            [logo, title, subtitle],
+            [logo, title, ft.Container(height=24), progress_bar, status_text],
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             spacing=12,
@@ -53,27 +51,69 @@ def splash_view(page: ft.Page, route: str) -> ft.View:
         bgcolor=c("bg_primary", dark),
     )
 
-    def _animate_and_redirect(_):
+    # ── Helpers de progresso ─────────────────────────────────────
+    async def _set_progress(value: float, msg: str):
+        progress_bar.value = value
+        status_text.value = msg
+        page.update()
+        await asyncio.sleep(0.15)
+
+    # ── Sequência de inicialização real ──────────────────────────
+    async def _init_sequence():
+        await asyncio.sleep(0.3)  # aguardar montagem da view
+
+        # Fade in dos elementos
         logo.opacity = 1
         title.opacity = 1
-        subtitle.opacity = 1
+        progress_bar.opacity = 1
+        status_text.opacity = 1
         page.update()
+        await asyncio.sleep(0.5)
 
-        import time
-        time.sleep(2)
-        page.go("/login")
+        # Etapa 1: Banco de dados
+        await _set_progress(0.15, "Inicializando banco de dados…")
+        from core.database import DatabaseManager
+        app_state.db = DatabaseManager()
+        await _set_progress(0.30, "Banco de dados pronto ✓")
 
-    page.on_connect = None  # reset
-    content.on_click = None  # no interaction needed
+        # Etapa 2: Preferências
+        await _set_progress(0.45, "Carregando preferências…")
+        session = app_state.load_session()
+        await _set_progress(0.55, "Preferências carregadas ✓")
 
-    # Trigger animation after view is mounted
-    def _on_view(_):
-        import threading
-        threading.Thread(target=_animate_and_redirect, args=(None,), daemon=True).start()
+        # Etapa 3: Verificar sessão anterior
+        auto_logged = False
+        if session:
+            await _set_progress(0.65, "Restaurando sessão…")
+            ok, data = app_state.db.autenticar_usuario(
+                session["credential"], session["password_raw"]
+            )
+            if ok:
+                app_state.login(data)
+                # Aplicar preferências persistidas
+                prefs = app_state.load_preferences()
+                if prefs:
+                    app_state.dark_mode = prefs.get("dark_mode", False)
+                    lang = prefs.get("language", "pt")
+                    app_state.language = lang
+                    set_language(lang)
+                    page.theme_mode = ft.ThemeMode.DARK if app_state.dark_mode else ft.ThemeMode.LIGHT
+                    page.theme = build_theme(dark=app_state.dark_mode)
+                auto_logged = True
+                await _set_progress(0.80, f"Bem-vindo, {app_state.trainer_name} ✓")
+            else:
+                app_state.clear_session()
+                await _set_progress(0.80, "Sessão expirada")
+        else:
+            await _set_progress(0.80, "Pronto para login")
 
-    page.on_connect = _on_view
-    # Also schedule directly for desktop (no on_connect event)
-    import threading
-    threading.Timer(0.3, _animate_and_redirect, args=(None,)).start()
+        # Etapa 4: Finalizar
+        await _set_progress(1.0, "Iniciando…")
+        await asyncio.sleep(0.4)
+
+        # Navegar
+        page.go("/dashboard" if auto_logged else "/login")
+
+    page.run_task(_init_sequence)
 
     return ft.View(route="/", controls=[content])

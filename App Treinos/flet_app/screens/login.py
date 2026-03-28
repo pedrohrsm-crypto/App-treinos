@@ -9,10 +9,6 @@ import flet as ft
 from i18n import t
 from flet_app.theme import c
 from flet_app.state import app_state
-from core.database import DatabaseManager
-
-
-_db = DatabaseManager()
 
 
 def login_view(page: ft.Page, route: str) -> ft.View:
@@ -49,9 +45,10 @@ def login_view(page: ft.Page, route: str) -> ft.View:
             page.update()
             return
 
-        ok, data = _db.autenticar_usuario(cred, pwd)
+        ok, data = app_state.db.autenticar_usuario(cred, pwd)
         if ok:
             app_state.login(data)
+            app_state.save_session(cred, pwd)
             page.go("/dashboard")
         else:
             error_text.value = t("login_error_invalid") if "login_error_invalid" in dir() else "Credenciais inválidas."

@@ -35,6 +35,6 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    version='C:\\Users\\Pedro Marques\\AppData\\Local\\Temp\\5961d813-831f-4263-9592-78c5badea164',
+    version='C:\\Users\\Pedro Marques\\AppData\\Local\\Temp\\5c7c2499-e04c-4c3f-886f-9205a5ccec14',
     icon=['D:\\GitHub\\App Treinos\\Python\\App Treinos\\assets\\icon.ico'],
 )
