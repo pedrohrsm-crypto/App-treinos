@@ -15,6 +15,7 @@ from flet_app.state import app_state
 from flet_app.components.nav_bar import build_nav_bar
 from flet_app.components.athlete_card import build_athlete_card
 from flet_app.components.loading_overlay import build_loading
+from flet_app.components.feature_tooltip import build_feature_tooltip
 from training_manager import training_manager
 
 
@@ -121,15 +122,22 @@ def dashboard_view(page: ft.Page, route: str) -> ft.View:
     # ── FAB ──────────────────────────────────────────────────────
     fab = ft.FloatingActionButton(
         icon=ft.Icons.ADD,
-        text="Novo Plano",
+        tooltip="Novo Plano",
         bgcolor=c("primary", dark),
         foreground_color=c("text_light", dark),
         on_click=_go_wizard,
     )
 
+    # ── Tooltip de primeiro uso ───────────────────────────────────────
+    tooltip = build_feature_tooltip(
+        "dashboard",
+        t("tooltip_dashboard"),
+        page, dark,
+    )
+
     return ft.View(
         route="/dashboard",
-        controls=[header, body],
+        controls=[header, tooltip, body],
         navigation_bar=build_nav_bar(page, selected_index=0),
         floating_action_button=fab,
     )

@@ -6,12 +6,15 @@ Stepper de 6 etapas: Atleta → Desporto → Período → Distância/Fisio
 → Disponibilidade → Revisão + Gerar plano.
 """
 
+import asyncio
 import flet as ft
 from datetime import datetime
 import math
 from i18n import t
 from flet_app.theme import c, SPORT_COLORS
 from flet_app.state import app_state
+from flet_app.components.loading_overlay import build_loading
+from flet_app.components.feature_tooltip import build_feature_tooltip
 from training_planner import Athlete, TrainerInfo, TrainingPlanGenerator, calcular_semanas_ate_prova
 from training_manager import training_manager
 
@@ -501,66 +504,86 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
     def _generate():
         _collect_form_values()
         error_text.value = ""
-        try:
-            # Build TrainerInfo
-            trainer_info = TrainerInfo(
-                nome_completo=app_state.trainer_name or "Treinador",
-                cpf=app_state.user.get("cpf", "") if app_state.user else "",
-                cref=app_state.trainer_cref or "",
-            )
 
-            # Build health issues
-            from training_planner import HealthIssue
-            health_issues = []
-            for h in form["problemas_saude"]:
-                health_issues.append(HealthIssue(
-                    tipo=h["tipo"],
-                    descricao=h["descricao"],
-                    membro_afetado=h.get("membro_afetado"),
+        # Show loading overlay
+        loading = build_loading("Gerando plano de treino…", dark)
+        step_container.content = loading
+        btn_generate.disabled = True
+        btn_back.disabled = True
+        page.update()
+
+        async def _do_generate():
+            try:
+                # Build TrainerInfo
+                trainer_info = TrainerInfo(
+                    nome_completo=app_state.trainer_name or "Treinador",
+                    cpf=app_state.user.get("cpf", "") if app_state.user else "",
+                    cref=app_state.trainer_cref or "",
+                )
+
+                # Build health issues
+                from training_planner import HealthIssue
+                health_issues = []
+                for h in form["problemas_saude"]:
+                    health_issues.append(HealthIssue(
+                        tipo=h["tipo"],
+                        descricao=h["descricao"],
+                        membro_afetado=h.get("membro_afetado"),
+                    ))
+
+                # Build Athlete
+                athlete = Athlete(
+                    nome=form["nome"].strip(),
+                    idade=int(form["idade"]),
+                    peso=float(form["peso"]),
+                    altura=float(form["altura"]),
+                    esporte=form["esporte"],
+                    dias_semana=form["dias_semana"],
+                    distancia_prova=form["distancia"],
+                    limiar_lactato=float(form["limiar_lactato"]),
+                    vo2_max=float(form["vo2_max"]),
+                    genero=form["genero"],
+                    trainer=trainer_info,
+                    semanas_ate_prova=int(form["semanas_ate_prova"]),
+                    problemas_saude=health_issues,
+                    fase_menstrual=form.get("fase_menstrual") or None,
+                )
+
+                # Generate plan in background thread (CPU-heavy)
+                generator = TrainingPlanGenerator(athlete)
+                full_plan = await asyncio.to_thread(
+                    generator.get_full_training_plan
+                )
+
+                # Register via training_manager
+                record = await asyncio.to_thread(
+                    training_manager.register_training, trainer_info, athlete
+                )
+
+                # Map to calendar
+                await asyncio.to_thread(
+                    training_manager.map_sessions_to_calendar,
+                    trainer_info, record.id, full_plan,
+                    datetime.now().strftime("%Y-%m-%d"),
+                )
+
+                page.open(ft.SnackBar(
+                    ft.Text(f"✅ Plano criado com sucesso! ({len(full_plan)} sessões)"),
+                    bgcolor=c("success", dark),
                 ))
+                # Navigate to athlete dashboard
+                app_state.selected_athlete = athlete.nome
+                page.go(f"/athlete/{athlete.nome}")
 
-            # Build Athlete
-            athlete = Athlete(
-                nome=form["nome"].strip(),
-                idade=int(form["idade"]),
-                peso=float(form["peso"]),
-                altura=float(form["altura"]),
-                esporte=form["esporte"],
-                dias_semana=form["dias_semana"],
-                distancia_prova=form["distancia"],
-                limiar_lactato=float(form["limiar_lactato"]),
-                vo2_max=float(form["vo2_max"]),
-                genero=form["genero"],
-                trainer=trainer_info,
-                semanas_ate_prova=int(form["semanas_ate_prova"]),
-                problemas_saude=health_issues,
-                fase_menstrual=form.get("fase_menstrual") or None,
-            )
+            except Exception as ex:
+                # Restore wizard view on error
+                _go_step(current_step[0])
+                btn_generate.disabled = False
+                btn_back.disabled = False
+                error_text.value = f"Erro: {ex}"
+                page.update()
 
-            # Generate plan
-            generator = TrainingPlanGenerator(athlete)
-            full_plan = generator.get_full_training_plan()
-
-            # Register via training_manager
-            record = training_manager.register_training(trainer_info, athlete)
-
-            # Map to calendar
-            training_manager.map_sessions_to_calendar(
-                trainer_info, record.id, full_plan,
-                datetime.now().strftime("%Y-%m-%d"),
-            )
-
-            page.open(ft.SnackBar(
-                ft.Text(f"✅ Plano criado com sucesso! ({len(full_plan)} sessões)"),
-                bgcolor=c("success", dark),
-            ))
-            # Navigate to athlete dashboard
-            app_state.selected_athlete = athlete.nome
-            page.go(f"/athlete/{athlete.nome}")
-
-        except Exception as ex:
-            error_text.value = f"Erro: {ex}"
-            page.update()
+        page.run_task(_do_generate)
 
     # ── Init ─────────────────────────────────────────────────────
     _build_progress()
@@ -601,6 +624,7 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
                             ],
                         ),
                         progress_row,
+                        build_feature_tooltip("wizard", t("tooltip_wizard"), page, dark),
                         ft.Divider(),
                         step_container,
                         ft.Divider(),

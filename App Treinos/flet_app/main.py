@@ -24,6 +24,7 @@ from flet_app.screens.admin import admin_view
 from flet_app.screens.progress import progress_view
 from flet_app.screens.fitness import fitness_view
 from flet_app.screens.templates import templates_view
+from flet_app.screens.onboarding import onboarding_view
 from flet_app.components.calendar_view import calendar_view_screen
 
 
@@ -44,6 +45,7 @@ def main(page: ft.Page):
 
     router.add("/", splash_view)
     router.add("/splash", splash_view)
+    router.add("/onboarding", onboarding_view)
     router.add("/login", login_view)
     router.add("/register", register_view)
     router.add("/dashboard", dashboard_view)

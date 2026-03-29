@@ -55,7 +55,7 @@ def athlete_dashboard_view(page: ft.Page, route: str) -> ft.View:
     # ── FAB novo plano ───────────────────────────────────────────
     fab = ft.FloatingActionButton(
         icon=ft.Icons.ADD,
-        text="Novo Plano",
+        tooltip="Novo Plano",
         bgcolor=c("primary", dark),
         foreground_color=c("text_light", dark),
         on_click=lambda _: page.go("/wizard"),

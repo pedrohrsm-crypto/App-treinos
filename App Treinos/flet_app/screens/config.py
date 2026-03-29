@@ -10,6 +10,7 @@ from i18n import t, set_language, get_language, SUPPORTED_LANGUAGES
 from flet_app.theme import c, build_theme
 from flet_app.state import app_state
 from flet_app.components.nav_bar import build_nav_bar
+from flet_app.components.feature_tooltip import build_feature_tooltip
 
 
 _LANG_LABELS = {"pt": "Português", "en": "English", "es": "Español"}
@@ -45,7 +46,7 @@ def config_view(page: ft.Page, route: str) -> ft.View:
     lang_chips = ft.Row(
         [
             ft.ElevatedButton(
-                text=label,
+                label,
                 data=code,
                 bgcolor=c("primary", dark) if get_language() == code else c("bg_card", dark),
                 color=c("text_light", dark) if get_language() == code else c("text_primary", dark),
@@ -72,6 +73,11 @@ def config_view(page: ft.Page, route: str) -> ft.View:
     )
 
     # ── Layout ───────────────────────────────────────────────────
+    tooltip = build_feature_tooltip(
+        "config",
+        t("tooltip_config"),
+        page, dark,
+    )
     content = ft.Column(
         [
             ft.Text("⚙️  Configurações", size=24, weight=ft.FontWeight.BOLD),
@@ -95,7 +101,7 @@ def config_view(page: ft.Page, route: str) -> ft.View:
     return ft.View(
         route="/config",
         controls=[
-            ft.Container(content=content, padding=24, expand=True),
+            ft.Container(content=ft.Column([tooltip, content], spacing=8), padding=24, expand=True),
         ],
         navigation_bar=build_nav_bar(page, selected_index=3),
     )

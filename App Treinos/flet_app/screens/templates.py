@@ -169,7 +169,7 @@ def templates_view(page: ft.Page, route: str) -> ft.View:
     # ── FAB ──────────────────────────────────────────────────────
     fab = ft.FloatingActionButton(
         icon=ft.Icons.ADD,
-        text="Novo",
+        tooltip="Novo",
         bgcolor=c("primary", dark),
         foreground_color=c("text_light", dark),
         on_click=_open_create_dialog,

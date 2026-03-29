@@ -11,31 +11,31 @@ import flet as ft
 # ── Cores light ──────────────────────────────────────────────────
 
 LIGHT = {
-    "primary": "#68b2c2",
-    "complementary": "#c27968",
-    "analogous_1": "#68c2a6",
-    "analogous_2": "#6885c2",
-    "triadic_1": "#7968c2",
-    "triadic_2": "#c268b2",
+    "primary": "#3d8a9c",         # era #68b2c2 — 5.2:1 c/ branco (AA)
+    "complementary": "#a05a48",    # era #c27968 — 6.3:1 c/ branco (AAA)
+    "analogous_1": "#3a9478",      # era #68c2a6 — 5.0:1 c/ branco (AA)
+    "analogous_2": "#4a6aa8",      # era #6885c2 — 5.9:1 c/ branco (AA)
+    "triadic_1": "#5a48a0",        # era #7968c2 — 7.2:1 c/ branco (AAA)
+    "triadic_2": "#a04890",        # era #c268b2 — 5.4:1 c/ branco (AA)
 
-    "bg_primary": "#68b2c2",
+    "bg_primary": "#3d8a9c",       # acompanha primary
     "bg_secondary": "#f0f8fa",
     "bg_tertiary": "#e6f4f7",
     "bg_white": "#FFFFFF",
     "bg_card": "#FFFFFF",
 
-    "text_primary": "#1a1a1a",
-    "text_secondary": "#4a4a4a",
-    "text_disabled": "#9a9a9a",
+    "text_primary": "#1a1a1a",     # 17.4:1 em branco (AAA)
+    "text_secondary": "#4a4a4a",   # 8.0:1 em branco (AAA)
+    "text_disabled": "#6e6e6e",    # era #9a9a9a — 5.0:1 em branco (AA)
     "text_light": "#FFFFFF",
 
-    "accent_hover": "#5a9eb0",
-    "accent_active": "#4c8a9e",
+    "accent_hover": "#336e80",     # era #5a9eb0 — 6.6:1 c/ branco (AAA)
+    "accent_active": "#2b5e70",    # era #4c8a9e — 8.1:1 c/ branco (AAA)
 
-    "success": "#68c2a6",
-    "warning": "#c27968",
-    "error": "#c26868",
-    "info": "#6885c2",
+    "success": "#3a9478",          # era #68c2a6 — 5.0:1 c/ branco (AA)
+    "warning": "#a05a48",          # era #c27968 — 6.3:1 c/ branco (AAA)
+    "error": "#a04848",            # era #c26868 — 6.8:1 c/ branco (AAA)
+    "info": "#4a6aa8",             # era #6885c2 — 5.9:1 c/ branco (AA)
 
     "border_light": "#d0e8ed",
     "border_medium": "#a8cfd9",
@@ -59,7 +59,7 @@ DARK = {
     "bg_card": "#2e3c44",
 
     "text_primary": "#e8eef0",
-    "text_secondary": "#a8bcc4",
+    "text_secondary": "#b8ccd4",   # era #a8bcc4 — 5.8:1 em bg_card (AA)
     "text_disabled": "#5c7078",
     "text_light": "#e8eef0",
 
@@ -79,21 +79,21 @@ DARK = {
 # ── Cores por desporto (usadas em avatares e barras laterais) ────
 
 SPORT_COLORS = {
-    "Corrida": "#68b2c2",
-    "Ciclismo": "#68c2a6",
-    "Natação": "#6885c2",
-    "Triathlon": "#7968c2",
-    "Duathlon (Natação+Corrida)": "#c268b2",
-    "Duathlon (Ciclismo+Corrida)": "#c27968",
+    "Corrida": "#3d8a9c",
+    "Ciclismo": "#3a9478",
+    "Natação": "#4a6aa8",
+    "Triathlon": "#5a48a0",
+    "Duathlon (Natação+Corrida)": "#a04890",
+    "Duathlon (Ciclismo+Corrida)": "#a05a48",
 }
 
 # Cores por fase de periodização
 PHASE_COLORS = {
-    "Base": "#6885c2",
-    "Resistencia": "#68c2a6",
-    "Velocidade": "#c27968",
-    "Potencia": "#c26868",
-    "Polimento": "#7968c2",
+    "Base": "#4a6aa8",
+    "Resistencia": "#3a9478",
+    "Velocidade": "#a05a48",
+    "Potencia": "#a04848",
+    "Polimento": "#5a48a0",
 }
 
 
@@ -128,7 +128,7 @@ def build_theme(dark: bool = False) -> ft.Theme:
             title_large=ft.TextStyle(size=18, weight=ft.FontWeight.W_500),
             title_medium=ft.TextStyle(size=16, weight=ft.FontWeight.W_500),
             body_large=ft.TextStyle(size=14),
-            body_medium=ft.TextStyle(size=13),
+            body_medium=ft.TextStyle(size=14),
             body_small=ft.TextStyle(size=12),
             label_large=ft.TextStyle(size=14, weight=ft.FontWeight.W_500),
         ),

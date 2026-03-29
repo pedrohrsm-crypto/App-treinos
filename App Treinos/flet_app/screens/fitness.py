@@ -9,6 +9,7 @@ import flet as ft
 from flet_app.theme import c
 from flet_app.state import app_state
 from flet_app.components.nav_bar import build_nav_bar
+from flet_app.components.feature_tooltip import build_feature_tooltip
 
 
 def fitness_view(page: ft.Page, route: str) -> ft.View:
@@ -119,6 +120,7 @@ def fitness_view(page: ft.Page, route: str) -> ft.View:
                 content=ft.Column(
                     [
                         ft.Text("⌚ Fitness & Conectores", size=20, weight=ft.FontWeight.BOLD),
+                        build_feature_tooltip("fitness", t("tooltip_fitness"), page, dark),
                         strava_section,
                         garmin_section,
                         ft.Divider(height=16),
