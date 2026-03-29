@@ -16,30 +16,30 @@ def register_view(page: ft.Page, route: str) -> ft.View:
 
     dark = app_state.dark_mode
 
-    nome = ft.TextField(label="Nome completo", prefix_icon=ft.Icons.PERSON_OUTLINE, border_radius=12, filled=True, autofocus=True)
-    cpf = ft.TextField(label="CPF", prefix_icon=ft.Icons.BADGE_OUTLINED, border_radius=12, filled=True)
-    cref = ft.TextField(label="CREF", prefix_icon=ft.Icons.VERIFIED_OUTLINED, border_radius=12, filled=True)
-    email = ft.TextField(label="E-mail (opcional)", prefix_icon=ft.Icons.EMAIL_OUTLINED, border_radius=12, filled=True)
-    senha = ft.TextField(label="Senha", prefix_icon=ft.Icons.LOCK_OUTLINE, password=True, can_reveal_password=True, border_radius=12, filled=True)
-    senha2 = ft.TextField(label="Confirmar senha", prefix_icon=ft.Icons.LOCK_OUTLINE, password=True, can_reveal_password=True, border_radius=12, filled=True)
+    nome = ft.TextField(label=t("register_name"), prefix_icon=ft.Icons.PERSON_OUTLINE, border_radius=12, filled=True, autofocus=True)
+    cpf = ft.TextField(label=t("register_cpf"), prefix_icon=ft.Icons.BADGE_OUTLINED, border_radius=12, filled=True)
+    cref = ft.TextField(label=t("register_cref"), prefix_icon=ft.Icons.VERIFIED_OUTLINED, border_radius=12, filled=True)
+    email = ft.TextField(label=t("register_email"), prefix_icon=ft.Icons.EMAIL_OUTLINED, border_radius=12, filled=True)
+    senha = ft.TextField(label=t("register_password"), prefix_icon=ft.Icons.LOCK_OUTLINE, password=True, can_reveal_password=True, border_radius=12, filled=True)
+    senha2 = ft.TextField(label=t("register_confirm"), prefix_icon=ft.Icons.LOCK_OUTLINE, password=True, can_reveal_password=True, border_radius=12, filled=True)
     msg = ft.Text("", size=13, visible=False)
 
     def _do_register(_):
         # Validação básica
         if not nome.value or not cpf.value or not cref.value or not senha.value:
-            msg.value = "Preencha os campos obrigatórios."
+            msg.value = t("register_error_required")
             msg.color = c("error", dark)
             msg.visible = True
             page.update()
             return
         if senha.value != senha2.value:
-            msg.value = "As senhas não coincidem."
+            msg.value = t("register_error_mismatch")
             msg.color = c("error", dark)
             msg.visible = True
             page.update()
             return
         if len(senha.value) < 6:
-            msg.value = "A senha deve ter no mínimo 6 caracteres."
+            msg.value = t("register_error_short")
             msg.color = c("error", dark)
             msg.visible = True
             page.update()
@@ -53,7 +53,7 @@ def register_view(page: ft.Page, route: str) -> ft.View:
             email=email.value.strip() or None,
         )
         if ok:
-            msg.value = "Conta criada! Redirecionando…"
+            msg.value = t("register_success")
             msg.color = c("success", dark)
             msg.visible = True
             page.update()
@@ -77,7 +77,7 @@ def register_view(page: ft.Page, route: str) -> ft.View:
             [
                 ft.Row(
                     [ft.IconButton(ft.Icons.ARROW_BACK, on_click=_go_back),
-                     ft.Text("Criar Conta", size=22, weight=ft.FontWeight.BOLD)],
+                     ft.Text(t("register_title"), size=22, weight=ft.FontWeight.BOLD)],
                     alignment=ft.MainAxisAlignment.START,
                 ),
                 ft.Divider(height=10, color=ft.Colors.TRANSPARENT),
@@ -85,7 +85,7 @@ def register_view(page: ft.Page, route: str) -> ft.View:
                 msg,
                 ft.Divider(height=8, color=ft.Colors.TRANSPARENT),
                 ft.ElevatedButton(
-                    "Cadastrar",
+                    t("register_button"),
                     icon=ft.Icons.PERSON_ADD,
                     bgcolor=c("primary", dark),
                     color=c("text_light", dark),

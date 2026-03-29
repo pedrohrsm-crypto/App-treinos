@@ -85,9 +85,20 @@ def splash_view(page: ft.Page, route: str) -> ft.View:
         auto_logged = False
         if session:
             await _set_progress(0.65, "Restaurando sessão…")
-            ok, data = app_state.db.autenticar_usuario(
-                session["credential"], session["password_raw"]
-            )
+            # Suporta formato novo (password_hash) e legado (password_raw)
+            if "password_hash" in session:
+                ok, data = app_state.db.autenticar_por_hash(
+                    session["credential"], session["password_hash"]
+                )
+            elif "password_raw" in session:
+                ok, data = app_state.db.autenticar_usuario(
+                    session["credential"], session["password_raw"]
+                )
+                # Migrar sessão legada para formato seguro
+                if ok:
+                    app_state.save_session(session["credential"], session["password_raw"])
+            else:
+                ok, data = False, None
             if ok:
                 app_state.login(data)
                 # Aplicar preferências persistidas
@@ -112,7 +123,12 @@ def splash_view(page: ft.Page, route: str) -> ft.View:
         await asyncio.sleep(0.4)
 
         # Navegar
-        page.go("/dashboard" if auto_logged else "/login")
+        if auto_logged:
+            page.go("/dashboard")
+        elif not app_state.is_onboarding_completed():
+            page.go("/onboarding")
+        else:
+            page.go("/login")
 
     page.run_task(_init_sequence)
 

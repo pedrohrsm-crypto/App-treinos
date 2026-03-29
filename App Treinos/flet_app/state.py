@@ -77,6 +77,19 @@ class AppState:
         data[key] = {"dark_mode": self.dark_mode, "language": self.language}
         self._write_prefs_file(data)
 
+    # ── Onboarding ───────────────────────────────────────────────
+
+    def is_onboarding_completed(self) -> bool:
+        """Verifica se o onboarding já foi concluído."""
+        data = self._read_prefs_file()
+        return data.get("_onboarding_completed", False)
+
+    def set_onboarding_completed(self):
+        """Marca o onboarding como concluído."""
+        data = self._read_prefs_file()
+        data["_onboarding_completed"] = True
+        self._write_prefs_file(data)
+
     def load_preferences(self) -> Optional[Dict]:
         """Carrega preferências do treinador logado (ou _global)."""
         data = self._read_prefs_file()
@@ -86,9 +99,31 @@ class AppState:
     # ── Persistência de sessão (auto-login) ──────────────────────
 
     def save_session(self, credential: str, password_raw: str):
-        """Guarda credenciais para auto-login (ficheiro local)."""
+        """Guarda credenciais para auto-login (ficheiro local).
+
+        Armazena o hash da DB (PBKDF2) após autenticação bem-sucedida,
+        nunca a senha em texto claro.
+        """
+        # Obter o hash armazenado na DB para este utilizador
+        import sqlite3
+        try:
+            conn = sqlite3.connect(self.db.db_path)
+            cursor = conn.cursor()
+            cursor.execute(
+                'SELECT senha_hash FROM usuarios WHERE (cpf = ? OR cref = ?) AND ativo = 1',
+                (credential, credential)
+            )
+            row = cursor.fetchone()
+            conn.close()
+            if row:
+                db_hash = row[0]
+            else:
+                return  # Utilizador não encontrado, não guardar sessão
+        except Exception:
+            return
+
         data = self._read_prefs_file()
-        data["_session"] = {"credential": credential, "password_raw": password_raw}
+        data["_session"] = {"credential": credential, "password_hash": db_hash}
         self._write_prefs_file(data)
 
     def load_session(self) -> Optional[Dict]:

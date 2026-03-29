@@ -62,6 +62,83 @@ _translations: Dict[str, Dict[str, str]] = {
         "en": "Admin Access",
         "es": "Acceso Administrativo",
     },
+    "login_error_empty": {
+        "pt": "Preencha todos os campos.",
+        "en": "Please fill in all fields.",
+        "es": "Por favor, complete todos los campos.",
+    },
+    "login_error_invalid": {
+        "pt": "Credenciais inválidas.",
+        "en": "Invalid credentials.",
+        "es": "Credenciales inválidas.",
+    },
+    "register_link": {
+        "pt": "Criar conta",
+        "en": "Create account",
+        "es": "Crear cuenta",
+    },
+
+    # ── Registro ─────────────────────────────────────────────────
+    "register_title": {
+        "pt": "Criar Conta",
+        "en": "Create Account",
+        "es": "Crear Cuenta",
+    },
+    "register_name": {
+        "pt": "Nome completo",
+        "en": "Full name",
+        "es": "Nombre completo",
+    },
+    "register_cpf": {
+        "pt": "CPF",
+        "en": "CPF",
+        "es": "CPF",
+    },
+    "register_cref": {
+        "pt": "CREF",
+        "en": "CREF",
+        "es": "CREF",
+    },
+    "register_email": {
+        "pt": "E-mail (opcional)",
+        "en": "Email (optional)",
+        "es": "Correo (opcional)",
+    },
+    "register_password": {
+        "pt": "Senha",
+        "en": "Password",
+        "es": "Contraseña",
+    },
+    "register_confirm": {
+        "pt": "Confirmar senha",
+        "en": "Confirm password",
+        "es": "Confirmar contraseña",
+    },
+    "register_button": {
+        "pt": "Cadastrar",
+        "en": "Register",
+        "es": "Registrarse",
+    },
+    "register_error_required": {
+        "pt": "Preencha os campos obrigatórios.",
+        "en": "Please fill in the required fields.",
+        "es": "Por favor, complete los campos obligatorios.",
+    },
+    "register_error_mismatch": {
+        "pt": "As senhas não coincidem.",
+        "en": "Passwords do not match.",
+        "es": "Las contraseñas no coinciden.",
+    },
+    "register_error_short": {
+        "pt": "A senha deve ter no mínimo 6 caracteres.",
+        "en": "Password must be at least 6 characters.",
+        "es": "La contraseña debe tener al menos 6 caracteres.",
+    },
+    "register_success": {
+        "pt": "Conta criada! Redirecionando…",
+        "en": "Account created! Redirecting…",
+        "es": "¡Cuenta creada! Redirigiendo…",
+    },
 
     # ── Dashboard ────────────────────────────────────────────────
     "dashboard_greeting": {
@@ -560,6 +637,85 @@ _translations: Dict[str, Dict[str, str]] = {
         "pt": "Voltar",
         "en": "Back",
         "es": "Volver",
+    },
+
+    # ── Onboarding ───────────────────────────────────────────────
+    "onboarding_welcome_title": {
+        "pt": "Bem-vindo ao App Treinos",
+        "en": "Welcome to Training App",
+        "es": "Bienvenido a App Entrenamientos",
+    },
+    "onboarding_welcome_body": {
+        "pt": "Planejamento profissional de treinos esportivos, com periodização automática e monitoramento completo.",
+        "en": "Professional sports training planning with automatic periodization and full monitoring.",
+        "es": "Planificación profesional de entrenamientos deportivos con periodización automática y monitoreo completo.",
+    },
+    "onboarding_plans_title": {
+        "pt": "Crie Planos Personalizados",
+        "en": "Create Custom Plans",
+        "es": "Cree Planes Personalizados",
+    },
+    "onboarding_plans_body": {
+        "pt": "Wizard de 6 passos gera planos de treino com periodização científica para Corrida, Ciclismo, Natação e Triathlon.",
+        "en": "6-step wizard generates training plans with scientific periodization for Running, Cycling, Swimming and Triathlon.",
+        "es": "Asistente de 6 pasos genera planes de entrenamiento con periodización científica para Carrera, Ciclismo, Natación y Triatlón.",
+    },
+    "onboarding_progress_title": {
+        "pt": "Acompanhe o Progresso",
+        "en": "Track Progress",
+        "es": "Siga el Progreso",
+    },
+    "onboarding_progress_body": {
+        "pt": "Estatísticas detalhadas, distribuição por esporte, calendário de sessões e histórico completo de atividades.",
+        "en": "Detailed statistics, sport distribution, session calendar and full activity history.",
+        "es": "Estadísticas detalladas, distribución por deporte, calendario de sesiones e historial completo de actividades.",
+    },
+    "onboarding_devices_title": {
+        "pt": "Conecte Seus Dispositivos",
+        "en": "Connect Your Devices",
+        "es": "Conecte Sus Dispositivos",
+    },
+    "onboarding_devices_body": {
+        "pt": "Integração com Strava para importar suas atividades. Suporte a Garmin em breve.",
+        "en": "Strava integration to import your activities. Garmin support coming soon.",
+        "es": "Integración con Strava para importar sus actividades. Soporte Garmin próximamente.",
+    },
+    "onboarding_skip": {
+        "pt": "Pular",
+        "en": "Skip",
+        "es": "Saltar",
+    },
+    "onboarding_next": {
+        "pt": "Próximo",
+        "en": "Next",
+        "es": "Siguiente",
+    },
+    "onboarding_start": {
+        "pt": "Começar",
+        "en": "Get Started",
+        "es": "Comenzar",
+    },
+
+    # ── Tooltips contextuais ─────────────────────────────────────
+    "tooltip_dashboard": {
+        "pt": "Toque em um atleta para ver detalhes. Use o botão + para criar um novo plano.",
+        "en": "Tap an athlete to see details. Use the + button to create a new plan.",
+        "es": "Toque un atleta para ver detalles. Use el botón + para crear un nuevo plan.",
+    },
+    "tooltip_config": {
+        "pt": "Personalize tema e idioma aqui. As configurações são salvas automaticamente.",
+        "en": "Customize theme and language here. Settings are saved automatically.",
+        "es": "Personalice tema e idioma aquí. Los ajustes se guardan automáticamente.",
+    },
+    "tooltip_fitness": {
+        "pt": "Conecte seu Strava para importar atividades automaticamente.",
+        "en": "Connect your Strava to import activities automatically.",
+        "es": "Conecte su Strava para importar actividades automáticamente.",
+    },
+    "tooltip_wizard": {
+        "pt": "Preencha os 6 passos para gerar um plano de treino personalizado.",
+        "en": "Fill in 6 steps to generate a personalized training plan.",
+        "es": "Complete los 6 pasos para generar un plan de entrenamiento personalizado.",
     },
 }
 

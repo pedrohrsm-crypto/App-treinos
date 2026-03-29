@@ -780,9 +780,9 @@ class TrainingPlanGenerator:
             treinos = self._generate_swimming_week(info_semana)
         elif esporte_lower == 'ciclismo':
             treinos = self._generate_cycling_week(info_semana)
-        elif esporte_lower in ['duathlon natação e corrida', 'aquathlon']:
+        elif esporte_lower in ['duathlon natação e corrida', 'duathlon (natação+corrida)', 'aquathlon']:
             treinos = self._generate_duathlon_swim_run_week(info_semana)
-        elif esporte_lower in ['duathlon ciclismo e corrida', 'duathlon']:
+        elif esporte_lower in ['duathlon ciclismo e corrida', 'duathlon (ciclismo+corrida)', 'duathlon']:
             treinos = self._generate_duathlon_bike_run_week(info_semana)
         else:
             raise ValueError(f"Esporte não reconhecido: {self.athlete.esporte}")

@@ -40,7 +40,7 @@ def login_view(page: ft.Page, route: str) -> ft.View:
         cred = credential.value.strip()
         pwd = password.value.strip()
         if not cred or not pwd:
-            error_text.value = t("login_error_empty") if "login_error_empty" in dir() else "Preencha todos os campos."
+            error_text.value = t("login_error_empty")
             error_text.visible = True
             page.update()
             return
@@ -51,7 +51,7 @@ def login_view(page: ft.Page, route: str) -> ft.View:
             app_state.save_session(cred, pwd)
             page.go("/dashboard")
         else:
-            error_text.value = t("login_error_invalid") if "login_error_invalid" in dir() else "Credenciais inválidas."
+            error_text.value = t("login_error_invalid")
             error_text.visible = True
             page.update()
 
@@ -81,7 +81,7 @@ def login_view(page: ft.Page, route: str) -> ft.View:
                 error_text,
                 ft.Divider(height=8, color=ft.Colors.TRANSPARENT),
                 ft.ElevatedButton(
-                    text=t("login_button"),
+                    t("login_button"),
                     icon=ft.Icons.LOGIN,
                     bgcolor=c("primary", dark),
                     color=c("text_light", dark),
@@ -90,7 +90,7 @@ def login_view(page: ft.Page, route: str) -> ft.View:
                     on_click=_do_login,
                 ),
                 ft.TextButton(
-                    text=t("register_link") if "register_link" in dir() else "Criar conta",
+                    t("register_link"),
                     on_click=_go_register,
                 ),
             ],

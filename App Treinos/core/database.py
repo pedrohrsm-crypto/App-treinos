@@ -135,8 +135,25 @@ class DatabaseManager:
         self.connection.commit()
     
     def _hash_password(self, password: str) -> str:
-        """Gera hash SHA-256 da senha."""
-        return hashlib.sha256(password.encode()).hexdigest()
+        """Gera hash PBKDF2-SHA256 com salt (ou SHA-256 legado para compatibilidade).
+
+        Formato novo: 'pbkdf2$<salt_hex>$<hash_hex>'
+        Formato legado: 64 caracteres hex (SHA-256 puro)
+        """
+        salt = os.urandom(16)
+        dk = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100_000)
+        return f"pbkdf2${salt.hex()}${dk.hex()}"
+
+    def _verify_password(self, password: str, stored_hash: str) -> bool:
+        """Verifica senha contra hash armazenado (suporta PBKDF2 e SHA-256 legado)."""
+        if stored_hash.startswith("pbkdf2$"):
+            _, salt_hex, hash_hex = stored_hash.split("$", 2)
+            salt = bytes.fromhex(salt_hex)
+            dk = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100_000)
+            return dk.hex() == hash_hex
+        else:
+            # Formato legado SHA-256
+            return hashlib.sha256(password.encode()).hexdigest() == stored_hash
     
     def _get_connection(self):
         """Retorna conexão ativa."""
@@ -160,10 +177,16 @@ class DatabaseManager:
         Returns:
             Tupla (sucesso, mensagem)
         """
+        # Validação de campos obrigatórios
+        if not senha or len(senha.strip()) < 6:
+            return False, "A senha deve ter no mínimo 6 caracteres."
+        if not nome or len(nome.strip()) < 2:
+            return False, "O nome deve ter no mínimo 2 caracteres."
+
         try:
             conn = self._get_connection()
             cursor = conn.cursor()
-            
+
             # Verificar se CPF ou CREF já existem
             if self.use_mysql:
                 cursor.execute(
@@ -209,36 +232,35 @@ class DatabaseManager:
     def autenticar_usuario(self, credencial: str, senha: str) -> Tuple[bool, Optional[Dict]]:
         """
         Autentica usuário por CPF ou CREF.
-        
+
         Args:
             credencial: CPF ou CREF do usuário
             senha: Senha de acesso
-        
+
         Returns:
             Tupla (sucesso, dados_usuario ou None)
         """
         try:
             conn = self._get_connection()
             cursor = conn.cursor()
-            
-            senha_hash = self._hash_password(senha)
-            
+
+            # Buscar utilizador pela credencial (verificação de senha em Python)
             if self.use_mysql:
                 cursor.execute('''
-                    SELECT id, cpf, cref, nome, email, tipo, ativo
+                    SELECT id, cpf, cref, nome, email, tipo, ativo, senha_hash
                     FROM usuarios
-                    WHERE (cpf = %s OR cref = %s) AND senha_hash = %s AND ativo = 1
-                ''', (credencial, credencial, senha_hash))
+                    WHERE (cpf = %s OR cref = %s) AND ativo = 1
+                ''', (credencial, credencial))
             else:
                 cursor.execute('''
-                    SELECT id, cpf, cref, nome, email, tipo, ativo
+                    SELECT id, cpf, cref, nome, email, tipo, ativo, senha_hash
                     FROM usuarios
-                    WHERE (cpf = ? OR cref = ?) AND senha_hash = ? AND ativo = 1
-                ''', (credencial, credencial, senha_hash))
-            
+                    WHERE (cpf = ? OR cref = ?) AND ativo = 1
+                ''', (credencial, credencial))
+
             resultado = cursor.fetchone()
-            
-            if resultado:
+
+            if resultado and self._verify_password(senha, resultado[7]):
                 # Atualizar último acesso
                 user_id = resultado[0]
                 if self.use_mysql:
@@ -251,9 +273,24 @@ class DatabaseManager:
                         'UPDATE usuarios SET ultimo_acesso = ? WHERE id = ?',
                         (datetime.now().isoformat(), user_id)
                     )
+
+                # Migrar hash legado (SHA-256) para PBKDF2 na primeira autenticação
+                stored_hash = resultado[7]
+                if not stored_hash.startswith("pbkdf2$"):
+                    new_hash = self._hash_password(senha)
+                    if self.use_mysql:
+                        cursor.execute(
+                            'UPDATE usuarios SET senha_hash = %s WHERE id = %s',
+                            (new_hash, user_id)
+                        )
+                    else:
+                        cursor.execute(
+                            'UPDATE usuarios SET senha_hash = ? WHERE id = ?',
+                            (new_hash, user_id)
+                        )
+
                 conn.commit()
-                
-                # Retornar dados do usuário
+
                 usuario = {
                     'id': resultado[0],
                     'cpf': resultado[1],
@@ -263,17 +300,84 @@ class DatabaseManager:
                     'tipo': resultado[5],
                     'ativo': resultado[6]
                 }
-                
+
                 conn.close()
                 return True, usuario
-            
+
             conn.close()
             return False, None
-        
+
         except Exception as e:
             print(f"❌ Erro na autenticação: {e}")
             return False, None
     
+    def autenticar_por_hash(self, credencial: str, senha_hash: str) -> Tuple[bool, Optional[Dict]]:
+        """
+        Autentica usuário por CPF ou CREF comparando hash armazenado.
+
+        Usado pelo auto-login: o preferences.json guarda o hash completo
+        da DB (PBKDF2 ou SHA-256 legado) e este método compara directamente.
+
+        Args:
+            credencial: CPF ou CREF do usuário
+            senha_hash: Hash completo armazenado (PBKDF2 ou SHA-256 legado)
+
+        Returns:
+            Tupla (sucesso, dados_usuario ou None)
+        """
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            if self.use_mysql:
+                cursor.execute('''
+                    SELECT id, cpf, cref, nome, email, tipo, ativo, senha_hash
+                    FROM usuarios
+                    WHERE (cpf = %s OR cref = %s) AND ativo = 1
+                ''', (credencial, credencial))
+            else:
+                cursor.execute('''
+                    SELECT id, cpf, cref, nome, email, tipo, ativo, senha_hash
+                    FROM usuarios
+                    WHERE (cpf = ? OR cref = ?) AND ativo = 1
+                ''', (credencial, credencial))
+
+            resultado = cursor.fetchone()
+
+            if resultado and resultado[7] == senha_hash:
+                user_id = resultado[0]
+                if self.use_mysql:
+                    cursor.execute(
+                        'UPDATE usuarios SET ultimo_acesso = %s WHERE id = %s',
+                        (datetime.now(), user_id)
+                    )
+                else:
+                    cursor.execute(
+                        'UPDATE usuarios SET ultimo_acesso = ? WHERE id = ?',
+                        (datetime.now().isoformat(), user_id)
+                    )
+                conn.commit()
+
+                usuario = {
+                    'id': resultado[0],
+                    'cpf': resultado[1],
+                    'cref': resultado[2],
+                    'nome': resultado[3],
+                    'email': resultado[4],
+                    'tipo': resultado[5],
+                    'ativo': resultado[6]
+                }
+
+                conn.close()
+                return True, usuario
+
+            conn.close()
+            return False, None
+
+        except Exception as e:
+            print(f"❌ Erro na autenticação por hash: {e}")
+            return False, None
+
     def autenticar_admin(self, usuario: str, senha: str) -> bool:
         """
         Autentica acesso administrativo.
@@ -337,18 +441,19 @@ class DatabaseManager:
             Tupla (sucesso, mensagem)
         """
         try:
-            campos_permitidos = ['nome', 'email', 'ativo', 'cpf', 'cref']
+            # Whitelist estrita — apenas estes nomes de coluna são permitidos
+            _CAMPOS_PERMITIDOS = frozenset({'nome', 'email', 'ativo', 'cpf', 'cref'})
             campos = []
             valores = []
-            
+
             for campo, valor in kwargs.items():
-                if campo in campos_permitidos:
+                if campo in _CAMPOS_PERMITIDOS:
                     campos.append(f"{campo} = ?")
                     valores.append(valor)
-            
+
             if not campos:
                 return False, "Nenhum campo válido para atualizar"
-            
+
             valores.append(user_id)
             query = f"UPDATE usuarios SET {', '.join(campos)} WHERE id = ?"
             
