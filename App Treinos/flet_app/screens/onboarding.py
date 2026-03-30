@@ -4,7 +4,7 @@ Onboarding — Carrossel de boas-vindas (primeiro uso)
 
 Exibido apenas na primeira execução. Apresenta as
 funcionalidades do app em 4 slides com navegação por
-botões e indicadores de página.
+botões e indicadores de página. Botão Voltar incluído.
 """
 
 import flet as ft
@@ -21,46 +21,46 @@ def onboarding_view(page: ft.Page, route: str) -> ft.View:
 
     slides = [
         {
-            "emoji": "🏃",
+            "icon": ft.Icons.DIRECTIONS_RUN,
             "title": t("onboarding_welcome_title"),
             "body": t("onboarding_welcome_body"),
         },
         {
-            "emoji": "📋",
+            "icon": ft.Icons.ASSIGNMENT,
             "title": t("onboarding_plans_title"),
             "body": t("onboarding_plans_body"),
         },
         {
-            "emoji": "📊",
+            "icon": ft.Icons.INSIGHTS,
             "title": t("onboarding_progress_title"),
             "body": t("onboarding_progress_body"),
         },
         {
-            "emoji": "⌚",
+            "icon": ft.Icons.WATCH,
             "title": t("onboarding_devices_title"),
             "body": t("onboarding_devices_body"),
         },
     ]
 
     # ── Elementos visuais ────────────────────────────────────────
-    emoji_text = ft.Text(slides[0]["emoji"], size=72, text_align=ft.TextAlign.CENTER)
+    icon_display = ft.Icon(slides[0]["icon"], size=72, color=c("primary", dark))
     title_text = ft.Text(
         slides[0]["title"], size=26, weight=ft.FontWeight.BOLD,
         text_align=ft.TextAlign.CENTER, color=c("text_primary", dark),
     )
     body_text = ft.Text(
-        slides[0]["body"], size=15, text_align=ft.TextAlign.CENTER,
+        slides[0]["body"], size=17, text_align=ft.TextAlign.CENTER,
         color=c("text_secondary", dark),
     )
 
-    # ── Indicadores de página ────────────────────────────────────
+    # ── Indicadores de página (maiores para acessibilidade) ──────
     def _build_dots():
         return ft.Row(
             [
                 ft.Container(
-                    width=10 if i != current[0] else 24,
-                    height=10,
-                    border_radius=5,
+                    width=14 if i != current[0] else 28,
+                    height=14,
+                    border_radius=7,
                     bgcolor=c("primary", dark) if i == current[0] else c("text_disabled", dark),
                     animate=ft.Animation(200, ft.AnimationCurve.EASE_OUT),
                     animate_size=ft.Animation(200, ft.AnimationCurve.EASE_OUT),
@@ -68,12 +68,19 @@ def onboarding_view(page: ft.Page, route: str) -> ft.View:
                 for i in range(len(slides))
             ],
             alignment=ft.MainAxisAlignment.CENTER,
-            spacing=6,
+            spacing=8,
         )
 
     dots_row = _build_dots()
 
     # ── Navegação ────────────────────────────────────────────────
+    btn_back = ft.TextButton(
+        t("onboarding_back"),
+        icon=ft.Icons.ARROW_BACK,
+        on_click=lambda _: _go_back(),
+        style=ft.ButtonStyle(color=c("text_secondary", dark)),
+        visible=False,
+    )
     btn_skip = ft.TextButton(
         t("onboarding_skip"),
         on_click=lambda _: _finish(),
@@ -99,14 +106,16 @@ def onboarding_view(page: ft.Page, route: str) -> ft.View:
 
     def _update_slide():
         slide = slides[current[0]]
-        emoji_text.value = slide["emoji"]
+        icon_display.name = slide["icon"]
         title_text.value = slide["title"]
         body_text.value = slide["body"]
 
         is_last = current[0] == len(slides) - 1
+        is_first = current[0] == 0
         btn_next.visible = not is_last
         btn_skip.visible = not is_last
         btn_start.visible = is_last
+        btn_back.visible = not is_first
 
         # Rebuild dots
         nonlocal dots_row
@@ -114,9 +123,9 @@ def onboarding_view(page: ft.Page, route: str) -> ft.View:
         for i in range(len(slides)):
             dots_row.controls.append(
                 ft.Container(
-                    width=24 if i == current[0] else 10,
-                    height=10,
-                    border_radius=5,
+                    width=28 if i == current[0] else 14,
+                    height=14,
+                    border_radius=7,
                     bgcolor=c("primary", dark) if i == current[0] else c("text_disabled", dark),
                     animate=ft.Animation(200, ft.AnimationCurve.EASE_OUT),
                 )
@@ -128,6 +137,11 @@ def onboarding_view(page: ft.Page, route: str) -> ft.View:
             current[0] += 1
             _update_slide()
 
+    def _go_back():
+        if current[0] > 0:
+            current[0] -= 1
+            _update_slide()
+
     def _finish():
         app_state.set_onboarding_completed()
         page.go("/login")
@@ -137,7 +151,7 @@ def onboarding_view(page: ft.Page, route: str) -> ft.View:
         content=ft.Column(
             [
                 ft.Container(expand=1),
-                emoji_text,
+                icon_display,
                 ft.Container(height=16),
                 title_text,
                 ft.Container(height=12),
@@ -149,7 +163,7 @@ def onboarding_view(page: ft.Page, route: str) -> ft.View:
                 dots_row,
                 ft.Container(height=24),
                 ft.Row(
-                    [btn_skip, btn_next],
+                    [btn_back, btn_skip, ft.Container(expand=True), btn_next],
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 ),
                 btn_start,

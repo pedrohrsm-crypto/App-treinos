@@ -40,7 +40,7 @@ def build_feature_tooltip(
                 ft.Icon(ft.Icons.LIGHTBULB_OUTLINE, color=c("primary", dark), size=20),
                 ft.Text(message, size=13, color=c("text_primary", dark), expand=True),
                 ft.IconButton(
-                    ft.Icons.CLOSE, icon_size=16,
+                    ft.Icons.CLOSE, icon_size=22,
                     icon_color=c("text_secondary", dark),
                     on_click=lambda _: _dismiss(),
                 ),

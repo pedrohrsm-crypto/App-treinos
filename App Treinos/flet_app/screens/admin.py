@@ -38,7 +38,7 @@ def admin_view(page: ft.Page, route: str) -> ft.View:
         users = app_state.db.listar_usuarios()
         rows = []
         for u in users:
-            status = "✅ Ativo" if u.get("ativo", 1) else "❌ Inativo"
+            status = "Ativo" if u.get("ativo", 1) else "Inativo"
             rows.append(
                 ft.DataRow(
                     cells=[
@@ -76,7 +76,7 @@ def admin_view(page: ft.Page, route: str) -> ft.View:
             [
                 ft.Row(
                     [ft.IconButton(ft.Icons.ARROW_BACK, on_click=_go_back),
-                     ft.Text("🔐 Painel de Administração", size=22, weight=ft.FontWeight.BOLD)],
+                     ft.Row([ft.Icon(ft.Icons.ADMIN_PANEL_SETTINGS, size=22, color=c("primary", dark)), ft.Text("Painel de Administração", size=22, weight=ft.FontWeight.BOLD)], spacing=8)],
                 ),
                 ft.Divider(),
                 ft.Container(content=table, expand=True),

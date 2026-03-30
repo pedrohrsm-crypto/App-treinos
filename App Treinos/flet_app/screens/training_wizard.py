@@ -11,7 +11,7 @@ import flet as ft
 from datetime import datetime
 import math
 from i18n import t
-from flet_app.theme import c, SPORT_COLORS
+from flet_app.theme import c, SPORT_COLORS, SPORT_ICONS, RADIUS, SPACING
 from flet_app.state import app_state
 from flet_app.components.loading_overlay import build_loading
 from flet_app.components.feature_tooltip import build_feature_tooltip
@@ -29,22 +29,17 @@ DISTANCES = {
     "Duathlon (Ciclismo+Corrida)": ["Duathlon Sprint", "Duathlon Olímpico", "Duathlon Longo", "Duathlon Ironman"],
 }
 
-SPORT_EMOJIS = {
-    "Corrida": "🏃",
-    "Ciclismo": "🚴",
-    "Natação": "🏊",
-    "Triathlon": "🏅",
-    "Duathlon (Natação+Corrida)": "🏊🏃",
-    "Duathlon (Ciclismo+Corrida)": "🚴🏃",
+# Icon names from SPORT_ICONS (theme.py)
+_SPORT_ICON_MAP = {
+    "Corrida": ft.Icons.DIRECTIONS_RUN,
+    "Ciclismo": ft.Icons.DIRECTIONS_BIKE,
+    "Natação": ft.Icons.POOL,
+    "Triathlon": ft.Icons.EMOJI_EVENTS,
+    "Duathlon (Natação+Corrida)": ft.Icons.POOL,
+    "Duathlon (Ciclismo+Corrida)": ft.Icons.DIRECTIONS_BIKE,
 }
 
-HEALTH_TYPES = {
-    1: "Ortopédico",
-    2: "Asma / Respiratório",
-    3: "Diabetes",
-    4: "Hipertensão",
-    5: "Outro",
-}
+_MAX_HEALTH_ISSUES = 10
 
 
 def training_wizard_view(page: ft.Page, route: str) -> ft.View:
@@ -76,27 +71,27 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
     # ═══════════════════════════════════════════════════════════════
     # STEP 1 — Dados do Atleta
     # ═══════════════════════════════════════════════════════════════
-    nome_field = ft.TextField(label="Nome completo", value=form["nome"], autofocus=True)
-    idade_field = ft.TextField(label="Idade", keyboard_type=ft.KeyboardType.NUMBER, width=100)
-    peso_field = ft.TextField(label="Peso (kg)", keyboard_type=ft.KeyboardType.NUMBER, width=120)
-    altura_field = ft.TextField(label="Altura (cm)", keyboard_type=ft.KeyboardType.NUMBER, width=120)
+    nome_field = ft.TextField(label=t("wizard_name"), value=form["nome"], autofocus=True, max_length=100)
+    idade_field = ft.TextField(label=t("wizard_age"), keyboard_type=ft.KeyboardType.NUMBER, width=100, max_length=3)
+    peso_field = ft.TextField(label=t("wizard_weight"), keyboard_type=ft.KeyboardType.NUMBER, width=120, max_length=6)
+    altura_field = ft.TextField(label=t("wizard_height"), keyboard_type=ft.KeyboardType.NUMBER, width=120, max_length=6)
     genero_dd = ft.Dropdown(
-        label="Género",
+        label=t("wizard_gender"),
         width=160,
         value="masculino",
-        options=[ft.dropdown.Option("masculino", "Masculino"), ft.dropdown.Option("feminino", "Feminino")],
+        options=[ft.dropdown.Option("masculino", t("wizard_gender_male")), ft.dropdown.Option("feminino", t("wizard_gender_female"))],
     )
 
     # Ciclo menstrual (visível apenas se feminino)
     fase_dd = ft.Dropdown(
-        label="Fase do ciclo menstrual (opcional)",
+        label=t("wizard_cycle_label"),
         width=280,
         options=[
-            ft.dropdown.Option("", "Não informar"),
-            ft.dropdown.Option("menstrual", "Menstrual"),
-            ft.dropdown.Option("folicular", "Folicular"),
-            ft.dropdown.Option("ovulatoria", "Ovulatória"),
-            ft.dropdown.Option("lutea", "Lútea"),
+            ft.dropdown.Option("", t("wizard_cycle_none")),
+            ft.dropdown.Option("menstrual", t("wizard_cycle_menstrual")),
+            ft.dropdown.Option("folicular", t("wizard_cycle_follicular")),
+            ft.dropdown.Option("ovulatoria", t("wizard_cycle_ovulatory")),
+            ft.dropdown.Option("lutea", t("wizard_cycle_luteal")),
         ],
         visible=False,
     )
@@ -109,7 +104,7 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
 
     step1_content = ft.Column(
         [
-            ft.Text("👤 Dados do Atleta", size=18, weight=ft.FontWeight.BOLD),
+            ft.Row([ft.Icon(ft.Icons.PERSON, size=20, color=c("primary", dark)), ft.Text(t("wizard_athlete_title"), size=18, weight=ft.FontWeight.BOLD)], spacing=8),
             nome_field,
             ft.Row([idade_field, peso_field, altura_field], spacing=12),
             ft.Row([genero_dd, fase_dd], spacing=12),
@@ -124,7 +119,7 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
 
     def _sport_cards():
         cards = []
-        for sport, emoji in SPORT_EMOJIS.items():
+        for sport, icon_name in _SPORT_ICON_MAP.items():
             color = SPORT_COLORS.get(sport, c("primary", dark))
 
             def _select(e, s=sport):
@@ -141,7 +136,7 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
             card = ft.Container(
                 content=ft.Column(
                     [
-                        ft.Text(emoji, size=36),
+                        ft.Icon(icon_name, size=36, color=color),
                         ft.Text(sport, size=13, weight=ft.FontWeight.W_600, text_align=ft.TextAlign.CENTER),
                     ],
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -150,7 +145,7 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
                 width=130,
                 height=100,
                 alignment=ft.Alignment.CENTER,
-                border_radius=12,
+                border_radius=RADIUS["md"],
                 bgcolor=color + "18",
                 on_click=_select,
                 ink=True,
@@ -163,7 +158,7 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
 
     step2_content = ft.Column(
         [
-            ft.Text("🏆 Selecione o Desporto", size=18, weight=ft.FontWeight.BOLD),
+            ft.Row([ft.Icon(ft.Icons.EMOJI_EVENTS, size=20, color=c("primary", dark)), ft.Text(t("wizard_sport_title"), size=18, weight=ft.FontWeight.BOLD)], spacing=8),
             sport_grid,
         ],
         spacing=12,
@@ -172,7 +167,7 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
     # ═══════════════════════════════════════════════════════════════
     # STEP 3 — Período / Data da Prova
     # ═══════════════════════════════════════════════════════════════
-    data_prova_field = ft.TextField(label="Data da prova (DD/MM/AAAA)", hint_text="Ex: 15/08/2026", width=220)
+    data_prova_field = ft.TextField(label=t("wizard_date_label"), hint_text=t("wizard_date_hint"), width=220, max_length=10)
     semanas_result = ft.Text("", size=14, color=c("success", dark))
 
     def _calc_weeks(e):
@@ -184,16 +179,16 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
         try:
             weeks = calcular_semanas_ate_prova(val)
             if weeks > 52:
-                semanas_result.value = f"⚠️ {weeks} semanas (máx 52). Será ajustado automaticamente."
+                semanas_result.value = t("wizard_weeks_capped", weeks=weeks)
                 semanas_result.color = c("warning", dark)
                 form["semanas_ate_prova"] = 52
             else:
-                semanas_result.value = f"✅ {weeks} semanas de treinamento"
+                semanas_result.value = t("wizard_weeks_result", weeks=weeks)
                 semanas_result.color = c("success", dark)
                 form["semanas_ate_prova"] = weeks
             form["data_prova"] = val
         except ValueError as ex:
-            semanas_result.value = f"❌ {ex}"
+            semanas_result.value = f"{ex}"
             semanas_result.color = c("error", dark)
         page.update()
 
@@ -202,8 +197,8 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
 
     step3_content = ft.Column(
         [
-            ft.Text("📅 Período de Treinamento", size=18, weight=ft.FontWeight.BOLD),
-            ft.Text("Informe a data da prova para cálculo automático das semanas.", size=13, color=c("text_secondary", dark)),
+            ft.Row([ft.Icon(ft.Icons.CALENDAR_TODAY, size=20, color=c("primary", dark)), ft.Text(t("wizard_period_title"), size=18, weight=ft.FontWeight.BOLD)], spacing=8),
+            ft.Text(t("wizard_period_hint"), size=13, color=c("text_secondary", dark)),
             data_prova_field,
             semanas_result,
         ],
@@ -213,9 +208,9 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
     # ═══════════════════════════════════════════════════════════════
     # STEP 4 — Distância + Fisiologia
     # ═══════════════════════════════════════════════════════════════
-    dist_dd = ft.Dropdown(label="Distância da prova", width=260)
-    limiar_field = ft.TextField(label="Limiar de lactato (bpm)", hint_text="100-220", keyboard_type=ft.KeyboardType.NUMBER, width=200)
-    vo2_field = ft.TextField(label="VO2 Max (ml/kg/min)", hint_text="20-90", keyboard_type=ft.KeyboardType.NUMBER, width=200)
+    dist_dd = ft.Dropdown(label=t("wizard_dist_label"), width=260)
+    limiar_field = ft.TextField(label=t("wizard_lactate"), hint_text="100-220", keyboard_type=ft.KeyboardType.NUMBER, width=200, max_length=6)
+    vo2_field = ft.TextField(label=t("wizard_vo2"), hint_text="20-90", keyboard_type=ft.KeyboardType.NUMBER, width=200, max_length=5)
 
     def _update_distance_options(sport: str):
         dists = DISTANCES.get(sport, [])
@@ -239,18 +234,29 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
         page.update()
 
     health_type_dd = ft.Dropdown(
-        label="Tipo",
+        label=t("wizard_health_type"),
         width=180,
-        options=[ft.dropdown.Option(str(k), v) for k, v in HEALTH_TYPES.items()],
+        options=[
+            ft.dropdown.Option("1", t("wizard_health_ortho")),
+            ft.dropdown.Option("2", t("wizard_health_asthma")),
+            ft.dropdown.Option("3", t("wizard_health_diabetes")),
+            ft.dropdown.Option("4", t("wizard_health_hypertension")),
+            ft.dropdown.Option("5", t("wizard_health_other")),
+        ],
     )
-    health_desc_field = ft.TextField(label="Descrição", expand=True)
-    health_member_field = ft.TextField(label="Membro afetado (opcional)", width=180)
+    _HEALTH_MAP = {"1": t("wizard_health_ortho"), "2": t("wizard_health_asthma"), "3": t("wizard_health_diabetes"), "4": t("wizard_health_hypertension"), "5": t("wizard_health_other")}
+    health_desc_field = ft.TextField(label=t("wizard_health_desc"), expand=True, max_length=200)
+    health_member_field = ft.TextField(label=t("wizard_health_member"), width=180, max_length=50)
 
     def _add_health(e):
         if not health_type_dd.value or not health_desc_field.value:
             return
+        if len(form["problemas_saude"]) >= _MAX_HEALTH_ISSUES:
+            error_text.value = t("wizard_health_limit")
+            page.update()
+            return
         issue = {
-            "tipo": HEALTH_TYPES.get(int(health_type_dd.value), "Outro"),
+            "tipo": _HEALTH_MAP.get(health_type_dd.value, t("wizard_health_other")),
             "descricao": health_desc_field.value,
             "membro_afetado": health_member_field.value or None,
         }
@@ -279,7 +285,7 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
     health_container = ft.Container(
         content=ft.Column([
             ft.Row([health_type_dd, health_desc_field], spacing=8),
-            ft.Row([health_member_field, ft.ElevatedButton("Adicionar", on_click=_add_health)], spacing=8),
+            ft.Row([health_member_field, ft.ElevatedButton(t("wizard_health_add"), on_click=_add_health)], spacing=8),
             health_list_col,
         ], spacing=8),
         visible=False,
@@ -288,10 +294,10 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
 
     step4_content = ft.Column(
         [
-            ft.Text("🎯 Distância & Fisiologia", size=18, weight=ft.FontWeight.BOLD),
+            ft.Row([ft.Icon(ft.Icons.GPS_FIXED, size=20, color=c("primary", dark)), ft.Text(t("wizard_dist_title"), size=18, weight=ft.FontWeight.BOLD)], spacing=8),
             dist_dd,
             ft.Row([limiar_field, vo2_field], spacing=12),
-            ft.TextButton("🏥 Adicionar problemas de saúde", on_click=_toggle_health),
+            ft.TextButton(t("wizard_health_toggle"), icon=ft.Icons.LOCAL_HOSPITAL, on_click=_toggle_health),
             health_container,
         ],
         spacing=12,
@@ -300,20 +306,20 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
     # ═══════════════════════════════════════════════════════════════
     # STEP 5 — Disponibilidade Semanal
     # ═══════════════════════════════════════════════════════════════
-    dias_label = ft.Text(f"Dias por semana: 5", size=16, weight=ft.FontWeight.W_500)
+    dias_label = ft.Text(t("wizard_days_label", days=5), size=16, weight=ft.FontWeight.W_500)
 
     def _on_slider(e):
         val = int(e.control.value)
         form["dias_semana"] = val
-        dias_label.value = f"Dias por semana: {val}"
+        dias_label.value = t("wizard_days_label", days=val)
         page.update()
 
     dias_slider = ft.Slider(min=1, max=7, divisions=6, value=5, label="{value}", on_change=_on_slider, expand=True)
 
     step5_content = ft.Column(
         [
-            ft.Text("📆 Disponibilidade Semanal", size=18, weight=ft.FontWeight.BOLD),
-            ft.Text("Quantos dias por semana o atleta pode treinar?", size=13, color=c("text_secondary", dark)),
+            ft.Row([ft.Icon(ft.Icons.DATE_RANGE, size=20, color=c("primary", dark)), ft.Text(t("wizard_days_title"), size=18, weight=ft.FontWeight.BOLD)], spacing=8),
+            ft.Text(t("wizard_days_hint"), size=13, color=c("text_secondary", dark)),
             dias_label,
             dias_slider,
         ],
@@ -328,20 +334,20 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
     def _build_review():
         review_col.controls.clear()
         items = [
-            ("👤 Nome", form.get("nome", "—")),
-            ("📏 Idade/Peso/Altura", f"{form.get('idade', '?')} anos · {form.get('peso', '?')} kg · {form.get('altura', '?')} cm"),
-            ("⚧ Género", form.get("genero", "—")),
-            ("🏆 Desporto", form.get("esporte", "—")),
-            ("🎯 Distância", form.get("distancia", "—")),
-            ("📅 Semanas", str(form.get("semanas_ate_prova", "—"))),
-            ("💓 Limiar / VO2", f"{form.get('limiar_lactato', '?')} bpm / {form.get('vo2_max', '?')} ml/kg/min"),
-            ("📆 Dias/semana", str(form.get("dias_semana", "?"))),
+            (t("wizard_review_name"), form.get("nome", "—")),
+            (t("wizard_review_age_weight"), f"{form.get('idade', '?')} · {form.get('peso', '?')} kg · {form.get('altura', '?')} cm"),
+            (t("wizard_review_gender"), form.get("genero", "—")),
+            (t("wizard_review_sport"), form.get("esporte", "—")),
+            (t("wizard_review_distance"), form.get("distancia", "—")),
+            (t("wizard_review_weeks"), str(form.get("semanas_ate_prova", "—"))),
+            (t("wizard_review_lactate_vo2"), f"{form.get('limiar_lactato', '?')} bpm / {form.get('vo2_max', '?')} ml/kg/min"),
+            (t("wizard_review_days"), str(form.get("dias_semana", "?"))),
         ]
         if form.get("fase_menstrual"):
-            items.append(("🌙 Ciclo", form["fase_menstrual"]))
+            items.append((t("wizard_review_cycle"), form["fase_menstrual"]))
         if form.get("problemas_saude"):
             saude = ", ".join(h["tipo"] for h in form["problemas_saude"])
-            items.append(("🏥 Saúde", saude))
+            items.append((t("wizard_review_health"), saude))
 
         for label, value in items:
             review_col.controls.append(
@@ -353,8 +359,8 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
 
     step6_content = ft.Column(
         [
-            ft.Text("📝 Revisão do Plano", size=18, weight=ft.FontWeight.BOLD),
-            ft.Text("Confirme os dados antes de gerar o plano.", size=13, color=c("text_secondary", dark)),
+            ft.Row([ft.Icon(ft.Icons.FACT_CHECK, size=20, color=c("primary", dark)), ft.Text(t("wizard_review_title"), size=18, weight=ft.FontWeight.BOLD)], spacing=8),
+            ft.Text(t("wizard_review_hint"), size=13, color=c("text_secondary", dark)),
             ft.Divider(),
             review_col,
         ],
@@ -365,7 +371,10 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
     # STEPPER
     # ═══════════════════════════════════════════════════════════════
     steps_content = [step1_content, step2_content, step3_content, step4_content, step5_content, step6_content]
-    step_titles = ["Atleta", "Desporto", "Período", "Distância", "Dias", "Revisão"]
+    _step_label_keys = [
+        "wizard_step_athlete_label", "wizard_step_sport_label", "wizard_step_period_label",
+        "wizard_step_dist_label", "wizard_step_days_label", "wizard_step_review_label",
+    ]
     step_container = ft.Container(expand=True, padding=ft.padding.all(16))
     step_container.content = steps_content[0]
 
@@ -374,7 +383,7 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
 
     def _build_progress():
         progress_row.controls.clear()
-        for i, title in enumerate(step_titles):
+        for i, key in enumerate(_step_label_keys):
             is_active = i == current_step[0]
             is_done = i < current_step[0]
             color = c("primary", dark) if is_active else (c("success", dark) if is_done else c("text_disabled", dark))
@@ -382,10 +391,10 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
                 ft.Container(
                     content=ft.Column([
                         ft.CircleAvatar(
-                            content=ft.Text("✓" if is_done else str(i + 1), size=12, color="#FFF"),
+                            content=ft.Text("✓" if is_done else str(i + 1), size=12, color=c("text_light", dark)),
                             bgcolor=color, radius=14,
                         ),
-                        ft.Text(title, size=10, color=color, text_align=ft.TextAlign.CENTER),
+                        ft.Text(t(key), size=10, color=color, text_align=ft.TextAlign.CENTER),
                     ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=2),
                     width=60,
                     on_click=lambda _, idx=i: _go_step(idx) if idx <= current_step[0] else None,
@@ -419,59 +428,60 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
         if step == 0:
             _collect_form_values()
             if not form["nome"] or len(form["nome"].strip()) < 2:
-                return "Nome é obrigatório (mínimo 2 caracteres)."
+                return t("wizard_err_name")
             try:
                 age = int(form["idade"])
                 if not (10 <= age <= 100):
-                    return "Idade deve ser entre 10 e 100."
+                    return t("wizard_err_age_range")
             except (ValueError, TypeError):
-                return "Idade inválida."
+                return t("wizard_err_age_invalid")
             try:
                 w = float(form["peso"])
                 if not (30 <= w <= 250):
-                    return "Peso deve ser entre 30 e 250 kg."
+                    return t("wizard_err_weight_range")
             except (ValueError, TypeError):
-                return "Peso inválido."
+                return t("wizard_err_weight_invalid")
             try:
                 h = float(form["altura"])
                 if not (100 <= h <= 250):
-                    return "Altura deve ser entre 100 e 250 cm."
+                    return t("wizard_err_height_range")
             except (ValueError, TypeError):
-                return "Altura inválida."
+                return t("wizard_err_height_invalid")
         elif step == 1:
             if not form["esporte"]:
-                return "Selecione um desporto."
+                return t("wizard_err_sport")
         elif step == 2:
             if not form.get("semanas_ate_prova"):
-                return "Informe a data da prova."
+                return t("wizard_err_date")
             try:
                 weeks = int(form["semanas_ate_prova"])
                 if weeks < 1:
-                    return "Semanas devem ser ≥ 1."
+                    return t("wizard_err_weeks")
             except (ValueError, TypeError):
-                return "Número de semanas inválido."
+                return t("wizard_err_weeks_invalid")
         elif step == 3:
             if not form.get("distancia"):
-                return "Selecione uma distância."
+                return t("wizard_err_distance")
             try:
                 lt = float(form["limiar_lactato"])
                 if not (100 <= lt <= 220):
-                    return "Limiar de lactato deve ser entre 100 e 220 bpm."
+                    return t("wizard_err_lactate_range")
             except (ValueError, TypeError):
-                return "Limiar de lactato inválido."
+                return t("wizard_err_lactate_invalid")
             try:
                 vo2 = float(form["vo2_max"])
                 if not (20 <= vo2 <= 90):
-                    return "VO2 Max deve ser entre 20 e 90."
+                    return t("wizard_err_vo2_range")
             except (ValueError, TypeError):
-                return "VO2 Max inválido."
+                return t("wizard_err_vo2_invalid")
         return None
 
     # ── Navegação ────────────────────────────────────────────────
-    btn_back = ft.OutlinedButton("Voltar", icon=ft.Icons.ARROW_BACK, on_click=lambda _: _prev())
-    btn_next = ft.ElevatedButton("Próximo", icon=ft.Icons.ARROW_FORWARD, on_click=lambda _: _next())
+    btn_back = ft.OutlinedButton(t("wizard_btn_back"), icon=ft.Icons.ARROW_BACK, on_click=lambda _: _prev())
+    btn_next = ft.ElevatedButton(t("wizard_btn_next"), icon=ft.Icons.ARROW_FORWARD, on_click=lambda _: _next())
     btn_generate = ft.ElevatedButton(
-        "🚀 Gerar Plano",
+        t("wizard_btn_generate"),
+        icon=ft.Icons.ROCKET_LAUNCH,
         bgcolor=c("success", dark),
         color=c("text_light", dark),
         on_click=lambda _: _generate(),
@@ -506,7 +516,7 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
         error_text.value = ""
 
         # Show loading overlay
-        loading = build_loading("Gerando plano de treino…", dark)
+        loading = build_loading(t("wizard_loading"), dark)
         step_container.content = loading
         btn_generate.disabled = True
         btn_back.disabled = True
@@ -568,7 +578,7 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
                 )
 
                 page.open(ft.SnackBar(
-                    ft.Text(f"✅ Plano criado com sucesso! ({len(full_plan)} sessões)"),
+                    ft.Text(t("wizard_plan_created", count=len(full_plan))),
                     bgcolor=c("success", dark),
                 ))
                 # Navigate to athlete dashboard
@@ -620,7 +630,7 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
                         ft.Row(
                             [
                                 ft.IconButton(ft.Icons.CLOSE, on_click=lambda _: page.go("/dashboard")),
-                                ft.Text("Novo Plano de Treino", size=18, weight=ft.FontWeight.BOLD, expand=True),
+                                ft.Text(t("wizard_header"), size=18, weight=ft.FontWeight.BOLD, expand=True),
                             ],
                         ),
                         progress_row,

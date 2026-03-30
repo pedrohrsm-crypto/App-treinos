@@ -7,18 +7,20 @@ sport + distance + semanas + botões de ação.
 """
 
 import flet as ft
-from flet_app.theme import c, PHASE_COLORS, SPORT_COLORS
+from i18n import t
+from flet_app.theme import c, PHASE_COLORS, SPORT_COLORS, RADIUS, SPACING, card_shadow
 from training_manager import TrainingRecord
 from typing import Callable, Optional
 
 
-def _sport_emoji(sport: str) -> str:
+def _sport_icon(sport: str) -> ft.Icon:
     _map = {
-        "Corrida": "🏃", "Ciclismo": "🚴", "Natação": "🏊",
-        "Triathlon": "🏅", "Duathlon (Natação+Corrida)": "🏊🏃",
-        "Duathlon (Ciclismo+Corrida)": "🚴🏃",
+        "Corrida": ft.Icons.DIRECTIONS_RUN, "Ciclismo": ft.Icons.DIRECTIONS_BIKE,
+        "Natação": ft.Icons.POOL, "Triathlon": ft.Icons.EMOJI_EVENTS,
+        "Duathlon (Natação+Corrida)": ft.Icons.POOL,
+        "Duathlon (Ciclismo+Corrida)": ft.Icons.DIRECTIONS_BIKE,
     }
-    return _map.get(sport, "🏋️")
+    return ft.Icon(_map.get(sport, ft.Icons.FITNESS_CENTER), size=16, color=c("primary", dark=False))
 
 
 def _phase_for_week(current_week: int, total_weeks: int) -> str:
@@ -52,35 +54,48 @@ def build_plan_card(
 
     info_col = ft.Column(
         [
-            ft.Text(
-                f"{_sport_emoji(plan.sport)} {plan.sport} — {plan.distance}",
-                size=15, weight=ft.FontWeight.W_600,
-            ),
-            ft.Text(f"Fase: {phase} · S{current_week}/{plan.weeks}", size=12, color=c("text_secondary", dark)),
-            ft.Text(f"Criado em {created}", size=11, color=c("text_disabled", dark)),
+            ft.Row([
+                _sport_icon(plan.sport),
+                ft.Text(f"{plan.sport} — {plan.distance}", size=15, weight=ft.FontWeight.W_600),
+            ], spacing=SPACING["xs"]),
+            ft.Text(t("plan_phase_label", phase=phase, week=current_week, total=plan.weeks), size=12, color=c("text_secondary", dark)),
+            ft.Text(t("plan_created_at", date=created), size=11, color=c("text_disabled", dark)),
         ],
-        spacing=4,
+        spacing=SPACING["xs"],
         expand=True,
     )
 
     actions = ft.Row(
         [
-            ft.IconButton(ft.Icons.CALENDAR_MONTH, tooltip="Calendário", icon_color=c("primary", dark), data=plan.id, on_click=on_calendar),
-            ft.IconButton(ft.Icons.DOWNLOAD, tooltip="Exportar", icon_color=c("info", dark), data=plan.id, on_click=on_export),
-            ft.IconButton(ft.Icons.DELETE_OUTLINE, tooltip="Apagar", icon_color=c("error", dark), data=plan.id, on_click=on_delete),
+            ft.IconButton(ft.Icons.CALENDAR_MONTH, tooltip=t("plan_tooltip_calendar"), icon_color=c("primary", dark), data=plan.id, on_click=on_calendar),
+            ft.IconButton(ft.Icons.DOWNLOAD, tooltip=t("plan_tooltip_export"), icon_color=c("info", dark), data=plan.id, on_click=on_export),
+            ft.IconButton(ft.Icons.DELETE_OUTLINE, tooltip=t("plan_tooltip_delete"), icon_color=c("error", dark), data=plan.id, on_click=on_delete),
         ],
         spacing=0,
     )
 
     row = ft.Row([info_col, actions], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
 
-    return ft.Container(
+    def _on_hover(e):
+        if e.data == "true":
+            container.shadow = card_shadow(dark, "lg")
+            container.scale = 1.01
+        else:
+            container.shadow = card_shadow(dark, "md")
+            container.scale = 1.0
+        container.update()
+
+    container = ft.Container(
         content=row,
-        padding=ft.padding.only(left=0, right=12, top=12, bottom=12),
-        border_radius=14,
+        padding=ft.padding.only(left=0, right=SPACING["md"], top=SPACING["md"], bottom=SPACING["md"]),
+        border_radius=RADIUS["lg"],
         bgcolor=c("bg_card", dark),
         border=ft.border.only(left=ft.BorderSide(5, phase_color)),
-        shadow=ft.BoxShadow(spread_radius=0, blur_radius=6, color=c("shadow", dark), offset=ft.Offset(0, 2)),
+        shadow=card_shadow(dark, "md"),
         ink=True,
         on_click=on_calendar,
+        on_hover=_on_hover,
+        animate=ft.Animation(200, ft.AnimationCurve.EASE_OUT),
+        animate_scale=ft.Animation(150, ft.AnimationCurve.EASE_OUT),
     )
+    return container

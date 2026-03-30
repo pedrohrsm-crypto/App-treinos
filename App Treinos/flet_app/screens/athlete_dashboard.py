@@ -10,7 +10,7 @@ import asyncio
 import flet as ft
 from datetime import datetime
 from i18n import t
-from flet_app.theme import c, SPORT_COLORS
+from flet_app.theme import c, SPORT_COLORS, RADIUS, SPACING, card_shadow
 from flet_app.state import app_state
 from flet_app.components.plan_card import build_plan_card
 from flet_app.components.loading_overlay import build_loading
@@ -27,7 +27,7 @@ def athlete_dashboard_view(page: ft.Page, route: str) -> ft.View:
     # ── Header (estático, mostra imediatamente) ──────────────────
     initials = "".join(w[0] for w in athlete_name.split()[:2]).upper()
     avatar = ft.CircleAvatar(
-        content=ft.Text(initials, size=24, weight=ft.FontWeight.BOLD, color="#FFF"),
+        content=ft.Text(initials, size=24, weight=ft.FontWeight.BOLD, color=c("text_light", dark)),
         bgcolor=c("primary", dark), radius=32,
     )
 
@@ -39,7 +39,7 @@ def athlete_dashboard_view(page: ft.Page, route: str) -> ft.View:
                 ft.Column(
                     [
                         ft.Text(athlete_name, size=20, weight=ft.FontWeight.BOLD),
-                        ft.Text("Carregando dados…", size=13, color=c("text_secondary", dark)),
+                        ft.Text(t("athlete_loading"), size=13, color=c("text_secondary", dark)),
                     ],
                     spacing=2,
                 ),
@@ -50,7 +50,7 @@ def athlete_dashboard_view(page: ft.Page, route: str) -> ft.View:
     )
 
     # Placeholder que será substituído com dados reais
-    body = ft.Container(content=build_loading("Carregando planos…", dark), expand=True)
+    body = ft.Container(content=build_loading(t("athlete_loading_plans"), dark), expand=True)
 
     # ── FAB novo plano ───────────────────────────────────────────
     fab = ft.FloatingActionButton(
@@ -94,23 +94,23 @@ def athlete_dashboard_view(page: ft.Page, route: str) -> ft.View:
         )
 
         # Stats
-        def _stat(icon, value, label):
+        def _stat(icon_name, value, label):
             return ft.Container(
                 content=ft.Column(
-                    [ft.Text(icon, size=22), ft.Text(value, size=18, weight=ft.FontWeight.BOLD), ft.Text(label, size=11, color=c("text_secondary", dark))],
+                    [ft.Icon(icon_name, size=22, color=c("primary", dark)), ft.Text(value, size=18, weight=ft.FontWeight.BOLD), ft.Text(label, size=11, color=c("text_secondary", dark))],
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=2,
                 ),
-                padding=12, border_radius=12, bgcolor=c("bg_card", dark),
-                shadow=ft.BoxShadow(blur_radius=4, color=c("shadow", dark)),
+                padding=SPACING["md"], border_radius=RADIUS["md"], bgcolor=c("bg_card", dark),
+                shadow=card_shadow(dark, "sm"),
                 expand=True,
             )
 
         stats_row = ft.Row(
             [
-                _stat("📋", str(total_plans), "Planos"),
-                _stat("📅", str(total_weeks), "Semanas"),
-                _stat(_sport_emoji(latest_sport), latest_sport, "Desporto"),
-                _stat("⚖️", f"{data.get('imc', '—')}", "IMC"),
+                _stat(ft.Icons.ASSIGNMENT, str(total_plans), t("athlete_stats_plans")),
+                _stat(ft.Icons.CALENDAR_TODAY, str(total_weeks), t("athlete_stats_weeks")),
+                _stat(_sport_icon(latest_sport), latest_sport, t("athlete_stats_sport")),
+                _stat(ft.Icons.MONITOR_WEIGHT, f"{data.get('imc', '—')}", t("athlete_stats_bmi")),
             ],
             spacing=10,
         )
@@ -122,15 +122,39 @@ def athlete_dashboard_view(page: ft.Page, route: str) -> ft.View:
             page.go(f"/calendar/{plan_id}")
 
         def _delete_plan(e):
-            plan_id = e.control.data
-            ok, msg = training_manager.delete_plan(trainer, plan_id)
-            if ok:
-                page.go(f"/athlete/{athlete_name}")
-            else:
-                page.open(ft.SnackBar(ft.Text(msg), bgcolor=c("error", dark)))
+            plan_id_to_delete = e.control.data
+
+            def _confirm_delete(e_confirm):
+                page.close(confirm_dialog)
+                ok, msg = training_manager.delete_plan(trainer, plan_id_to_delete)
+                if ok:
+                    page.go(f"/athlete/{athlete_name}")
+                else:
+                    page.open(ft.SnackBar(ft.Text(msg), bgcolor=c("error", dark)))
+
+            def _cancel_delete(e_cancel):
+                page.close(confirm_dialog)
+
+            confirm_dialog = ft.AlertDialog(
+                title=ft.Text(t("confirm_delete_plan_title")),
+                content=ft.Text(t("confirm_delete_plan_body")),
+                actions=[
+                    ft.TextButton(t("btn_cancel"), on_click=_cancel_delete),
+                    ft.ElevatedButton(
+                        t("btn_delete"),
+                        icon=ft.Icons.DELETE,
+                        bgcolor=c("error", dark),
+                        color=c("text_light", dark),
+                        on_click=_confirm_delete,
+                    ),
+                ],
+                actions_alignment=ft.MainAxisAlignment.END,
+            )
+            page.open(confirm_dialog)
+            page.update()
 
         def _export_plan(e):
-            page.open(ft.SnackBar(ft.Text("Exportação disponível via wizard."), bgcolor=c("info", dark)))
+            page.open(ft.SnackBar(ft.Text(t("athlete_export_msg")), bgcolor=c("info", dark)))
 
         plan_cards = []
         for p in athlete_plans:
@@ -140,12 +164,12 @@ def athlete_dashboard_view(page: ft.Page, route: str) -> ft.View:
 
         if not plan_cards:
             plan_cards.append(
-                ft.Container(ft.Text("Nenhum plano criado para este atleta.", color=c("text_secondary", dark)), padding=20)
+                ft.Container(ft.Text(t("athlete_no_plans"), color=c("text_secondary", dark)), padding=20)
             )
 
         content = ft.Column(
             [stats_row, ft.Divider(height=16, color=ft.Colors.TRANSPARENT),
-             ft.Text("  Planos de Treino", size=16, weight=ft.FontWeight.W_600),
+             ft.Text(f"  {t('athlete_plans_title')}", size=16, weight=ft.FontWeight.W_600),
              *plan_cards],
             spacing=8,
             expand=True,
@@ -164,6 +188,6 @@ def athlete_dashboard_view(page: ft.Page, route: str) -> ft.View:
     )
 
 
-def _sport_emoji(sport: str) -> str:
-    _map = {"Corrida": "🏃", "Ciclismo": "🚴", "Natação": "🏊", "Triathlon": "🏅"}
-    return _map.get(sport, "🏋️")
+def _sport_icon(sport: str):
+    _map = {"Corrida": ft.Icons.DIRECTIONS_RUN, "Ciclismo": ft.Icons.DIRECTIONS_BIKE, "Natação": ft.Icons.POOL, "Triathlon": ft.Icons.EMOJI_EVENTS}
+    return _map.get(sport, ft.Icons.FITNESS_CENTER)

@@ -717,6 +717,806 @@ _translations: Dict[str, Dict[str, str]] = {
         "en": "Fill in 6 steps to generate a personalized training plan.",
         "es": "Complete los 6 pasos para generar un plan de entrenamiento personalizado.",
     },
+
+    # ── Dashboard (hardcoded → i18n) ────────────────────────────
+    "dashboard_search": {
+        "pt": "Pesquisar atleta…",
+        "en": "Search athlete…",
+        "es": "Buscar atleta…",
+    },
+    "dashboard_no_athlete": {
+        "pt": "Nenhum atleta encontrado",
+        "en": "No athlete found",
+        "es": "Ningún atleta encontrado",
+    },
+    "dashboard_no_athlete_hint": {
+        "pt": "Crie um plano de treino para começar.",
+        "en": "Create a training plan to get started.",
+        "es": "Cree un plan de entrenamiento para comenzar.",
+    },
+    "dashboard_loading": {
+        "pt": "Carregando atletas…",
+        "en": "Loading athletes…",
+        "es": "Cargando atletas…",
+    },
+    "dashboard_new_plan": {
+        "pt": "Novo Plano",
+        "en": "New Plan",
+        "es": "Nuevo Plan",
+    },
+
+    # ── Wizard (hardcoded → i18n) ────────────────────────────────
+    "wizard_header": {
+        "pt": "Novo Plano de Treino",
+        "en": "New Training Plan",
+        "es": "Nuevo Plan de Entrenamiento",
+    },
+    "wizard_athlete_title": {
+        "pt": "Dados do Atleta",
+        "en": "Athlete Data",
+        "es": "Datos del Atleta",
+    },
+    "wizard_name": {
+        "pt": "Nome completo",
+        "en": "Full name",
+        "es": "Nombre completo",
+    },
+    "wizard_age": {
+        "pt": "Idade",
+        "en": "Age",
+        "es": "Edad",
+    },
+    "wizard_weight": {
+        "pt": "Peso (kg)",
+        "en": "Weight (kg)",
+        "es": "Peso (kg)",
+    },
+    "wizard_height": {
+        "pt": "Altura (cm)",
+        "en": "Height (cm)",
+        "es": "Altura (cm)",
+    },
+    "wizard_gender": {
+        "pt": "Género",
+        "en": "Gender",
+        "es": "Género",
+    },
+    "wizard_gender_male": {
+        "pt": "Masculino",
+        "en": "Male",
+        "es": "Masculino",
+    },
+    "wizard_gender_female": {
+        "pt": "Feminino",
+        "en": "Female",
+        "es": "Femenino",
+    },
+    "wizard_cycle_label": {
+        "pt": "Fase do ciclo menstrual (opcional)",
+        "en": "Menstrual cycle phase (optional)",
+        "es": "Fase del ciclo menstrual (opcional)",
+    },
+    "wizard_cycle_none": {
+        "pt": "Não informar",
+        "en": "Not specified",
+        "es": "No informar",
+    },
+    "wizard_cycle_menstrual": {
+        "pt": "Menstrual",
+        "en": "Menstrual",
+        "es": "Menstrual",
+    },
+    "wizard_cycle_follicular": {
+        "pt": "Folicular",
+        "en": "Follicular",
+        "es": "Folicular",
+    },
+    "wizard_cycle_ovulatory": {
+        "pt": "Ovulatória",
+        "en": "Ovulatory",
+        "es": "Ovulatoria",
+    },
+    "wizard_cycle_luteal": {
+        "pt": "Lútea",
+        "en": "Luteal",
+        "es": "Lútea",
+    },
+    "wizard_sport_title": {
+        "pt": "Selecione o Desporto",
+        "en": "Select a Sport",
+        "es": "Seleccione el Deporte",
+    },
+    "wizard_period_title": {
+        "pt": "Período de Treinamento",
+        "en": "Training Period",
+        "es": "Período de Entrenamiento",
+    },
+    "wizard_period_hint": {
+        "pt": "Informe a data da prova para cálculo automático das semanas.",
+        "en": "Enter the race date for automatic week calculation.",
+        "es": "Ingrese la fecha de la prueba para cálculo automático de semanas.",
+    },
+    "wizard_date_label": {
+        "pt": "Data da prova (DD/MM/AAAA)",
+        "en": "Race date (DD/MM/YYYY)",
+        "es": "Fecha de la prueba (DD/MM/AAAA)",
+    },
+    "wizard_date_hint": {
+        "pt": "Ex: 15/08/2026",
+        "en": "E.g.: 15/08/2026",
+        "es": "Ej: 15/08/2026",
+    },
+    "wizard_weeks_result": {
+        "pt": "{weeks} semanas de treinamento",
+        "en": "{weeks} weeks of training",
+        "es": "{weeks} semanas de entrenamiento",
+    },
+    "wizard_weeks_capped": {
+        "pt": "{weeks} semanas — será ajustado ao máximo de 52.",
+        "en": "{weeks} weeks — will be capped at 52.",
+        "es": "{weeks} semanas — se ajustará al máximo de 52.",
+    },
+    "wizard_dist_title": {
+        "pt": "Distância & Fisiologia",
+        "en": "Distance & Physiology",
+        "es": "Distancia y Fisiología",
+    },
+    "wizard_dist_label": {
+        "pt": "Distância da prova",
+        "en": "Race distance",
+        "es": "Distancia de la prueba",
+    },
+    "wizard_lactate": {
+        "pt": "Limiar de lactato (bpm)",
+        "en": "Lactate threshold (bpm)",
+        "es": "Umbral de lactato (bpm)",
+    },
+    "wizard_vo2": {
+        "pt": "VO2 Max (ml/kg/min)",
+        "en": "VO2 Max (ml/kg/min)",
+        "es": "VO2 Max (ml/kg/min)",
+    },
+    "wizard_health_toggle": {
+        "pt": "Adicionar problemas de saúde",
+        "en": "Add health issues",
+        "es": "Agregar problemas de salud",
+    },
+    "wizard_health_type": {
+        "pt": "Tipo",
+        "en": "Type",
+        "es": "Tipo",
+    },
+    "wizard_health_desc": {
+        "pt": "Descrição",
+        "en": "Description",
+        "es": "Descripción",
+    },
+    "wizard_health_member": {
+        "pt": "Membro afetado (opcional)",
+        "en": "Affected limb (optional)",
+        "es": "Miembro afectado (opcional)",
+    },
+    "wizard_health_add": {
+        "pt": "Adicionar",
+        "en": "Add",
+        "es": "Agregar",
+    },
+    "wizard_days_title": {
+        "pt": "Disponibilidade Semanal",
+        "en": "Weekly Availability",
+        "es": "Disponibilidad Semanal",
+    },
+    "wizard_days_hint": {
+        "pt": "Quantos dias por semana o atleta pode treinar?",
+        "en": "How many days per week can the athlete train?",
+        "es": "¿Cuántos días por semana puede entrenar el atleta?",
+    },
+    "wizard_days_label": {
+        "pt": "Dias por semana: {days}",
+        "en": "Days per week: {days}",
+        "es": "Días por semana: {days}",
+    },
+    "wizard_review_title": {
+        "pt": "Revisão do Plano",
+        "en": "Plan Review",
+        "es": "Revisión del Plan",
+    },
+    "wizard_review_hint": {
+        "pt": "Confirme os dados antes de gerar o plano.",
+        "en": "Confirm the data before generating the plan.",
+        "es": "Confirme los datos antes de generar el plan.",
+    },
+    "wizard_review_name": {
+        "pt": "Nome",
+        "en": "Name",
+        "es": "Nombre",
+    },
+    "wizard_review_age_weight": {
+        "pt": "Idade/Peso/Altura",
+        "en": "Age/Weight/Height",
+        "es": "Edad/Peso/Altura",
+    },
+    "wizard_review_gender": {
+        "pt": "Género",
+        "en": "Gender",
+        "es": "Género",
+    },
+    "wizard_review_sport": {
+        "pt": "Desporto",
+        "en": "Sport",
+        "es": "Deporte",
+    },
+    "wizard_review_distance": {
+        "pt": "Distância",
+        "en": "Distance",
+        "es": "Distancia",
+    },
+    "wizard_review_weeks": {
+        "pt": "Semanas",
+        "en": "Weeks",
+        "es": "Semanas",
+    },
+    "wizard_review_lactate_vo2": {
+        "pt": "Limiar / VO2",
+        "en": "Threshold / VO2",
+        "es": "Umbral / VO2",
+    },
+    "wizard_review_days": {
+        "pt": "Dias/semana",
+        "en": "Days/week",
+        "es": "Días/semana",
+    },
+    "wizard_review_cycle": {
+        "pt": "Ciclo",
+        "en": "Cycle",
+        "es": "Ciclo",
+    },
+    "wizard_review_health": {
+        "pt": "Saúde",
+        "en": "Health",
+        "es": "Salud",
+    },
+    "wizard_btn_back": {
+        "pt": "Voltar",
+        "en": "Back",
+        "es": "Volver",
+    },
+    "wizard_btn_next": {
+        "pt": "Próximo",
+        "en": "Next",
+        "es": "Siguiente",
+    },
+    "wizard_btn_generate": {
+        "pt": "Gerar Plano",
+        "en": "Generate Plan",
+        "es": "Generar Plan",
+    },
+    "wizard_loading": {
+        "pt": "Gerando plano de treino…",
+        "en": "Generating training plan…",
+        "es": "Generando plan de entrenamiento…",
+    },
+    "wizard_step_athlete_label": {
+        "pt": "Atleta",
+        "en": "Athlete",
+        "es": "Atleta",
+    },
+    "wizard_step_sport_label": {
+        "pt": "Desporto",
+        "en": "Sport",
+        "es": "Deporte",
+    },
+    "wizard_step_period_label": {
+        "pt": "Período",
+        "en": "Period",
+        "es": "Período",
+    },
+    "wizard_step_dist_label": {
+        "pt": "Distância",
+        "en": "Distance",
+        "es": "Distancia",
+    },
+    "wizard_step_days_label": {
+        "pt": "Dias",
+        "en": "Days",
+        "es": "Días",
+    },
+    "wizard_step_review_label": {
+        "pt": "Revisão",
+        "en": "Review",
+        "es": "Revisión",
+    },
+
+    # ── Validação do Wizard ──────────────────────────────────────
+    "wizard_err_name": {
+        "pt": "Nome é obrigatório (mínimo 2 caracteres).",
+        "en": "Name is required (minimum 2 characters).",
+        "es": "El nombre es obligatorio (mínimo 2 caracteres).",
+    },
+    "wizard_err_age_range": {
+        "pt": "Idade deve ser entre 10 e 100.",
+        "en": "Age must be between 10 and 100.",
+        "es": "La edad debe estar entre 10 y 100.",
+    },
+    "wizard_err_age_invalid": {
+        "pt": "Idade inválida (use um número inteiro).",
+        "en": "Invalid age (use a whole number).",
+        "es": "Edad inválida (use un número entero).",
+    },
+    "wizard_err_weight_range": {
+        "pt": "Peso deve ser entre 30 e 250 kg.",
+        "en": "Weight must be between 30 and 250 kg.",
+        "es": "El peso debe estar entre 30 y 250 kg.",
+    },
+    "wizard_err_weight_invalid": {
+        "pt": "Peso inválido.",
+        "en": "Invalid weight.",
+        "es": "Peso inválido.",
+    },
+    "wizard_err_height_range": {
+        "pt": "Altura deve ser entre 100 e 250 cm.",
+        "en": "Height must be between 100 and 250 cm.",
+        "es": "La altura debe estar entre 100 y 250 cm.",
+    },
+    "wizard_err_height_invalid": {
+        "pt": "Altura inválida.",
+        "en": "Invalid height.",
+        "es": "Altura inválida.",
+    },
+    "wizard_err_sport": {
+        "pt": "Selecione um desporto.",
+        "en": "Select a sport.",
+        "es": "Seleccione un deporte.",
+    },
+    "wizard_err_date": {
+        "pt": "Informe a data da prova.",
+        "en": "Enter the race date.",
+        "es": "Ingrese la fecha de la prueba.",
+    },
+    "wizard_err_weeks": {
+        "pt": "Semanas devem ser ≥ 1.",
+        "en": "Weeks must be ≥ 1.",
+        "es": "Las semanas deben ser ≥ 1.",
+    },
+    "wizard_err_weeks_invalid": {
+        "pt": "Número de semanas inválido.",
+        "en": "Invalid number of weeks.",
+        "es": "Número de semanas inválido.",
+    },
+    "wizard_err_distance": {
+        "pt": "Selecione uma distância.",
+        "en": "Select a distance.",
+        "es": "Seleccione una distancia.",
+    },
+    "wizard_err_lactate_range": {
+        "pt": "Limiar de lactato deve ser entre 100 e 220 bpm.",
+        "en": "Lactate threshold must be between 100 and 220 bpm.",
+        "es": "El umbral de lactato debe estar entre 100 y 220 bpm.",
+    },
+    "wizard_err_lactate_invalid": {
+        "pt": "Limiar de lactato inválido.",
+        "en": "Invalid lactate threshold.",
+        "es": "Umbral de lactato inválido.",
+    },
+    "wizard_err_vo2_range": {
+        "pt": "VO2 Max deve ser entre 20 e 90.",
+        "en": "VO2 Max must be between 20 and 90.",
+        "es": "VO2 Max debe estar entre 20 y 90.",
+    },
+    "wizard_err_vo2_invalid": {
+        "pt": "VO2 Max inválido.",
+        "en": "Invalid VO2 Max.",
+        "es": "VO2 Max inválido.",
+    },
+    "wizard_health_ortho": {
+        "pt": "Ortopédico",
+        "en": "Orthopedic",
+        "es": "Ortopédico",
+    },
+    "wizard_health_asthma": {
+        "pt": "Asma / Respiratório",
+        "en": "Asthma / Respiratory",
+        "es": "Asma / Respiratorio",
+    },
+    "wizard_health_diabetes": {
+        "pt": "Diabetes",
+        "en": "Diabetes",
+        "es": "Diabetes",
+    },
+    "wizard_health_hypertension": {
+        "pt": "Hipertensão",
+        "en": "Hypertension",
+        "es": "Hipertensión",
+    },
+    "wizard_health_other": {
+        "pt": "Outro",
+        "en": "Other",
+        "es": "Otro",
+    },
+    "wizard_health_limit": {
+        "pt": "Máximo de 10 problemas de saúde.",
+        "en": "Maximum 10 health issues.",
+        "es": "Máximo 10 problemas de salud.",
+    },
+
+    # ── Config (hardcoded → i18n) ────────────────────────────────
+    "config_title": {
+        "pt": "Configurações",
+        "en": "Settings",
+        "es": "Configuración",
+    },
+    "config_theme": {
+        "pt": "Tema",
+        "en": "Theme",
+        "es": "Tema",
+    },
+    "config_dark_mode": {
+        "pt": "Modo escuro",
+        "en": "Dark mode",
+        "es": "Modo oscuro",
+    },
+    "config_language": {
+        "pt": "Idioma",
+        "en": "Language",
+        "es": "Idioma",
+    },
+    "config_session": {
+        "pt": "Sessão: {name}",
+        "en": "Session: {name}",
+        "es": "Sesión: {name}",
+    },
+    "config_logout": {
+        "pt": "Logout",
+        "en": "Logout",
+        "es": "Cerrar sesión",
+    },
+    "config_admin": {
+        "pt": "Painel Admin",
+        "en": "Admin Panel",
+        "es": "Panel Admin",
+    },
+
+    # ── Progress (hardcoded → i18n) ──────────────────────────────
+    "progress_plans_label": {
+        "pt": "Planos",
+        "en": "Plans",
+        "es": "Planes",
+    },
+    "progress_athletes_label": {
+        "pt": "Atletas",
+        "en": "Athletes",
+        "es": "Atletas",
+    },
+    "progress_latest_label": {
+        "pt": "Último",
+        "en": "Latest",
+        "es": "Último",
+    },
+    "progress_sport_dist": {
+        "pt": "Distribuição por Desporto",
+        "en": "Distribution by Sport",
+        "es": "Distribución por Deporte",
+    },
+    "progress_no_data": {
+        "pt": "Sem dados.",
+        "en": "No data.",
+        "es": "Sin datos.",
+    },
+    "progress_changelog_title": {
+        "pt": "Changelog",
+        "en": "Changelog",
+        "es": "Historial",
+    },
+    "progress_no_log": {
+        "pt": "Sem registos.",
+        "en": "No records.",
+        "es": "Sin registros.",
+    },
+    "progress_header": {
+        "pt": "Progresso",
+        "en": "Progress",
+        "es": "Progreso",
+    },
+    "progress_loading": {
+        "pt": "Carregando estatísticas…",
+        "en": "Loading statistics…",
+        "es": "Cargando estadísticas…",
+    },
+
+    # ── Athlete Dashboard (hardcoded → i18n) ─────────────────────
+    "athlete_loading": {
+        "pt": "Carregando dados…",
+        "en": "Loading data…",
+        "es": "Cargando datos…",
+    },
+    "athlete_loading_plans": {
+        "pt": "Carregando planos…",
+        "en": "Loading plans…",
+        "es": "Cargando planes…",
+    },
+    "athlete_stats_plans": {
+        "pt": "Planos",
+        "en": "Plans",
+        "es": "Planes",
+    },
+    "athlete_stats_weeks": {
+        "pt": "Semanas",
+        "en": "Weeks",
+        "es": "Semanas",
+    },
+    "athlete_stats_sport": {
+        "pt": "Desporto",
+        "en": "Sport",
+        "es": "Deporte",
+    },
+    "athlete_stats_bmi": {
+        "pt": "IMC",
+        "en": "BMI",
+        "es": "IMC",
+    },
+    "athlete_plans_title": {
+        "pt": "Planos de Treino",
+        "en": "Training Plans",
+        "es": "Planes de Entrenamiento",
+    },
+    "athlete_no_plans": {
+        "pt": "Nenhum plano criado para este atleta.",
+        "en": "No plans created for this athlete.",
+        "es": "Ningún plan creado para este atleta.",
+    },
+    "athlete_export_msg": {
+        "pt": "Exportação disponível via wizard.",
+        "en": "Export available via wizard.",
+        "es": "Exportación disponible via wizard.",
+    },
+
+    # ── Confirmações de exclusão ─────────────────────────────────
+    "confirm_delete_plan_title": {
+        "pt": "Confirmar exclusão",
+        "en": "Confirm deletion",
+        "es": "Confirmar eliminación",
+    },
+    "confirm_delete_plan_body": {
+        "pt": "Tem certeza que deseja excluir este plano? Esta ação não pode ser desfeita.",
+        "en": "Are you sure you want to delete this plan? This action cannot be undone.",
+        "es": "¿Está seguro de que desea eliminar este plan? Esta acción no se puede deshacer.",
+    },
+    "confirm_delete_session_title": {
+        "pt": "Confirmar remoção",
+        "en": "Confirm removal",
+        "es": "Confirmar eliminación",
+    },
+    "confirm_delete_session_body": {
+        "pt": "Tem certeza que deseja remover esta sessão de treino?",
+        "en": "Are you sure you want to remove this training session?",
+        "es": "¿Está seguro de que desea eliminar esta sesión de entrenamiento?",
+    },
+
+    # ── Calendário (hardcoded → i18n) ────────────────────────────
+    "calendar_header": {
+        "pt": "Calendário de Treino",
+        "en": "Training Calendar",
+        "es": "Calendario de Entrenamiento",
+    },
+    "calendar_btn_today": {
+        "pt": "Hoje",
+        "en": "Today",
+        "es": "Hoy",
+    },
+    "calendar_moved": {
+        "pt": "Treino movido.",
+        "en": "Workout moved.",
+        "es": "Entrenamiento movido.",
+    },
+    "calendar_undo": {
+        "pt": "Desfazer",
+        "en": "Undo",
+        "es": "Deshacer",
+    },
+    "calendar_day_mon": {"pt": "Seg", "en": "Mon", "es": "Lun"},
+    "calendar_day_tue": {"pt": "Ter", "en": "Tue", "es": "Mar"},
+    "calendar_day_wed": {"pt": "Qua", "en": "Wed", "es": "Mié"},
+    "calendar_day_thu": {"pt": "Qui", "en": "Thu", "es": "Jue"},
+    "calendar_day_fri": {"pt": "Sex", "en": "Fri", "es": "Vie"},
+    "calendar_day_sat": {"pt": "Sáb", "en": "Sat", "es": "Sáb"},
+    "calendar_day_sun": {"pt": "Dom", "en": "Sun", "es": "Dom"},
+    "calendar_month_1": {"pt": "Janeiro", "en": "January", "es": "Enero"},
+    "calendar_month_2": {"pt": "Fevereiro", "en": "February", "es": "Febrero"},
+    "calendar_month_3": {"pt": "Março", "en": "March", "es": "Marzo"},
+    "calendar_month_4": {"pt": "Abril", "en": "April", "es": "Abril"},
+    "calendar_month_5": {"pt": "Maio", "en": "May", "es": "Mayo"},
+    "calendar_month_6": {"pt": "Junho", "en": "June", "es": "Junio"},
+    "calendar_month_7": {"pt": "Julho", "en": "July", "es": "Julio"},
+    "calendar_month_8": {"pt": "Agosto", "en": "August", "es": "Agosto"},
+    "calendar_month_9": {"pt": "Setembro", "en": "September", "es": "Septiembre"},
+    "calendar_month_10": {"pt": "Outubro", "en": "October", "es": "Octubre"},
+    "calendar_month_11": {"pt": "Novembro", "en": "November", "es": "Noviembre"},
+    "calendar_month_12": {"pt": "Dezembro", "en": "December", "es": "Diciembre"},
+    "calendar_move_btn": {
+        "pt": "Mover para…",
+        "en": "Move to…",
+        "es": "Mover a…",
+    },
+    "calendar_move_date_label": {
+        "pt": "Data destino (AAAA-MM-DD)",
+        "en": "Target date (YYYY-MM-DD)",
+        "es": "Fecha destino (AAAA-MM-DD)",
+    },
+
+    # ── Workout Editor (hardcoded → i18n) ────────────────────────
+    "editor_type_label": {
+        "pt": "Tipo de treino",
+        "en": "Workout type",
+        "es": "Tipo de entrenamiento",
+    },
+    "editor_zone_label": {
+        "pt": "Zona de FC",
+        "en": "HR Zone",
+        "es": "Zona de FC",
+    },
+    "editor_duration_label": {
+        "pt": "Duração",
+        "en": "Duration",
+        "es": "Duración",
+    },
+    "editor_duration_hint": {
+        "pt": "Ex: 45 min",
+        "en": "E.g.: 45 min",
+        "es": "Ej: 45 min",
+    },
+    "editor_modality_label": {
+        "pt": "Modalidade",
+        "en": "Modality",
+        "es": "Modalidad",
+    },
+    "editor_notes_label": {
+        "pt": "Descrição / Notas",
+        "en": "Description / Notes",
+        "es": "Descripción / Notas",
+    },
+    "editor_header": {
+        "pt": "Editar Treino — {date}",
+        "en": "Edit Workout — {date}",
+        "es": "Editar Entrenamiento — {date}",
+    },
+    "editor_copy_label": {
+        "pt": "Copiar para data (AAAA-MM-DD)",
+        "en": "Copy to date (YYYY-MM-DD)",
+        "es": "Copiar a fecha (AAAA-MM-DD)",
+    },
+    "editor_copy_confirm": {
+        "pt": "Confirmar cópia",
+        "en": "Confirm copy",
+        "es": "Confirmar copia",
+    },
+    "editor_copy_btn": {
+        "pt": "Copiar",
+        "en": "Copy",
+        "es": "Copiar",
+    },
+    "editor_reset_btn": {
+        "pt": "Reset",
+        "en": "Reset",
+        "es": "Reset",
+    },
+    "editor_delete_btn": {
+        "pt": "Apagar",
+        "en": "Delete",
+        "es": "Eliminar",
+    },
+    "editor_session_not_found": {
+        "pt": "Sessão não encontrada.",
+        "en": "Session not found.",
+        "es": "Sesión no encontrada.",
+    },
+    "editor_save_error": {
+        "pt": "Erro ao salvar.",
+        "en": "Error saving.",
+        "es": "Error al guardar.",
+    },
+    "editor_reset_msg": {
+        "pt": "Treino restaurado ao gerado.",
+        "en": "Workout reset to generated.",
+        "es": "Entrenamiento restaurado al generado.",
+    },
+    "editor_reset_error": {
+        "pt": "Erro ao restaurar.",
+        "en": "Error resetting.",
+        "es": "Error al restaurar.",
+    },
+    "editor_deleted_msg": {
+        "pt": "Sessão removida.",
+        "en": "Session removed.",
+        "es": "Sesión eliminada.",
+    },
+    "editor_copied_msg": {
+        "pt": "Copiado para {date}.",
+        "en": "Copied to {date}.",
+        "es": "Copiado a {date}.",
+    },
+    "editor_copy_invalid_date": {
+        "pt": "Data inválida. Use o formato AAAA-MM-DD.",
+        "en": "Invalid date. Use the format YYYY-MM-DD.",
+        "es": "Fecha inválida. Use el formato AAAA-MM-DD.",
+    },
+
+    # ── Plan Card (hardcoded → i18n) ─────────────────────────────
+    "plan_phase_base": {"pt": "Base", "en": "Base", "es": "Base"},
+    "plan_phase_resistance": {"pt": "Resistência", "en": "Endurance", "es": "Resistencia"},
+    "plan_phase_speed": {"pt": "Velocidade", "en": "Speed", "es": "Velocidad"},
+    "plan_phase_power": {"pt": "Potência", "en": "Power", "es": "Potencia"},
+    "plan_phase_taper": {"pt": "Polimento", "en": "Taper", "es": "Afinación"},
+    "plan_phase_label": {
+        "pt": "Fase: {phase} · S{week}/{total}",
+        "en": "Phase: {phase} · W{week}/{total}",
+        "es": "Fase: {phase} · S{week}/{total}",
+    },
+    "plan_created_at": {
+        "pt": "Criado em {date}",
+        "en": "Created on {date}",
+        "es": "Creado el {date}",
+    },
+    "plan_tooltip_calendar": {
+        "pt": "Calendário",
+        "en": "Calendar",
+        "es": "Calendario",
+    },
+    "plan_tooltip_export": {
+        "pt": "Exportar",
+        "en": "Export",
+        "es": "Exportar",
+    },
+    "plan_tooltip_delete": {
+        "pt": "Apagar",
+        "en": "Delete",
+        "es": "Eliminar",
+    },
+
+    # ── Nav Bar (hardcoded → i18n) ───────────────────────────────
+    "nav_dashboard": {
+        "pt": "Dashboard",
+        "en": "Dashboard",
+        "es": "Panel",
+    },
+    "nav_stats": {
+        "pt": "Estatísticas",
+        "en": "Statistics",
+        "es": "Estadísticas",
+    },
+    "nav_templates": {
+        "pt": "Modelos",
+        "en": "Templates",
+        "es": "Plantillas",
+    },
+    "nav_fitness": {
+        "pt": "Fitness",
+        "en": "Fitness",
+        "es": "Fitness",
+    },
+    "nav_config": {
+        "pt": "Config",
+        "en": "Settings",
+        "es": "Ajustes",
+    },
+
+    # ── Onboarding extras ────────────────────────────────────────
+    "onboarding_back": {
+        "pt": "Voltar",
+        "en": "Back",
+        "es": "Volver",
+    },
+
+    # ── Debounce / login ─────────────────────────────────────────
+    "login_processing": {
+        "pt": "Entrando…",
+        "en": "Signing in…",
+        "es": "Iniciando sesión…",
+    },
+    "register_processing": {
+        "pt": "Criando conta…",
+        "en": "Creating account…",
+        "es": "Creando cuenta…",
+    },
 }
 
 SUPPORTED_LANGUAGES = ("pt", "en", "es")

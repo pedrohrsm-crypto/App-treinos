@@ -6,7 +6,7 @@ Mostra avatar, nome, desporto, progresso semanal e status.
 """
 
 import flet as ft
-from flet_app.theme import c, SPORT_COLORS
+from flet_app.theme import c, SPORT_COLORS, SPORT_ICONS, RADIUS, SPACING, card_shadow
 from typing import Dict, Callable, Optional
 
 
@@ -17,16 +17,16 @@ def _initials(name: str) -> str:
     return name[:2].upper() if name else "??"
 
 
-def _sport_emoji(sport: str) -> str:
+def _sport_icon(sport: str) -> ft.Icon:
     _map = {
-        "Corrida": "🏃",
-        "Ciclismo": "🚴",
-        "Natação": "🏊",
-        "Triathlon": "🏅",
-        "Duathlon (Natação+Corrida)": "🏊🏃",
-        "Duathlon (Ciclismo+Corrida)": "🚴🏃",
+        "Corrida": ft.Icons.DIRECTIONS_RUN,
+        "Ciclismo": ft.Icons.DIRECTIONS_BIKE,
+        "Natação": ft.Icons.POOL,
+        "Triathlon": ft.Icons.EMOJI_EVENTS,
+        "Duathlon (Natação+Corrida)": ft.Icons.POOL,
+        "Duathlon (Ciclismo+Corrida)": ft.Icons.DIRECTIONS_BIKE,
     }
-    return _map.get(sport, "🏋️")
+    return ft.Icon(_map.get(sport, ft.Icons.FITNESS_CENTER), size=14)
 
 
 def build_athlete_card(
@@ -53,10 +53,10 @@ def build_athlete_card(
     progress = min(cur_week / max(total, 1), 1.0)
 
     sport_color = SPORT_COLORS.get(sport, c("primary", dark))
-    status_icon = "🟢" if status == "active" else "⚪"
+    status_color = c("success", dark) if status == "active" else c("text_disabled", dark)
 
     avatar = ft.CircleAvatar(
-        content=ft.Text(_initials(name), size=18, weight=ft.FontWeight.BOLD, color="#FFFFFF"),
+        content=ft.Text(_initials(name), size=18, weight=ft.FontWeight.BOLD, color=c("text_light", dark)),
         bgcolor=sport_color,
         radius=26,
     )
@@ -67,34 +67,51 @@ def build_athlete_card(
                 [avatar, ft.Column(
                     [
                         ft.Text(name, size=16, weight=ft.FontWeight.W_600, max_lines=1, overflow=ft.TextOverflow.ELLIPSIS),
-                        ft.Text(f"{_sport_emoji(sport)} {sport} · {distance}", size=12, color=c("text_secondary", dark)),
+                        ft.Row([_sport_icon(sport), ft.Text(f"{sport} · {distance}", size=12, color=c("text_secondary", dark))], spacing=4),
                     ],
                     spacing=2,
                     expand=True,
                 )],
-                spacing=12,
+                spacing=SPACING["md"],
             ),
             ft.Divider(height=1, color=c("border_light", dark)),
             ft.Row(
                 [
-                    ft.Text(f"{status_icon} S{cur_week}/{total}", size=13, weight=ft.FontWeight.W_500),
+                    ft.Row([
+                        ft.Icon(ft.Icons.CIRCLE, size=10, color=status_color),
+                        ft.Text(f"S{cur_week}/{total}", size=13, weight=ft.FontWeight.W_500),
+                    ], spacing=4),
                     ft.Text(f"{len(summary['plans'])} plano(s)", size=12, color=c("text_secondary", dark)),
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             ),
             ft.ProgressBar(value=progress, color=sport_color, bgcolor=c("border_light", dark), height=6),
         ],
-        spacing=8,
+        spacing=SPACING["sm"],
     )
 
-    return ft.Container(
+    shadow_ref = [card_shadow(dark, "md")]
+
+    def _on_hover(e):
+        if e.data == "true":
+            container.shadow = card_shadow(dark, "lg")
+            container.scale = 1.01
+        else:
+            container.shadow = card_shadow(dark, "md")
+            container.scale = 1.0
+        container.update()
+
+    container = ft.Container(
         content=card_content,
-        padding=16,
-        border_radius=16,
+        padding=SPACING["md"],
+        border_radius=RADIUS["lg"],
         bgcolor=c("bg_card", dark),
-        shadow=ft.BoxShadow(spread_radius=0, blur_radius=8, color=c("shadow", dark), offset=ft.Offset(0, 2)),
+        shadow=card_shadow(dark, "md"),
         on_click=on_click,
+        on_hover=_on_hover,
         ink=True,
         animate=ft.Animation(200, ft.AnimationCurve.EASE_OUT),
-        width=320,
+        animate_scale=ft.Animation(150, ft.AnimationCurve.EASE_OUT),
+        width=360,
     )
+    return container

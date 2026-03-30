@@ -10,9 +10,9 @@ Dados carregados assincronamente com spinner.
 import asyncio
 import flet as ft
 from i18n import t
-from flet_app.theme import c
+from flet_app.theme import c, SPACING
 from flet_app.state import app_state
-from flet_app.components.nav_bar import build_nav_bar
+from flet_app.components.adaptive_nav import build_adaptive_layout
 from flet_app.components.athlete_card import build_athlete_card
 from flet_app.components.loading_overlay import build_loading
 from flet_app.components.feature_tooltip import build_feature_tooltip
@@ -27,7 +27,7 @@ def dashboard_view(page: ft.Page, route: str) -> ft.View:
 
     # ── Pesquisa ─────────────────────────────────────────────────
     search_field = ft.TextField(
-        hint_text="Pesquisar atleta…",
+        hint_text=t("dashboard_search"),
         prefix_icon=ft.Icons.SEARCH,
         border_radius=24,
         filled=True,
@@ -48,7 +48,7 @@ def dashboard_view(page: ft.Page, route: str) -> ft.View:
     )
 
     # Container que começa com spinner e será substituído pelo grid
-    body = ft.Container(content=build_loading("Carregando atletas…", dark), expand=True)
+    body = ft.Container(content=build_loading(t("dashboard_loading"), dark), expand=True)
 
     athletes = []  # preenchido assincronamente
 
@@ -72,9 +72,9 @@ def dashboard_view(page: ft.Page, route: str) -> ft.View:
                 ft.Container(
                     content=ft.Column(
                         [
-                            ft.Text("📭", size=48),
-                            ft.Text("Nenhum atleta encontrado", size=16, color=c("text_secondary", dark)),
-                            ft.Text("Crie um plano de treino para começar.", size=13, color=c("text_disabled", dark)),
+                            ft.Icon(ft.Icons.PERSON_ADD, size=48, color=c("text_disabled", dark)),
+                            ft.Text(t("dashboard_no_athlete"), size=16, color=c("text_secondary", dark)),
+                            ft.Text(t("dashboard_no_athlete_hint"), size=13, color=c("text_disabled", dark)),
                         ],
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                         spacing=8,
@@ -111,18 +111,18 @@ def dashboard_view(page: ft.Page, route: str) -> ft.View:
     header = ft.Container(
         content=ft.Column(
             [
-                ft.Text(greeting, size=22, weight=ft.FontWeight.BOLD),
-                ft.Row([search_field], spacing=8),
+                ft.Text(greeting, size=22, weight=ft.FontWeight.BOLD, color=c("text_primary", dark)),
+                ft.Row([search_field], spacing=SPACING["sm"]),
             ],
-            spacing=8,
+            spacing=SPACING["sm"],
         ),
-        padding=ft.padding.only(left=16, right=16, top=12, bottom=4),
+        padding=ft.padding.only(left=SPACING["md"], right=SPACING["md"], top=SPACING["md"], bottom=SPACING["xs"]),
     )
 
     # ── FAB ──────────────────────────────────────────────────────
     fab = ft.FloatingActionButton(
         icon=ft.Icons.ADD,
-        tooltip="Novo Plano",
+        tooltip=t("dashboard_new_plan"),
         bgcolor=c("primary", dark),
         foreground_color=c("text_light", dark),
         on_click=_go_wizard,
@@ -135,9 +135,12 @@ def dashboard_view(page: ft.Page, route: str) -> ft.View:
         page, dark,
     )
 
-    return ft.View(
-        route="/dashboard",
-        controls=[header, tooltip, body],
-        navigation_bar=build_nav_bar(page, selected_index=0),
-        floating_action_button=fab,
+    content = ft.Column([header, tooltip, body], expand=True)
+
+    return build_adaptive_layout(
+        page=page,
+        selected_index=0,
+        body=content,
+        dark=dark,
+        fab=fab,
     )

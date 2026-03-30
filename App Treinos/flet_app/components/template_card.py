@@ -6,7 +6,7 @@ Mostra nome, desporto, tipo, duração e zona com botão "Usar".
 """
 
 import flet as ft
-from flet_app.theme import c, SPORT_COLORS
+from flet_app.theme import c, SPORT_COLORS, RADIUS, SPACING, card_shadow
 
 
 ZONE_COLORS = {
@@ -47,9 +47,9 @@ def build_template_card(
                         ft.Text(name, size=14, weight=ft.FontWeight.W_600),
                         ft.Row([
                             ft.Container(
-                                content=ft.Text(sport, size=10, color="#FFF"),
+                                content=ft.Text(sport, size=10, color=c("text_light", dark)),
                                 bgcolor=sport_color,
-                                border_radius=4,
+                                border_radius=RADIUS["sm"],
                                 padding=ft.padding.symmetric(horizontal=6, vertical=2),
                             ),
                             ft.Text(f"{tipo} · {duration}", size=11, color=c("text_secondary", dark)),
@@ -83,7 +83,7 @@ def build_template_card(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
         ),
         bgcolor=c("bg_card", dark),
-        border_radius=10,
-        padding=12,
-        shadow=ft.BoxShadow(blur_radius=4, color=c("shadow", dark)),
+        border_radius=RADIUS["md"],
+        padding=SPACING["md"],
+        shadow=card_shadow(dark, "sm"),
     )

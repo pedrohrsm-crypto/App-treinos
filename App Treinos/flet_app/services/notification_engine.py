@@ -59,7 +59,7 @@ def get_pending_notifications(trainer_info) -> List[Dict]:
                 tipos = ", ".join(s.get("tipo", "?") for s in today_sessions[:3])
                 notifications.append({
                     "type": "training",
-                    "icon": "⏰",
+                    "icon": "alarm",
                     "title": f"Treino hoje — {athlete_name}",
                     "detail": f"{len(today_sessions)} sessão(ões): {tipos}",
                     "priority": 1,
@@ -69,7 +69,7 @@ def get_pending_notifications(trainer_info) -> List[Dict]:
                 tipos = ", ".join(s.get("tipo", "?") for s in tomorrow_sessions[:3])
                 notifications.append({
                     "type": "training",
-                    "icon": "📅",
+                    "icon": "calendar_today",
                     "title": f"Treino amanhã — {athlete_name}",
                     "detail": f"{len(tomorrow_sessions)} sessão(ões): {tipos}",
                     "priority": 2,
@@ -80,7 +80,7 @@ def get_pending_notifications(trainer_info) -> List[Dict]:
             if 0 < remaining_weeks <= 2:
                 notifications.append({
                     "type": "deadline",
-                    "icon": "🏁",
+                    "icon": "flag",
                     "title": f"Prova próxima — {athlete_name}",
                     "detail": f"Faltam {remaining_weeks} semana(s) para a prova ({plan.sport} {plan.distance}).",
                     "priority": 1,
@@ -91,7 +91,7 @@ def get_pending_notifications(trainer_info) -> List[Dict]:
             if days_since > 14 and not calendar:
                 notifications.append({
                     "type": "info",
-                    "icon": "📋",
+                    "icon": "assignment",
                     "title": f"Plano sem calendário — {athlete_name}",
                     "detail": f"Plano criado há {days_since} dias sem mapeamento de calendário.",
                     "priority": 3,
@@ -112,7 +112,7 @@ def get_pending_notifications(trainer_info) -> List[Dict]:
                 if last_training_date and (today - last_training_date).days > 3:
                     notifications.append({
                         "type": "inactive",
-                        "icon": "⚠️",
+                        "icon": "warning",
                         "title": f"Atleta inativo — {athlete_name}",
                         "detail": f"Último treino agendado: {last_training_date.isoformat()} ({(today - last_training_date).days} dias atrás).",
                         "priority": 2,

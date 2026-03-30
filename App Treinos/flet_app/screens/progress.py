@@ -9,9 +9,9 @@ Dados carregados assincronamente com spinner.
 import asyncio
 import flet as ft
 from i18n import t
-from flet_app.theme import c, SPORT_COLORS
+from flet_app.theme import c, SPORT_COLORS, RADIUS, SPACING, card_shadow
 from flet_app.state import app_state
-from flet_app.components.nav_bar import build_nav_bar
+from flet_app.components.adaptive_nav import build_adaptive_layout
 from flet_app.components.loading_overlay import build_loading
 from training_manager import training_manager
 
@@ -22,7 +22,7 @@ def progress_view(page: ft.Page, route: str) -> ft.View:
     dark = app_state.dark_mode
     trainer = app_state.trainer_info()
 
-    body = ft.Container(content=build_loading("Carregando estatísticas…", dark), expand=True, padding=ft.padding.all(16))
+    body = ft.Container(content=build_loading(t("progress_loading"), dark), expand=True, padding=ft.padding.all(16))
 
     async def _load_data():
         await asyncio.sleep(0.01)
@@ -31,21 +31,21 @@ def progress_view(page: ft.Page, route: str) -> ft.View:
         changelog = training_manager.get_changelog(trainer) if trainer else []
 
         # Stats cards
-        def _stat(icon, value, label):
+        def _stat(icon_name, value, label):
             return ft.Container(
                 content=ft.Column(
-                    [ft.Text(icon, size=24), ft.Text(value, size=20, weight=ft.FontWeight.BOLD), ft.Text(label, size=11, color=c("text_secondary", dark))],
+                    [ft.Icon(icon_name, size=24, color=c("primary", dark)), ft.Text(value, size=20, weight=ft.FontWeight.BOLD), ft.Text(label, size=11, color=c("text_secondary", dark))],
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=2,
                 ),
-                padding=16, border_radius=12, bgcolor=c("bg_card", dark),
-                shadow=ft.BoxShadow(blur_radius=4, color=c("shadow", dark)), expand=True,
+                padding=SPACING["md"], border_radius=RADIUS["md"], bgcolor=c("bg_card", dark),
+                shadow=card_shadow(dark, "sm"), expand=True,
             )
 
         stats_row = ft.Row(
             [
-                _stat("📋", str(stats.get("total_plans", 0)), "Planos"),
-                _stat("👥", str(stats.get("unique_athletes", 0)), "Atletas"),
-                _stat("📅", stats.get("latest_plan", "—") or "—", "Último"),
+                _stat(ft.Icons.ASSIGNMENT, str(stats.get("total_plans", 0)), t("progress_plans_label")),
+                _stat(ft.Icons.GROUP, str(stats.get("unique_athletes", 0)), t("progress_athletes_label")),
+                _stat(ft.Icons.CALENDAR_TODAY, stats.get("latest_plan", "—") or "—", t("progress_latest_label")),
             ],
             spacing=10,
         )
@@ -64,7 +64,7 @@ def progress_view(page: ft.Page, route: str) -> ft.View:
                 ], spacing=4)
             )
         if not sport_bars:
-            sport_bars.append(ft.Text("Sem dados.", size=13, color=c("text_secondary", dark)))
+            sport_bars.append(ft.Text(t("progress_no_data"), size=13, color=c("text_secondary", dark)))
 
         # Changelog
         log_items = []
@@ -75,7 +75,7 @@ def progress_view(page: ft.Page, route: str) -> ft.View:
             log_items.append(
                 ft.Container(
                     content=ft.Row([
-                        ft.Text("📝", size=16),
+                        ft.Icon(ft.Icons.EDIT_NOTE, size=16, color=c("primary", dark)),
                         ft.Column([
                             ft.Text(action, size=13, weight=ft.FontWeight.W_500),
                             ft.Text(f"{ts} — {detail}", size=11, color=c("text_secondary", dark)),
@@ -86,17 +86,17 @@ def progress_view(page: ft.Page, route: str) -> ft.View:
                 )
             )
         if not log_items:
-            log_items.append(ft.Text("Sem registos.", size=13, color=c("text_secondary", dark)))
+            log_items.append(ft.Text(t("progress_no_log"), size=13, color=c("text_secondary", dark)))
 
         body.content = ft.Column(
             [
-                ft.Text("📊 Progresso", size=20, weight=ft.FontWeight.BOLD),
+                ft.Row([ft.Icon(ft.Icons.INSIGHTS, size=22, color=c("primary", dark)), ft.Text(t("progress_header"), size=20, weight=ft.FontWeight.BOLD)], spacing=SPACING["sm"]),
                 stats_row,
                 ft.Divider(height=20),
-                ft.Text("Distribuição por Desporto", size=16, weight=ft.FontWeight.W_600),
+                ft.Text(t("progress_sport_dist"), size=16, weight=ft.FontWeight.W_600),
                 *sport_bars,
                 ft.Divider(height=20),
-                ft.Text("Changelog", size=16, weight=ft.FontWeight.W_600),
+                ft.Text(t("progress_changelog_title"), size=16, weight=ft.FontWeight.W_600),
                 *log_items,
             ],
             spacing=12,
@@ -107,9 +107,9 @@ def progress_view(page: ft.Page, route: str) -> ft.View:
 
     page.run_task(_load_data)
 
-    return ft.View(
-        route="/progress",
-        controls=[body],
-        navigation_bar=build_nav_bar(page, selected_index=1),
-        bgcolor=c("bg_secondary", dark),
+    return build_adaptive_layout(
+        page=page,
+        selected_index=1,
+        body=body,
+        dark=dark,
     )

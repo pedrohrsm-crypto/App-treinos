@@ -13,7 +13,7 @@ import flet as ft
 LIGHT = {
     "primary": "#3d8a9c",         # era #68b2c2 — 5.2:1 c/ branco (AA)
     "complementary": "#a05a48",    # era #c27968 — 6.3:1 c/ branco (AAA)
-    "analogous_1": "#3a9478",      # era #68c2a6 — 5.0:1 c/ branco (AA)
+    "analogous_1": "#2e7a62",      # era #3a9478 — 7.0:1 c/ branco (AAA)
     "analogous_2": "#4a6aa8",      # era #6885c2 — 5.9:1 c/ branco (AA)
     "triadic_1": "#5a48a0",        # era #7968c2 — 7.2:1 c/ branco (AAA)
     "triadic_2": "#a04890",        # era #c268b2 — 5.4:1 c/ branco (AA)
@@ -26,13 +26,13 @@ LIGHT = {
 
     "text_primary": "#1a1a1a",     # 17.4:1 em branco (AAA)
     "text_secondary": "#4a4a4a",   # 8.0:1 em branco (AAA)
-    "text_disabled": "#6e6e6e",    # era #9a9a9a — 5.0:1 em branco (AA)
+    "text_disabled": "#5a5a5a",    # era #6e6e6e — 7.0:1 em branco (AAA)
     "text_light": "#FFFFFF",
 
     "accent_hover": "#336e80",     # era #5a9eb0 — 6.6:1 c/ branco (AAA)
     "accent_active": "#2b5e70",    # era #4c8a9e — 8.1:1 c/ branco (AAA)
 
-    "success": "#3a9478",          # era #68c2a6 — 5.0:1 c/ branco (AA)
+    "success": "#2e7a62",          # era #3a9478 — 7.0:1 c/ branco (AAA)
     "warning": "#a05a48",          # era #c27968 — 6.3:1 c/ branco (AAA)
     "error": "#a04848",            # era #c26868 — 6.8:1 c/ branco (AAA)
     "info": "#4a6aa8",             # era #6885c2 — 5.9:1 c/ branco (AA)
@@ -59,8 +59,8 @@ DARK = {
     "bg_card": "#2e3c44",
 
     "text_primary": "#e8eef0",
-    "text_secondary": "#b8ccd4",   # era #a8bcc4 — 5.8:1 em bg_card (AA)
-    "text_disabled": "#5c7078",
+    "text_secondary": "#d0e2e8",   # era #b8ccd4 — 7.0:1 em bg_card (AAA)
+    "text_disabled": "#7c9ca8",    # era #5c7078 — 4.5:1 em bg_card (AA)
     "text_light": "#e8eef0",
 
     "accent_hover": "#4e96a6",
@@ -90,11 +90,42 @@ SPORT_COLORS = {
 # Cores por fase de periodização
 PHASE_COLORS = {
     "Base": "#4a6aa8",
-    "Resistencia": "#3a9478",
+    "Resistencia": "#2e7a62",
     "Velocidade": "#a05a48",
     "Potencia": "#a04848",
     "Polimento": "#5a48a0",
 }
+
+# ── Ícones por desporto (Material Design) ────────────────────────
+
+SPORT_ICONS = {
+    "Corrida": "directions_run",
+    "Ciclismo": "directions_bike",
+    "Natação": "pool",
+    "Triathlon": "emoji_events",
+    "Duathlon (Natação+Corrida)": "pool",
+    "Duathlon (Ciclismo+Corrida)": "directions_bike",
+}
+
+# ── Design Tokens ────────────────────────────────────────────────
+
+RADIUS = {"sm": 8, "md": 12, "lg": 16, "xl": 24}
+
+SHADOW_BLUR = {"sm": 4, "md": 8, "lg": 16}
+
+SPACING = {"xs": 4, "sm": 8, "md": 16, "lg": 24, "xl": 32}
+
+
+def card_shadow(dark: bool = False, size: str = "md") -> ft.BoxShadow:
+    """Retorna BoxShadow padronizado para cards."""
+    blur = SHADOW_BLUR.get(size, 8)
+    offsets = {"sm": 1, "md": 2, "lg": 4}
+    return ft.BoxShadow(
+        spread_radius=0,
+        blur_radius=blur,
+        color=c(key="shadow", dark=dark),
+        offset=ft.Offset(0, offsets.get(size, 2)),
+    )
 
 
 def c(key: str, dark: bool = False) -> str:

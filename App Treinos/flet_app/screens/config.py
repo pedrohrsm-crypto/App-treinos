@@ -7,9 +7,9 @@ Toggle dark mode, seletor de idioma, logout, acesso admin.
 
 import flet as ft
 from i18n import t, set_language, get_language, SUPPORTED_LANGUAGES
-from flet_app.theme import c, build_theme
+from flet_app.theme import c, build_theme, SPACING
 from flet_app.state import app_state
-from flet_app.components.nav_bar import build_nav_bar
+from flet_app.components.adaptive_nav import build_adaptive_layout
 from flet_app.components.feature_tooltip import build_feature_tooltip
 
 
@@ -30,7 +30,7 @@ def config_view(page: ft.Page, route: str) -> ft.View:
         page.go("/config")  # reload view
 
     dark_switch = ft.Switch(
-        label="Modo escuro",
+        label=t("config_dark_mode"),
         value=app_state.dark_mode,
         on_change=_toggle_dark,
     )
@@ -64,7 +64,7 @@ def config_view(page: ft.Page, route: str) -> ft.View:
 
     # ── Admin ────────────────────────────────────────────────────
     admin_btn = ft.ElevatedButton(
-        "Painel Admin",
+        t("config_admin"),
         icon=ft.Icons.ADMIN_PANEL_SETTINGS,
         bgcolor=c("triadic_1", dark),
         color=c("text_light", dark),
@@ -80,28 +80,27 @@ def config_view(page: ft.Page, route: str) -> ft.View:
     )
     content = ft.Column(
         [
-            ft.Text("⚙️  Configurações", size=24, weight=ft.FontWeight.BOLD),
+            ft.Row([ft.Icon(ft.Icons.SETTINGS, size=24, color=c("primary", dark)), ft.Text(t("config_title"), size=24, weight=ft.FontWeight.BOLD)], spacing=SPACING["sm"]),
             ft.Divider(),
-            ft.Text("Tema", size=16, weight=ft.FontWeight.W_600),
+            ft.Text(t("config_theme"), size=16, weight=ft.FontWeight.W_600),
             dark_switch,
             ft.Divider(height=20, color=ft.Colors.TRANSPARENT),
-            ft.Text("Idioma", size=16, weight=ft.FontWeight.W_600),
+            ft.Text(t("config_language"), size=16, weight=ft.FontWeight.W_600),
             lang_chips,
             ft.Divider(height=20, color=ft.Colors.TRANSPARENT),
             admin_btn,
             ft.Divider(height=20, color=ft.Colors.TRANSPARENT),
-            ft.Text(f"Sessão: {app_state.trainer_name or '—'}", size=13, color=c("text_secondary", dark)),
-            ft.OutlinedButton("Logout", icon=ft.Icons.LOGOUT, on_click=_logout),
+            ft.Text(t("config_session", name=app_state.trainer_name or "—"), size=13, color=c("text_secondary", dark)),
+            ft.OutlinedButton(t("config_logout"), icon=ft.Icons.LOGOUT, on_click=_logout),
         ],
         spacing=8,
         expand=True,
         scroll=ft.ScrollMode.AUTO,
     )
 
-    return ft.View(
-        route="/config",
-        controls=[
-            ft.Container(content=ft.Column([tooltip, content], spacing=8), padding=24, expand=True),
-        ],
-        navigation_bar=build_nav_bar(page, selected_index=3),
+    return build_adaptive_layout(
+        page=page,
+        selected_index=4,
+        body=ft.Container(content=ft.Column([tooltip, content], spacing=SPACING["sm"]), padding=SPACING["lg"], expand=True),
+        dark=dark,
     )

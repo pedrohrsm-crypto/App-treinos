@@ -16,15 +16,29 @@ def register_view(page: ft.Page, route: str) -> ft.View:
 
     dark = app_state.dark_mode
 
-    nome = ft.TextField(label=t("register_name"), prefix_icon=ft.Icons.PERSON_OUTLINE, border_radius=12, filled=True, autofocus=True)
-    cpf = ft.TextField(label=t("register_cpf"), prefix_icon=ft.Icons.BADGE_OUTLINED, border_radius=12, filled=True)
-    cref = ft.TextField(label=t("register_cref"), prefix_icon=ft.Icons.VERIFIED_OUTLINED, border_radius=12, filled=True)
-    email = ft.TextField(label=t("register_email"), prefix_icon=ft.Icons.EMAIL_OUTLINED, border_radius=12, filled=True)
-    senha = ft.TextField(label=t("register_password"), prefix_icon=ft.Icons.LOCK_OUTLINE, password=True, can_reveal_password=True, border_radius=12, filled=True)
-    senha2 = ft.TextField(label=t("register_confirm"), prefix_icon=ft.Icons.LOCK_OUTLINE, password=True, can_reveal_password=True, border_radius=12, filled=True)
+    nome = ft.TextField(label=t("register_name"), prefix_icon=ft.Icons.PERSON_OUTLINE, border_radius=12, filled=True, autofocus=True, max_length=100)
+    cpf = ft.TextField(label=t("register_cpf"), prefix_icon=ft.Icons.BADGE_OUTLINED, border_radius=12, filled=True, max_length=14)
+    cref = ft.TextField(label=t("register_cref"), prefix_icon=ft.Icons.VERIFIED_OUTLINED, border_radius=12, filled=True, max_length=20)
+    email = ft.TextField(label=t("register_email"), prefix_icon=ft.Icons.EMAIL_OUTLINED, border_radius=12, filled=True, max_length=100)
+    senha = ft.TextField(label=t("register_password"), prefix_icon=ft.Icons.LOCK_OUTLINE, password=True, can_reveal_password=True, border_radius=12, filled=True, max_length=128)
+    senha2 = ft.TextField(label=t("register_confirm"), prefix_icon=ft.Icons.LOCK_OUTLINE, password=True, can_reveal_password=True, border_radius=12, filled=True, max_length=128)
     msg = ft.Text("", size=13, visible=False)
 
+    register_btn = ft.ElevatedButton(
+        t("register_button"),
+        icon=ft.Icons.PERSON_ADD,
+        bgcolor=c("primary", dark),
+        color=c("text_light", dark),
+        width=320,
+        height=48,
+        on_click=lambda _: _do_register(None),
+    )
+
+    register_busy = [False]  # debounce guard
+
     def _do_register(_):
+        if register_busy[0]:
+            return
         # Validação básica
         if not nome.value or not cpf.value or not cref.value or not senha.value:
             msg.value = t("register_error_required")
@@ -45,6 +59,12 @@ def register_view(page: ft.Page, route: str) -> ft.View:
             page.update()
             return
 
+        register_busy[0] = True
+        register_btn.disabled = True
+        register_btn.text = t("register_processing")
+        msg.visible = False
+        page.update()
+
         ok, resp = app_state.db.cadastrar_usuario(
             cpf=cpf.value.strip(),
             cref=cref.value.strip(),
@@ -60,13 +80,16 @@ def register_view(page: ft.Page, route: str) -> ft.View:
 
             import time, threading
             def _redirect():
-                time.sleep(1.2)
+                time.sleep(0.8)
                 page.go("/login")
             threading.Thread(target=_redirect, daemon=True).start()
         else:
             msg.value = resp
             msg.color = c("error", dark)
             msg.visible = True
+            register_btn.disabled = False
+            register_btn.text = t("register_button")
+            register_busy[0] = False
             page.update()
 
     def _go_back(_):
@@ -84,15 +107,7 @@ def register_view(page: ft.Page, route: str) -> ft.View:
                 nome, cpf, cref, email, senha, senha2,
                 msg,
                 ft.Divider(height=8, color=ft.Colors.TRANSPARENT),
-                ft.ElevatedButton(
-                    t("register_button"),
-                    icon=ft.Icons.PERSON_ADD,
-                    bgcolor=c("primary", dark),
-                    color=c("text_light", dark),
-                    width=320,
-                    height=48,
-                    on_click=_do_register,
-                ),
+                register_btn,
             ],
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             spacing=8,

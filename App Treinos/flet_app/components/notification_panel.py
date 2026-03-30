@@ -18,6 +18,19 @@ PRIORITY_COLORS = {
     3: "#6885c2",  # baixa → azul
 }
 
+_ICON_MAP = {
+    "alarm": ft.Icons.ALARM,
+    "calendar_today": ft.Icons.CALENDAR_TODAY,
+    "flag": ft.Icons.FLAG,
+    "assignment": ft.Icons.ASSIGNMENT,
+    "warning": ft.Icons.WARNING,
+    "notifications": ft.Icons.NOTIFICATIONS,
+}
+
+
+def _icon_from_name(name: str):
+    return _ICON_MAP.get(name, ft.Icons.NOTIFICATIONS)
+
 
 def build_notification_icon(page: ft.Page, dark: bool = False) -> ft.Container:
     """
@@ -29,7 +42,7 @@ def build_notification_icon(page: ft.Page, dark: bool = False) -> ft.Container:
     notifications = get_pending_notifications(trainer)
     count = len(notifications)
 
-    badge_text = ft.Text(str(count) if count <= 9 else "9+", size=9, color="#FFF", weight=ft.FontWeight.BOLD)
+    badge_text = ft.Text(str(count) if count <= 9 else "9+", size=9, color=c("text_light", dark), weight=ft.FontWeight.BOLD)
     badge = ft.Container(
         content=badge_text,
         bgcolor=c("error", dark) if count > 0 else c("text_disabled", dark),
@@ -59,7 +72,7 @@ def _show_notification_panel(page: ft.Page, notifications: list, dark: bool):
     """Abre BottomSheet com lista de notificações."""
 
     if not notifications:
-        page.open(ft.SnackBar(ft.Text("🔔 Sem notificações pendentes."), bgcolor=c("info", dark)))
+        page.open(ft.SnackBar(ft.Text("Sem notificações pendentes."), bgcolor=c("info", dark)))
         return
 
     cards = []
@@ -70,7 +83,7 @@ def _show_notification_panel(page: ft.Page, notifications: list, dark: bool):
                 content=ft.Row(
                     [
                         ft.Container(width=4, height=50, bgcolor=pcolor, border_radius=2),
-                        ft.Text(n.get("icon", "🔔"), size=24),
+                        ft.Icon(_icon_from_name(n.get("icon", "notifications")), size=24, color=pcolor),
                         ft.Column(
                             [
                                 ft.Text(n.get("title", ""), size=14, weight=ft.FontWeight.W_600),
@@ -95,7 +108,7 @@ def _show_notification_panel(page: ft.Page, notifications: list, dark: bool):
             content=ft.Column(
                 [
                     ft.Row([
-                        ft.Text("🔔 Notificações", size=16, weight=ft.FontWeight.BOLD, expand=True),
+                        ft.Row([ft.Icon(ft.Icons.NOTIFICATIONS, size=16, color=c("primary", dark)), ft.Text("Notificações", size=16, weight=ft.FontWeight.BOLD)], spacing=8, expand=True),
                         ft.Text(f"{len(notifications)} pendente(s)", size=13, color=c("text_secondary", dark)),
                     ]),
                     ft.Divider(),

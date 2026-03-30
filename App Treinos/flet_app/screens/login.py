@@ -7,7 +7,7 @@ Usa DatabaseManager.autenticar_usuario() para validar CPF/CREF + senha.
 
 import flet as ft
 from i18n import t
-from flet_app.theme import c
+from flet_app.theme import c, RADIUS
 from flet_app.state import app_state
 
 
@@ -23,6 +23,7 @@ def login_view(page: ft.Page, route: str) -> ft.View:
         border_radius=12,
         filled=True,
         autofocus=True,
+        max_length=20,
     )
     password = ft.TextField(
         label=t("login_password"),
@@ -31,12 +32,27 @@ def login_view(page: ft.Page, route: str) -> ft.View:
         can_reveal_password=True,
         border_radius=12,
         filled=True,
+        max_length=128,
         on_submit=lambda _: _do_login(None),
     )
     error_text = ft.Text("", color=c("error", dark), size=13, visible=False)
 
+    login_btn = ft.ElevatedButton(
+        t("login_button"),
+        icon=ft.Icons.LOGIN,
+        bgcolor=c("primary", dark),
+        color=c("text_light", dark),
+        width=320,
+        height=48,
+        on_click=lambda _: _do_login(None),
+    )
+
     # ── Acções ───────────────────────────────────────────────────
+    login_busy = [False]  # debounce guard
+
     def _do_login(_):
+        if login_busy[0]:
+            return
         cred = credential.value.strip()
         pwd = password.value.strip()
         if not cred or not pwd:
@@ -44,6 +60,12 @@ def login_view(page: ft.Page, route: str) -> ft.View:
             error_text.visible = True
             page.update()
             return
+
+        login_busy[0] = True
+        login_btn.disabled = True
+        login_btn.text = t("login_processing")
+        error_text.visible = False
+        page.update()
 
         ok, data = app_state.db.autenticar_usuario(cred, pwd)
         if ok:
@@ -53,6 +75,9 @@ def login_view(page: ft.Page, route: str) -> ft.View:
         else:
             error_text.value = t("login_error_invalid")
             error_text.visible = True
+            login_btn.disabled = False
+            login_btn.text = t("login_button")
+            login_busy[0] = False
             page.update()
 
     def _go_register(_):
@@ -62,7 +87,7 @@ def login_view(page: ft.Page, route: str) -> ft.View:
     card = ft.Container(
         content=ft.Column(
             [
-                ft.Text("🏃", size=50, text_align=ft.TextAlign.CENTER),
+                ft.Icon(ft.Icons.DIRECTIONS_RUN, size=50, color=c("primary", dark)),
                 ft.Text(
                     t("app_name"),
                     size=28,
@@ -80,15 +105,7 @@ def login_view(page: ft.Page, route: str) -> ft.View:
                 password,
                 error_text,
                 ft.Divider(height=8, color=ft.Colors.TRANSPARENT),
-                ft.ElevatedButton(
-                    t("login_button"),
-                    icon=ft.Icons.LOGIN,
-                    bgcolor=c("primary", dark),
-                    color=c("text_light", dark),
-                    width=320,
-                    height=48,
-                    on_click=_do_login,
-                ),
+                login_btn,
                 ft.TextButton(
                     t("register_link"),
                     on_click=_go_register,

@@ -6,9 +6,9 @@ Ecrã com conexão OAuth via Strava e lista de atividades importadas.
 """
 
 import flet as ft
-from flet_app.theme import c
+from flet_app.theme import c, SPACING
 from flet_app.state import app_state
-from flet_app.components.nav_bar import build_nav_bar
+from flet_app.components.adaptive_nav import build_adaptive_layout
 from flet_app.components.feature_tooltip import build_feature_tooltip
 
 
@@ -32,12 +32,12 @@ def fitness_view(page: ft.Page, route: str) -> ft.View:
             if url:
                 page.launch_url(url)
                 page.open(ft.SnackBar(
-                    ft.Text("🔗 Abra o navegador para autorizar o Strava."),
+                    ft.Text("Abra o navegador para autorizar o Strava."),
                     bgcolor=c("info", dark),
                 ))
         except Exception as ex:
             page.open(ft.SnackBar(
-                ft.Text(f"⚠️ Configuração Strava necessária: {ex}"),
+                ft.Text(f"Configuração Strava necessária: {ex}"),
                 bgcolor=c("warning", dark),
             ))
 
@@ -66,7 +66,10 @@ def fitness_view(page: ft.Page, route: str) -> ft.View:
                 activities_col.controls.append(
                     ft.Container(
                         content=ft.Row([
-                            ft.Text("🏃" if "run" in (a.sport_type or "").lower() else "🚴" if "ride" in (a.sport_type or "").lower() else "🏊", size=20),
+                            ft.Icon(
+                                ft.Icons.DIRECTIONS_RUN if "run" in (a.sport_type or "").lower() else ft.Icons.DIRECTIONS_BIKE if "ride" in (a.sport_type or "").lower() else ft.Icons.POOL,
+                                size=20, color=c("primary", dark),
+                            ),
                             ft.Column([
                                 ft.Text(a.name or "Atividade", size=14, weight=ft.FontWeight.W_600),
                                 ft.Text(f"{a.sport_type} · {a.distance_km:.1f} km · {a.duration_min:.0f} min", size=12, color=c("text_secondary", dark)),
@@ -89,7 +92,7 @@ def fitness_view(page: ft.Page, route: str) -> ft.View:
         content=ft.Column([
             ft.Row([
                 ft.Image(src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Strava_Logo.svg", width=100, height=30, fit=ft.ImageFit.CONTAIN)
-                if False else ft.Text("🔶 Strava", size=18, weight=ft.FontWeight.BOLD),
+                if False else ft.Row([ft.Icon(ft.Icons.FLASH_ON, size=20, color="#FC4C02"), ft.Text("Strava", size=18, weight=ft.FontWeight.BOLD)], spacing=SPACING["sm"]),
                 ft.ElevatedButton("Conectar", icon=ft.Icons.LINK, on_click=_connect_strava),
                 ft.OutlinedButton("Carregar Atividades", icon=ft.Icons.REFRESH, on_click=_load_activities),
             ], spacing=12),
@@ -105,7 +108,7 @@ def fitness_view(page: ft.Page, route: str) -> ft.View:
 
     garmin_section = ft.Container(
         content=ft.Column([
-            ft.Text("⌚ Garmin", size=18, weight=ft.FontWeight.BOLD),
+            ft.Row([ft.Icon(ft.Icons.WATCH, size=20, color=c("primary", dark)), ft.Text("Garmin", size=18, weight=ft.FontWeight.BOLD)], spacing=SPACING["sm"]),
             ft.Text("Integração Garmin Connect em breve.", size=13, color=c("text_secondary", dark)),
         ], spacing=8),
         padding=16,
@@ -113,28 +116,26 @@ def fitness_view(page: ft.Page, route: str) -> ft.View:
         border_radius=12,
     )
 
-    return ft.View(
-        route="/fitness",
-        controls=[
-            ft.Container(
-                content=ft.Column(
-                    [
-                        ft.Text("⌚ Fitness & Conectores", size=20, weight=ft.FontWeight.BOLD),
-                        build_feature_tooltip("fitness", t("tooltip_fitness"), page, dark),
-                        strava_section,
-                        garmin_section,
-                        ft.Divider(height=16),
-                        ft.Text("Atividades Importadas", size=16, weight=ft.FontWeight.W_600),
-                        activities_col,
-                    ],
-                    spacing=12,
-                    scroll=ft.ScrollMode.AUTO,
-                    expand=True,
-                ),
-                padding=ft.padding.all(16),
+    return build_adaptive_layout(
+        page=page,
+        selected_index=3,
+        body=ft.Container(
+            content=ft.Column(
+                [
+                    ft.Row([ft.Icon(ft.Icons.WATCH, size=22, color=c("primary", dark)), ft.Text("Fitness & Conectores", size=20, weight=ft.FontWeight.BOLD)], spacing=SPACING["sm"]),
+                    build_feature_tooltip("fitness", t("tooltip_fitness"), page, dark),
+                    strava_section,
+                    garmin_section,
+                    ft.Divider(height=16),
+                    ft.Text("Atividades Importadas", size=16, weight=ft.FontWeight.W_600),
+                    activities_col,
+                ],
+                spacing=SPACING["md"],
+                scroll=ft.ScrollMode.AUTO,
                 expand=True,
-            )
-        ],
-        navigation_bar=build_nav_bar(page, selected_index=2),
-        bgcolor=c("bg_secondary", dark),
+            ),
+            padding=ft.padding.all(SPACING["md"]),
+            expand=True,
+        ),
+        dark=dark,
     )

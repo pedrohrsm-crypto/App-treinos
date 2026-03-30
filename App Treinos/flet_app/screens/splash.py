@@ -19,12 +19,17 @@ def splash_view(page: ft.Page, route: str) -> ft.View:
     dark = app_state.dark_mode
 
     # ── Elementos visuais ────────────────────────────────────────
-    logo = ft.Text(
-        "🏃", size=80, text_align=ft.TextAlign.CENTER,
+    logo = ft.Icon(
+        ft.Icons.DIRECTIONS_RUN, size=80, color=c("text_light", dark),
         opacity=0, animate_opacity=ft.Animation(500, ft.AnimationCurve.EASE_OUT),
     )
     title = ft.Text(
         t("app_name"), size=40, weight=ft.FontWeight.BOLD,
+        color=c("text_light", dark), text_align=ft.TextAlign.CENTER,
+        opacity=0, animate_opacity=ft.Animation(600, ft.AnimationCurve.EASE_OUT),
+    )
+    subtitle = ft.Text(
+        "Planeamento Profissional de Treinos", size=14,
         color=c("text_light", dark), text_align=ft.TextAlign.CENTER,
         opacity=0, animate_opacity=ft.Animation(600, ft.AnimationCurve.EASE_OUT),
     )
@@ -41,7 +46,7 @@ def splash_view(page: ft.Page, route: str) -> ft.View:
 
     content = ft.Container(
         content=ft.Column(
-            [logo, title, ft.Container(height=24), progress_bar, status_text],
+            [logo, title, subtitle, ft.Container(height=24), progress_bar, status_text],
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             spacing=12,
@@ -65,6 +70,7 @@ def splash_view(page: ft.Page, route: str) -> ft.View:
         # Fade in dos elementos
         logo.opacity = 1
         title.opacity = 1
+        subtitle.opacity = 1
         progress_bar.opacity = 1
         status_text.opacity = 1
         page.update()

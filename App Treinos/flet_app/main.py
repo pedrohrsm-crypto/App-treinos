@@ -35,9 +35,9 @@ def main(page: ft.Page):
     page.title = "App Treinos v3.0"
     page.theme_mode = ft.ThemeMode.LIGHT
     page.theme = build_theme(dark=False)
-    page.window.width = 420
-    page.window.height = 740
-    page.window.min_width = 360
+    page.window.width = 1024
+    page.window.height = 720
+    page.window.min_width = 420
     page.window.min_height = 600
 
     # ── Router ───────────────────────────────────────────────────

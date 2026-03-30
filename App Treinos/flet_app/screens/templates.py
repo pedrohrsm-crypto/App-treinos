@@ -8,10 +8,10 @@ Dados carregados assincronamente com spinner.
 
 import asyncio
 import flet as ft
-from flet_app.theme import c, SPORT_COLORS
+from flet_app.theme import c, SPORT_COLORS, SPACING
 from flet_app.state import app_state
 from flet_app.components.template_card import build_template_card
-from flet_app.components.nav_bar import build_nav_bar
+from flet_app.components.adaptive_nav import build_adaptive_layout
 from flet_app.components.loading_overlay import build_loading
 from training_manager import training_manager
 
@@ -77,7 +77,7 @@ def templates_view(page: ft.Page, route: str) -> ft.View:
                 break
         if tmpl:
             page.open(ft.SnackBar(
-                ft.Text(f"📋 Template '{tmpl['name']}' disponível para uso no editor de treino."),
+                ft.Text(f"Template '{tmpl['name']}' disponível para uso no editor de treino."),
                 bgcolor=c("info", dark),
             ))
 
@@ -85,7 +85,7 @@ def templates_view(page: ft.Page, route: str) -> ft.View:
         tmpl_id = e.control.data
         ok = training_manager.delete_template(trainer, tmpl_id)
         if ok:
-            page.open(ft.SnackBar(ft.Text("🗑️ Template removido."), bgcolor=c("warning", dark)))
+            page.open(ft.SnackBar(ft.Text("Template removido."), bgcolor=c("warning", dark)))
             _refresh()
 
     # ── Criar novo template ──────────────────────────────────────
@@ -121,11 +121,11 @@ def templates_view(page: ft.Page, route: str) -> ft.View:
             ok = training_manager.save_template(trainer, tmpl)
             if ok:
                 page.close(dialog)
-                page.open(ft.SnackBar(ft.Text("✅ Template criado."), bgcolor=c("success", dark)))
+                page.open(ft.SnackBar(ft.Text("Template criado."), bgcolor=c("success", dark)))
                 _refresh()
 
         dialog = ft.AlertDialog(
-            title=ft.Text("📋 Novo Template"),
+            title=ft.Row([ft.Icon(ft.Icons.LIBRARY_ADD, size=22, color=c("primary", dark)), ft.Text("Novo Template")], spacing=SPACING["sm"]),
             content=ft.Container(
                 content=ft.Column([
                     name_f,
@@ -152,10 +152,10 @@ def templates_view(page: ft.Page, route: str) -> ft.View:
         _populate()
         body.content = ft.Column(
             [
-                ft.Text("📋 Meus Templates", size=18, weight=ft.FontWeight.BOLD),
+                ft.Row([ft.Icon(ft.Icons.FOLDER_SPECIAL, size=20, color=c("primary", dark)), ft.Text("Meus Templates", size=18, weight=ft.FontWeight.BOLD)], spacing=SPACING["sm"]),
                 user_list,
                 ft.Divider(height=20),
-                ft.Text("📦 Templates do Sistema", size=18, weight=ft.FontWeight.BOLD),
+                ft.Row([ft.Icon(ft.Icons.INVENTORY_2, size=20, color=c("primary", dark)), ft.Text("Templates do Sistema", size=18, weight=ft.FontWeight.BOLD)], spacing=SPACING["sm"]),
                 system_list,
             ],
             spacing=12,
@@ -175,10 +175,10 @@ def templates_view(page: ft.Page, route: str) -> ft.View:
         on_click=_open_create_dialog,
     )
 
-    return ft.View(
-        route="/templates",
-        controls=[body],
-        navigation_bar=build_nav_bar(page, selected_index=0),
-        floating_action_button=fab,
-        bgcolor=c("bg_secondary", dark),
+    return build_adaptive_layout(
+        page=page,
+        selected_index=2,
+        body=body,
+        dark=dark,
+        fab=fab,
     )
