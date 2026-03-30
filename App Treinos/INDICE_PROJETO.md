@@ -1,4 +1,4 @@
-# 📚 Índice do Projeto — App Treinos v3.0.0
+# 📚 Índice do Projeto — App Treinos v3.1.0
 
 ## 📁 Estrutura Principal
 
@@ -18,7 +18,7 @@
 
 ### 💻 Código Fonte
 
-#### Flet (Interface v3.0 — ativa)
+#### Flet (Interface v3.1 — ativa)
 - `flet_app/main.py` — **Ponto de entrada + 13 rotas**
 - `flet_app/theme.py` — Tema visual (cores, tipografia, modo escuro)
 - `flet_app/state.py` — Estado global (AppState)
@@ -36,8 +36,10 @@
 - `fitness.py` — Integração Strava/Garmin
 - `config.py` — Configurações (tema, idioma, logout)
 - `admin.py` — Administração de utilizadores
+- `ai_config_screen.py` — **Configuração de IA** (provider, modelo, key, limites)
 
 ##### Componentes (`flet_app/components/`)
+- `adaptive_nav.py` — Navegação adaptativa (sidebar desktop / bottom mobile)
 - `nav_bar.py` — Barra de navegação inferior
 - `athlete_card.py` — Hero card de atleta
 - `plan_card.py` — Card de plano de treino
@@ -45,6 +47,9 @@
 - `workout_editor.py` — Editor modal de treino
 - `template_card.py` — Card de template
 - `notification_panel.py` — Painel de notificações (bell icon + BottomSheet)
+- `ai_suggestion_panel.py` — **Painel colapsável de sugestões IA**
+- `feature_tooltip.py` — Tooltips de funcionalidades
+- `loading_overlay.py` — Overlay de carregamento
 
 ##### Serviços (`flet_app/services/`)
 - `notification_engine.py` — Motor de notificações inteligente
@@ -59,6 +64,17 @@
 - `i18n.py` — Internacionalização (PT-BR, EN, ES)
 - `version.py` — Versão semântica
 
+#### Módulo de IA (`ai/`)
+- `ai/ai_config.py` — **Configuração** (AIProviderConfig, cifra Fernet, persistência)
+- `ai/ai_provider.py` — **Interface abstrata** (AIProvider ABC, AIResponse, factory)
+- `ai/ai_assistant.py` — **Fachada** (sync + async, token tracking, limites)
+- `ai/token_tracker.py` — **Rastreio** de consumo mensal (auto-reset, custos)
+- `ai/prompt_templates.py` — **6 templates** de prompt para treino desportivo
+- `ai/providers/openai_provider.py` — OpenAI Chat Completions (+ Custom)
+- `ai/providers/anthropic_provider.py` — Anthropic Messages API (Claude)
+- `ai/providers/google_provider.py` — Google Gemini generateContent
+- `ai/providers/deepseek_provider.py` — DeepSeek (OpenAI-compatível)
+
 ### 📊 Dados
 - `data/exports/` — Planilhas exportadas
 - `data/trainers/` — Diretórios por treinador (CREF)
@@ -69,10 +85,11 @@
 - `README.md` — Visão geral
 - `docs/` — Documentação técnica (periodização, ciclo menstrual, etc.)
 
-### 🧪 Testes Automatizados (192 testes)
+### 🧪 Testes Automatizados (227 testes)
 - `tests/test_app_treinos.py` — Testes de integração
 - `tests/test_funcionalidades.py` — Funcionalidades completas
 - `tests/test_flet_backend.py` — Backend Flet
+- `tests/test_ai_integration.py` — Módulo de IA (35 testes)
 
 ### 🔧 Scripts Utilitários
 - `scripts/generate_icon.py` — Gerador de ícone do aplicativo

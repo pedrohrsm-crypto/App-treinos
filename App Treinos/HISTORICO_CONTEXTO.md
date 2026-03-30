@@ -1,9 +1,9 @@
 # Histórico de Contexto — App Treinos
 
-**Última atualização:** 28/03/2026  
-**Versão atual:** 3.0.0  
+**Última atualização:** 29/03/2026  
+**Versão atual:** 3.1.0  
 **Branch:** main  
-**Último commit:** `09c2897` — "fix: corrigir chamada register_training no wizard e typo entry.details no progress" (28/03/2026)
+**Último commit:** Módulo de integração IA + redesign visual (29/03/2026)
 
 ---
 
@@ -54,12 +54,26 @@ D:\GitHub\App Treinos\Python\App Treinos\
 │   ├── icon.png                # Ícone alta resolução (512px)
 │   └── icon-192.png            # Ícone web/mobile (192px)
 │
-├── flet_app/                   # ★ Interface Flet (v3.0)
+├── ai/                         # ★ Módulo de Integração IA (v3.1)
+│   ├── __init__.py             # Módulo marker
+│   ├── ai_config.py            # Configuração + cifra de API keys
+│   ├── ai_provider.py          # Interface abstrata (ABC) + factory
+│   ├── ai_assistant.py         # Fachada (sync + async)
+│   ├── token_tracker.py        # Rastreio de consumo mensal
+│   ├── prompt_templates.py     # 6 templates de prompt para treino
+│   └── providers/              # Providers concretos
+│       ├── __init__.py
+│       ├── openai_provider.py  # OpenAI + compatíveis (Custom)
+│       ├── anthropic_provider.py # Anthropic (Claude)
+│       ├── google_provider.py  # Google Gemini
+│       └── deepseek_provider.py # DeepSeek
+│
+├── flet_app/                   # ★ Interface Flet (v3.1)
 │   ├── main.py                 # Ponto de entrada + 13 rotas
 │   ├── theme.py                # Tema visual (cores, tipografia)
 │   ├── state.py                # Estado global (AppState)
 │   ├── router.py               # Navegação entre ecrãs
-│   ├── screens/                # 11 ecrãs
+│   ├── screens/                # 12 ecrãs
 │   │   ├── splash.py           # Splash screen animado
 │   │   ├── login.py            # Autenticação
 │   │   ├── register.py         # Registo de treinador
@@ -70,15 +84,20 @@ D:\GitHub\App Treinos\Python\App Treinos\
 │   │   ├── progress.py         # Estatísticas e changelog
 │   │   ├── fitness.py          # Integração Strava/Garmin
 │   │   ├── config.py           # Configurações (tema, idioma)
-│   │   └── admin.py            # Administração de utilizadores
-│   ├── components/             # 7 componentes reutilizáveis
+│   │   ├── admin.py            # Administração de utilizadores
+│   │   └── ai_config_screen.py # ★ Configuração de IA
+│   ├── components/             # 9 componentes reutilizáveis
+│   │   ├── adaptive_nav.py     # Navegação adaptativa (sidebar/bottom)
 │   │   ├── nav_bar.py          # Barra de navegação inferior
 │   │   ├── athlete_card.py     # Hero card de atleta
 │   │   ├── plan_card.py        # Card de plano de treino
 │   │   ├── calendar_view.py    # Calendário mensal + drag & drop
 │   │   ├── workout_editor.py   # Editor inline de treino
 │   │   ├── template_card.py    # Card de template
-│   │   └── notification_panel.py # Painel de notificações
+│   │   ├── notification_panel.py # Painel de notificações
+│   │   ├── ai_suggestion_panel.py # ★ Painel de sugestões IA
+│   │   ├── feature_tooltip.py  # Tooltips de funcionalidades
+│   │   └── loading_overlay.py  # Overlay de carregamento
 │   └── services/
 │       └── notification_engine.py # Motor de notificações
 │
@@ -135,21 +154,24 @@ D:\GitHub\App Treinos\Python\App Treinos\
 | 27/03/2026 | `468c3d5` | **v3.0.0** | Migração completa para Flet — UI atleta-cêntrica |
 | 28/03/2026 | `09c2897` | — | Fix: register_training no wizard + entry.details |
 | 28/03/2026 | `71f1357` | — | Organização raiz, ícone, build executável |
-| 28/03/2026 | *pendente* | — | Limpeza: remover gui/ legado, scripts/docs redundantes, fix theme ← **HEAD** |
+| 28/03/2026 | *pendente* | — | Limpeza: remover gui/ legado, scripts/docs redundantes, fix theme |
+| 29/03/2026 | — | — | Redesign visual: WCAG, Material icons, layout adaptativo |
+| 29/03/2026 | — | **v3.1.0** | Módulo de integração IA: 5 providers, token tracking, UI ← **HEAD** |
 
 ---
 
-## 4. Estado Atual (28/03/2026)
+## 4. Estado Atual (29/03/2026)
 
 ### O que está PRONTO (✅)
 
 - [x] Motor de geração de treinos (6 modalidades, periodização completa)
-- [x] Interface Flet v3.0 com 11 ecrãs e 7 componentes reutilizáveis
+- [x] Interface Flet v3.1 com 12 ecrãs e 9 componentes reutilizáveis
 - [x] Dashboard atleta-cêntrico com hero cards e busca
 - [x] Calendário mensal interativo com drag & drop
 - [x] Wizard de 6 passos para criação de planos
 - [x] Sistema de notificações inteligente
-- [x] Tema material com modo escuro/claro
+- [x] Tema material com modo escuro/claro (WCAG compliant)
+- [x] Layout responsivo com navegação adaptativa (sidebar desktop / bottom nav mobile)
 - [x] Sistema de autenticação (CPF + CREF + senha)
 - [x] Banco de dados SQLite com suporte a MySQL
 - [x] Isolamento de dados por profissional (diretórios por CREF)
@@ -162,11 +184,47 @@ D:\GitHub\App Treinos\Python\App Treinos\
 - [x] Biblioteca de templates reutilizáveis
 - [x] Painel de administração de utilizadores
 - [x] Suporte multiplataforma (Windows, Linux, macOS)
-- [x] 192 testes automatizados passando (pytest)
+- [x] 227 testes automatizados passando (pytest) — inclui 35 testes de IA
 - [x] Ícone profissional (.ico + .png, múltiplas resoluções)
 - [x] Launchers: Windows (.bat), Linux/macOS (.sh), .desktop
 - [x] Build system (flet pack + PyInstaller) com ícone
 - [x] Documentação curada (9 documentos técnicos essenciais em docs/)
+- [x] **Módulo de integração IA** — 5 providers, token tracking, UI completa
+
+### Redesign visual aplicado em 29/03/2026
+
+- **Contraste WCAG** — Correções de contraste em theme.py para acessibilidade
+- **Design tokens** — RADIUS, SHADOW_BLUR, SPACING, card_shadow() padronizados
+- **Material Design icons** — Todos os emojis substituídos por ícones Material em todas as telas
+- **Layout adaptativo** — Sidebar desktop (≥768px) / bottom nav mobile via adaptive_nav.py
+- **Janela default** — 1024×720 em desktop
+
+### Módulo de integração IA implementado em 29/03/2026
+
+**13 novos ficheiros criados** no módulo `ai/`:
+
+| Ficheiro | Função |
+|----------|--------|
+| `ai/ai_config.py` | Configuração + cifra Fernet de API keys + persistência JSON |
+| `ai/ai_provider.py` | Interface abstrata (ABC), AIResponse, factory create_provider() |
+| `ai/token_tracker.py` | Rastreio mensal de tokens, detecção de limites (80%/100%), custos |
+| `ai/prompt_templates.py` | 6 templates especializados para treino desportivo |
+| `ai/ai_assistant.py` | Fachada única — sync + async (asyncio.to_thread) |
+| `ai/providers/openai_provider.py` | OpenAI Chat Completions (+ Custom compatível) |
+| `ai/providers/anthropic_provider.py` | Anthropic Messages API (Claude) |
+| `ai/providers/google_provider.py` | Google Gemini generateContent API |
+| `ai/providers/deepseek_provider.py` | DeepSeek (herda OpenAI-compatible) |
+| `flet_app/screens/ai_config_screen.py` | Tela de configuração: provider, modelo, key, limites |
+| `flet_app/components/ai_suggestion_panel.py` | Painel colapsável de sugestões IA |
+| `tests/test_ai_integration.py` | 35 testes unitários (todos passando) |
+
+**Providers suportados:** OpenAI, Anthropic (Claude), Google (Gemini), DeepSeek, Custom (OpenAI-compatível — Ollama, Groq, Azure OpenAI, etc.)
+
+**Segurança:** API keys cifradas em repouso com Fernet (AES-128-CBC), fallback base64.
+
+**Dependência adicionada:** `cryptography>=41.0.0` em requirements.txt.
+
+**Nota:** Integração nas rotas existentes (Phase 5) pendente — requer apenas adicionar rota `/ai-config` e embed do painel nas telas existentes.
 
 ### Correções aplicadas em 28/03/2026
 
@@ -193,6 +251,7 @@ D:\GitHub\App Treinos\Python\App Treinos\
 | Dados tabulares | pandas | >= 2.0.0 |
 | Export Excel | openpyxl | >= 3.1.0 |
 | Export PDF | reportlab | >= 4.0.0 |
+| Cifra API keys | cryptography | >= 41.0.0 |
 | Banco de dados | SQLite | (nativo) |
 | Banco de dados (prod) | MySQL | opcional |
 | Build executável | PyInstaller / flet pack | >= 6.0.0 |
@@ -256,6 +315,12 @@ python build.py --clean
 10. **Relatórios avançados** — gráficos de evolução e comparação de períodos
 11. **Publicação como app mobile** — Flet suporta compilação para Android/iOS
 12. **Marketplace de templates** — partilha de templates entre treinadores
+
+### Integração IA — Próximos Passos (Phase 5)
+17. **Adicionar rota `/ai-config`** ao router em `App_Treinos_Flet.py`
+18. **Botão "Configuração IA"** na tela de configurações (`config.py`)
+19. **Embed `ai_suggestion_panel`** no wizard, calendário e editor de treino
+20. **Histórico de sugestões** — salvar e rever sugestões anteriores da IA
 
 ### Infraestrutura
 13. ~~**CI/CD**~~ ✅ GitHub Actions pipeline
