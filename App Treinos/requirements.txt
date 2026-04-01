@@ -4,3 +4,13 @@ reportlab>=4.0.0
 pyinstaller>=6.0.0
 flet>=0.25.0
 cryptography>=41.0.0
+
+# --- Exportação FIT/TCX + Sync Garmin/Polar ---
+fit-tool>=0.9.13
+lxml>=4.9.0
+garminconnect>=0.2.15
+python-dotenv>=1.0.0
+fastapi>=0.100.0
+uvicorn>=0.23.0
+python-jose[cryptography]>=3.3.0
+httpx>=0.24.0
