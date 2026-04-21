@@ -16,6 +16,7 @@ from flet_app.components.adaptive_nav import build_adaptive_layout
 from flet_app.components.athlete_card import build_athlete_card
 from flet_app.components.loading_overlay import build_loading
 from flet_app.components.feature_tooltip import build_feature_tooltip
+from flet_app.components.tour_overlay import create_dashboard_tour
 from flet_app.components.hover_effects import apply_hover_effects_to_button
 from training_manager import training_manager
 
@@ -126,6 +127,10 @@ def dashboard_view(page: ft.Page, route: str) -> ft.View:
         _populate()
         body.content = grid
         page.update()
+
+        # Iniciar tour se for primeira vez
+        tour = create_dashboard_tour(page)
+        tour.start()
 
     page.run_task(_load_data)
 

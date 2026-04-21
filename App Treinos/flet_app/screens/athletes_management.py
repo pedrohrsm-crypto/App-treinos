@@ -15,6 +15,7 @@ from flet_app.state import app_state
 from flet_app.components.loading_overlay import build_loading
 from flet_app.components.confirm_modal import show_confirm
 from flet_app.components.toast import show_toast
+from flet_app.components.tour_overlay import create_athletes_tour
 
 
 def athletes_management_view(page: ft.Page, route: str) -> ft.View:
@@ -65,6 +66,10 @@ def athletes_management_view(page: ft.Page, route: str) -> ft.View:
                     athletes_container.controls.append(card)
 
             page.update()
+
+            # Iniciar tour se for primeira vez
+            tour = create_athletes_tour(page)
+            tour.start()
 
         page.run_task(load_athletes)
 

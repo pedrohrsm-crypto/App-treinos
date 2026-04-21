@@ -14,6 +14,7 @@ from i18n import t
 from flet_app.theme import c, RADIUS, SPACING
 from flet_app.components.adaptive_nav import build_adaptive_layout
 from flet_app.state import app_state
+from flet_app.components.tour_overlay import create_help_tour
 
 
 def help_view(page: ft.Page, route: str) -> ft.View:
@@ -164,6 +165,10 @@ def help_view(page: ft.Page, route: str) -> ft.View:
         page.snack_bar = ft.SnackBar(ft.Text("Tour será exibido na próxima tela!"))
         page.snack_bar.open = True
         page.update()
+
+    # Iniciar tour se for primeira vez
+    tour = create_help_tour(page)
+    tour.start()
 
     return build_adaptive_layout(page, 5, body, dark)  # Index 5 = Help
 
