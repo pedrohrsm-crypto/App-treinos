@@ -16,6 +16,7 @@ from flet_app.state import app_state
 from flet_app.components.loading_overlay import build_loading
 from flet_app.components.feature_tooltip import build_feature_tooltip
 from flet_app.components.toast import show_toast
+from flet_app.components.hover_effects import apply_hover_effects_to_button, apply_hover_effects_to_icon_button
 from training_planner import Athlete, TrainerInfo, TrainingPlanGenerator, calcular_semanas_ate_prova
 from training_manager import training_manager
 
@@ -488,6 +489,11 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
         on_click=lambda _: _generate(),
     )
 
+    # Apply hover effects to buttons
+    apply_hover_effects_to_button(btn_back, scale_ratio=1.05, duration_ms=150, dark=dark)
+    apply_hover_effects_to_button(btn_next, scale_ratio=1.05, duration_ms=150, dark=dark)
+    apply_hover_effects_to_button(btn_generate, scale_ratio=1.05, duration_ms=150, dark=dark)
+
     bottom_row = ft.Row(
         [btn_back, error_text, btn_next, btn_generate],
         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -631,7 +637,11 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
                         # Top bar
                         ft.Row(
                             [
-                                ft.IconButton(ft.Icons.CLOSE, on_click=lambda _: page.go("/dashboard")),
+                                apply_hover_effects_to_icon_button(
+                                    ft.IconButton(ft.Icons.CLOSE, on_click=lambda _: page.go("/dashboard")),
+                                    scale_ratio=1.15,
+                                    dark=dark
+                                ),
                                 ft.Text(t("wizard_header"), size=18, weight=ft.FontWeight.BOLD, expand=True),
                             ],
                         ),

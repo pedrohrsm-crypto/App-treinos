@@ -16,6 +16,7 @@ from flet_app.components.plan_card import build_plan_card
 from flet_app.components.loading_overlay import build_loading
 from flet_app.components.confirm_modal import show_confirm
 from flet_app.components.toast import show_toast
+from flet_app.components.hover_effects import apply_hover_effects_to_icon_button, apply_hover_effects_to_card
 from training_manager import training_manager
 
 
@@ -36,7 +37,11 @@ def athlete_dashboard_view(page: ft.Page, route: str) -> ft.View:
     header = ft.Container(
         content=ft.Row(
             [
-                ft.IconButton(ft.Icons.ARROW_BACK, on_click=lambda _: page.go("/dashboard")),
+                apply_hover_effects_to_icon_button(
+                    ft.IconButton(ft.Icons.ARROW_BACK, on_click=lambda _: page.go("/dashboard")),
+                    scale_ratio=1.2,
+                    dark=dark
+                ),
                 avatar,
                 ft.Column(
                     [
@@ -62,6 +67,7 @@ def athlete_dashboard_view(page: ft.Page, route: str) -> ft.View:
         foreground_color=c("text_light", dark),
         on_click=lambda _: page.go("/wizard"),
     )
+    apply_hover_effects_to_button(fab, scale_ratio=1.1, duration_ms=200, dark=dark)
 
     # ── Carregamento assíncrono ──────────────────────────────────
     async def _load_data():

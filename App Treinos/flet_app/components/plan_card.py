@@ -9,6 +9,7 @@ sport + distance + semanas + botões de ação.
 import flet as ft
 from i18n import t
 from flet_app.theme import c, PHASE_COLORS, SPORT_COLORS, RADIUS, SPACING, card_shadow
+from flet_app.components.hover_effects import apply_hover_effects_to_icon_button
 from training_manager import TrainingRecord
 from typing import Callable, Optional
 
@@ -67,9 +68,21 @@ def build_plan_card(
 
     actions = ft.Row(
         [
-            ft.IconButton(ft.Icons.CALENDAR_MONTH, tooltip=t("plan_tooltip_calendar"), icon_color=c("primary", dark), data=plan.id, on_click=on_calendar),
-            ft.IconButton(ft.Icons.DOWNLOAD, tooltip=t("plan_tooltip_export"), icon_color=c("info", dark), data=plan.id, on_click=on_export),
-            ft.IconButton(ft.Icons.DELETE_OUTLINE, tooltip=t("plan_tooltip_delete"), icon_color=c("error", dark), data=plan.id, on_click=on_delete),
+            apply_hover_effects_to_icon_button(
+                ft.IconButton(ft.Icons.CALENDAR_MONTH, tooltip=t("plan_tooltip_calendar"), icon_color=c("primary", dark), data=plan.id, on_click=on_calendar),
+                scale_ratio=1.2,
+                dark=dark
+            ),
+            apply_hover_effects_to_icon_button(
+                ft.IconButton(ft.Icons.DOWNLOAD, tooltip=t("plan_tooltip_export"), icon_color=c("info", dark), data=plan.id, on_click=on_export),
+                scale_ratio=1.2,
+                dark=dark
+            ),
+            apply_hover_effects_to_icon_button(
+                ft.IconButton(ft.Icons.DELETE_OUTLINE, tooltip=t("plan_tooltip_delete"), icon_color=c("error", dark), data=plan.id, on_click=on_delete),
+                scale_ratio=1.2,
+                dark=dark
+            ),
         ],
         spacing=0,
     )

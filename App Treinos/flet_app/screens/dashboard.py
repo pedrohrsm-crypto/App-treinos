@@ -16,6 +16,7 @@ from flet_app.components.adaptive_nav import build_adaptive_layout
 from flet_app.components.athlete_card import build_athlete_card
 from flet_app.components.loading_overlay import build_loading
 from flet_app.components.feature_tooltip import build_feature_tooltip
+from flet_app.components.hover_effects import apply_hover_effects_to_button
 from training_manager import training_manager
 
 
@@ -127,6 +128,7 @@ def dashboard_view(page: ft.Page, route: str) -> ft.View:
         foreground_color=c("text_light", dark),
         on_click=_go_wizard,
     )
+    apply_hover_effects_to_button(fab, scale_ratio=1.1, duration_ms=200, dark=dark)
 
     # ── Tooltip de primeiro uso ───────────────────────────────────────
     tooltip = build_feature_tooltip(
