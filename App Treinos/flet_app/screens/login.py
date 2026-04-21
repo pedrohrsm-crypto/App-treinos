@@ -24,6 +24,7 @@ def login_view(page: ft.Page, route: str) -> ft.View:
         filled=True,
         autofocus=True,
         max_length=20,
+        text_color=c("text_primary", dark),
     )
     password = ft.TextField(
         label=t("login_password"),
@@ -34,6 +35,7 @@ def login_view(page: ft.Page, route: str) -> ft.View:
         filled=True,
         max_length=128,
         on_submit=lambda _: _do_login(None),
+        text_color=c("text_primary", dark),
     )
     error_text = ft.Text("", color=c("error", dark), size=13, visible=False)
 

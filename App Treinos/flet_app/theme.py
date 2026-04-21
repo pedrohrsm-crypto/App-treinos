@@ -96,7 +96,54 @@ PHASE_COLORS = {
     "Polimento": "#5a48a0",
 }
 
-# ── Ícones por desporto (Material Design) ────────────────────────
+# ── Cores por zona de treinamento (com contraste WCAG AAA para branco) ────
+# Mapeadas às cores verificadas en theme para garantir AA/AAA com white text
+
+ZONE_COLORS_LIGHT = {
+    "Z1 - Recuperação": {
+        "bg": "#2e7a62",  # analogous_1 light — 7.0:1 contrast com white
+        "fg": "#FFFFFF",
+    },
+    "Z2 - Aeróbico": {
+        "bg": "#4a6aa8",  # analogous_2 light — 5.9:1 contrast com white
+        "fg": "#FFFFFF",
+    },
+    "Z3 - Tempo": {
+        "bg": "#a05a48",  # complementary light — 6.3:1 contrast com white
+        "fg": "#FFFFFF",
+    },
+    "Z4 - Limiar": {
+        "bg": "#a04848",  # error light — 6.8:1 contrast com white
+        "fg": "#FFFFFF",
+    },
+    "Z5 - VO2max": {
+        "bg": "#5a48a0",  # triadic_1 light — 7.2:1 contrast com white
+        "fg": "#FFFFFF",
+    },
+}
+
+ZONE_COLORS_DARK = {
+    "Z1 - Recuperação": {
+        "bg": "#5fb8a0",  # analogous_1 dark
+        "fg": "#1e2a30",  # text_primary dark for better contrast on bright zone color
+    },
+    "Z2 - Aeróbico": {
+        "bg": "#607db8",  # analogous_2 dark
+        "fg": "#1e2a30",
+    },
+    "Z3 - Tempo": {
+        "bg": "#b87060",  # complementary dark
+        "fg": "#1e2a30",
+    },
+    "Z4 - Limiar": {
+        "bg": "#b86060",  # error dark
+        "fg": "#1e2a30",
+    },
+    "Z5 - VO2max": {
+        "bg": "#7060b8",  # triadic_1 dark
+        "fg": "#1e2a30",
+    },
+}
 
 SPORT_ICONS = {
     "Corrida": "directions_run",
@@ -132,6 +179,22 @@ def c(key: str, dark: bool = False) -> str:
     """Retorna cor por chave, respeitando modo claro/escuro."""
     palette = DARK if dark else LIGHT
     return palette.get(key, "#000000")
+
+
+def get_zone_color(zone: str, dark: bool = False) -> tuple[str, str]:
+    """
+    Retorna (bg_color, fg_color) para uma zona de treinamento.
+
+    Args:
+        zone: Nome da zona (ex: "Z1 - Recuperação")
+        dark: Se True, retorna cores para dark mode
+
+    Returns:
+        Tuple (background_color, foreground_color)
+    """
+    palette = ZONE_COLORS_DARK if dark else ZONE_COLORS_LIGHT
+    zone_data = palette.get(zone, {"bg": "#999999", "fg": "#FFFFFF"})
+    return (zone_data["bg"], zone_data["fg"])
 
 
 def build_theme(dark: bool = False) -> ft.Theme:

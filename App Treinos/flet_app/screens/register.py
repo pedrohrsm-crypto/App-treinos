@@ -6,9 +6,11 @@ Usa DatabaseManager.cadastrar_usuario() para criar conta.
 """
 
 import flet as ft
+import asyncio
 from i18n import t
 from flet_app.theme import c
 from flet_app.state import app_state
+from core.email_service import EmailService
 
 
 def register_view(page: ft.Page, route: str) -> ft.View:
@@ -73,14 +75,24 @@ def register_view(page: ft.Page, route: str) -> ft.View:
             email=email.value.strip() or None,
         )
         if ok:
-            msg.value = t("register_success")
+            # Enviar email de confirmação em background
+            EmailService.send_confirmation_email_async(
+                name=nome.value.strip(),
+                cpf=cpf.value.strip(),
+                cref=cref.value.strip(),
+                email=email.value.strip() or "sem-email",
+            )
+
+            # Mostrar mensagem "Retornando à tela inicial."
+            msg.value = t("register_returning")
             msg.color = c("success", dark)
             msg.visible = True
             page.update()
 
+            # Aguardar 3 segundos antes de redirecionar
             import time, threading
             def _redirect():
-                time.sleep(0.8)
+                time.sleep(3.0)
                 page.go("/login")
             threading.Thread(target=_redirect, daemon=True).start()
         else:

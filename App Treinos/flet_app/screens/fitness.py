@@ -98,7 +98,7 @@ def fitness_view(page: ft.Page, route: str) -> ft.View:
             content=ft.Column([
                 ft.Row([
                     ft.Image(src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Strava_Logo.svg", width=100, height=30, fit=ft.ImageFit.CONTAIN)
-                    if False else ft.Row([ft.Icon(ft.Icons.FLASH_ON, size=20, color="#FC4C02"), ft.Text("Strava", size=18, weight=ft.FontWeight.BOLD)], spacing=SPACING["sm"]),
+                    if False else ft.Row([ft.Icon(ft.Icons.FLASH_ON, size=20, color=c("warning", dark)), ft.Text("Strava", size=18, weight=ft.FontWeight.BOLD)], spacing=SPACING["sm"]),
                     apply_hover_effects_to_button(
                         ft.ElevatedButton("Conectar", icon=ft.Icons.LINK, on_click=_connect_strava),
                         scale_ratio=1.05,

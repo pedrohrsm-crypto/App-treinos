@@ -139,8 +139,11 @@ _translations: Dict[str, Dict[str, str]] = {
         "en": "Account created! Redirecting…",
         "es": "¡Cuenta creada! Redirigiendo…",
     },
-
-    # ── Dashboard ────────────────────────────────────────────────
+    "register_returning": {
+        "pt": "Retornando à tela inicial.",
+        "en": "Returning to home screen.",
+        "es": "Volviendo a la pantalla inicial.",
+    },
     "dashboard_greeting": {
         "pt": "Olá, {name}! O que você deseja fazer hoje?",
         "en": "Hello, {name}! What would you like to do today?",

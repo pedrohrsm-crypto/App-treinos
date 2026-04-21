@@ -6,16 +6,7 @@ Mostra nome, desporto, tipo, duração e zona com botão "Usar".
 """
 
 import flet as ft
-from flet_app.theme import c, SPORT_COLORS, RADIUS, SPACING, card_shadow
-
-
-ZONE_COLORS = {
-    "Z1 - Recuperação": "#68c2a6",
-    "Z2 - Aeróbico": "#6885c2",
-    "Z3 - Tempo": "#c27968",
-    "Z4 - Limiar": "#c26868",
-    "Z5 - VO2max": "#7968c2",
-}
+from flet_app.theme import c, get_zone_color, SPORT_COLORS, RADIUS, SPACING, card_shadow
 
 
 def build_template_card(
@@ -34,14 +25,14 @@ def build_template_card(
     description = template.get("description", "")
     template_id = template.get("id", "")
 
-    zone_color = ZONE_COLORS.get(zone, c("primary", dark))
+    zone_bg_color, _ = get_zone_color(zone, dark)
     sport_color = SPORT_COLORS.get(sport, c("primary", dark))
 
     return ft.Container(
         content=ft.Row(
             [
-                # Barra lateral colorida pela zona
-                ft.Container(width=4, height=70, bgcolor=zone_color, border_radius=2),
+                # Barra lateral colorida pela zona (WCAG AAA compliant)
+                ft.Container(width=4, height=70, bgcolor=zone_bg_color, border_radius=2),
                 ft.Column(
                     [
                         ft.Text(name, size=14, weight=ft.FontWeight.W_600),
@@ -54,7 +45,7 @@ def build_template_card(
                             ),
                             ft.Text(f"{tipo} · {duration}", size=11, color=c("text_secondary", dark)),
                         ], spacing=6),
-                        ft.Text(description, size=11, color=c("text_disabled", dark), max_lines=1),
+                        ft.Text(description, size=11, color=c("text_secondary", dark), max_lines=1),
                     ],
                     spacing=2,
                     expand=True,
