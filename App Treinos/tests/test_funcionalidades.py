@@ -37,7 +37,7 @@ from fitness_connectors import (
     CONNECTORS,
     _STRAVA_SPORT_MAP,
 )
-from version import __version__
+from app_treinos.version import __version__
 
 
 # ═══════════════════════════════════════════════════════════════════

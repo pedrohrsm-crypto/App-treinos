@@ -448,17 +448,17 @@ class TestEstruturaProjeto:
     """Testes de integridade da estrutura de diretórios."""
 
     @pytest.mark.parametrize("subdir", [
-        "flet_app", "core", "data", "docs", "scripts", "linux", "macos", "assets",
+        "flet_app", "core", "data", "assets", "ai", "tests",
     ])
     def test_diretorio_existe(self, subdir):
         assert (PROJECT_ROOT / subdir).is_dir()
 
     @pytest.mark.parametrize("arquivo", [
-        "App_Treinos_Flet.py",
         "training_planner.py",
         "training_manager.py",
         "pdf_exporter.py",
-        "requirements.txt",
+        "i18n.py",
+        "fitness_connectors.py",
     ])
     def test_arquivo_raiz_existe(self, arquivo):
         assert (PROJECT_ROOT / arquivo).is_file()
