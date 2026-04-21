@@ -15,6 +15,7 @@ from flet_app.theme import c, SPORT_COLORS, SPORT_ICONS, RADIUS, SPACING
 from flet_app.state import app_state
 from flet_app.components.loading_overlay import build_loading
 from flet_app.components.feature_tooltip import build_feature_tooltip
+from flet_app.components.toast import show_toast
 from training_planner import Athlete, TrainerInfo, TrainingPlanGenerator, calcular_semanas_ate_prova
 from training_manager import training_manager
 
@@ -577,20 +578,21 @@ def training_wizard_view(page: ft.Page, route: str) -> ft.View:
                     datetime.now().strftime("%Y-%m-%d"),
                 )
 
-                page.open(ft.SnackBar(
-                    ft.Text(t("wizard_plan_created", count=len(full_plan))),
-                    bgcolor=c("success", dark),
-                ))
+                # Show success toast
+                await show_toast(page, t("wizard_plan_created", count=len(full_plan)), "success")
+
                 # Navigate to athlete dashboard
                 app_state.selected_athlete = athlete.nome
                 page.go(f"/athlete/{athlete.nome}")
 
             except Exception as ex:
+                # Show error toast
+                await show_toast(page, f"Erro: {str(ex)}", "error", duration_ms=0)
+
                 # Restore wizard view on error
                 _go_step(current_step[0])
                 btn_generate.disabled = False
                 btn_back.disabled = False
-                error_text.value = f"Erro: {ex}"
                 page.update()
 
         page.run_task(_do_generate)

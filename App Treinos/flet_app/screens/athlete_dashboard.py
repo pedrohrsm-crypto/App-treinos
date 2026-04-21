@@ -14,6 +14,8 @@ from flet_app.theme import c, SPORT_COLORS, RADIUS, SPACING, card_shadow
 from flet_app.state import app_state
 from flet_app.components.plan_card import build_plan_card
 from flet_app.components.loading_overlay import build_loading
+from flet_app.components.confirm_modal import show_confirm
+from flet_app.components.toast import show_toast
 from training_manager import training_manager
 
 
@@ -123,38 +125,35 @@ def athlete_dashboard_view(page: ft.Page, route: str) -> ft.View:
 
         def _delete_plan(e):
             plan_id_to_delete = e.control.data
+            plan_name = ""
+            for p in athlete_plans:
+                if p.id == plan_id_to_delete:
+                    plan_name = f"{p.sport} ({p.weeks} weeks)"
+                    break
 
-            def _confirm_delete(e_confirm):
-                page.close(confirm_dialog)
-                ok, msg = training_manager.delete_plan(trainer, plan_id_to_delete)
-                if ok:
-                    page.go(f"/athlete/{athlete_name}")
-                else:
-                    page.open(ft.SnackBar(ft.Text(msg), bgcolor=c("error", dark)))
+            async def _confirm_and_delete():
+                confirmed = await show_confirm(
+                    page,
+                    title=t("confirm_delete_plan_title"),
+                    message=f"{t('confirm_delete_plan_body')}\n\n{plan_name}",
+                    confirm_text=t("btn_delete"),
+                    cancel_text=t("btn_cancel"),
+                    danger=True,
+                )
+                if confirmed:
+                    ok, msg = training_manager.delete_plan(trainer, plan_id_to_delete)
+                    if ok:
+                        await show_toast(page, "Plano deletado com sucesso", "success")
+                        page.go(f"/athlete/{athlete_name}")
+                    else:
+                        await show_toast(page, msg, "error", duration_ms=0)
 
-            def _cancel_delete(e_cancel):
-                page.close(confirm_dialog)
-
-            confirm_dialog = ft.AlertDialog(
-                title=ft.Text(t("confirm_delete_plan_title")),
-                content=ft.Text(t("confirm_delete_plan_body")),
-                actions=[
-                    ft.TextButton(t("btn_cancel"), on_click=_cancel_delete),
-                    ft.ElevatedButton(
-                        t("btn_delete"),
-                        icon=ft.Icons.DELETE,
-                        bgcolor=c("error", dark),
-                        color=c("text_light", dark),
-                        on_click=_confirm_delete,
-                    ),
-                ],
-                actions_alignment=ft.MainAxisAlignment.END,
-            )
-            page.open(confirm_dialog)
-            page.update()
+            page.run_task(_confirm_and_delete)
 
         def _export_plan(e):
-            page.open(ft.SnackBar(ft.Text(t("athlete_export_msg")), bgcolor=c("info", dark)))
+            async def _do_export():
+                await show_toast(page, t("athlete_export_msg"), "info")
+            page.run_task(_do_export)
 
         plan_cards = []
         for p in athlete_plans:

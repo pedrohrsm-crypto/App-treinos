@@ -24,10 +24,11 @@ from flet_app.screens.admin import admin_view
 from flet_app.screens.progress import progress_view
 from flet_app.screens.fitness import fitness_view
 from flet_app.screens.templates import templates_view
-from flet_app.screens.onboarding import onboarding_view
+from flet_app.screens.onboarding_v2 import onboarding_view_v2 as onboarding_view
 from flet_app.screens.initial_setup import initial_setup_view
 from flet_app.screens.ai_config_screen import ai_config_view
 from flet_app.components.calendar_view import calendar_view_screen
+from flet_app.components.toast import setup_toasts
 
 
 def main(page: ft.Page):
@@ -41,6 +42,9 @@ def main(page: ft.Page):
     page.window.height = 720
     page.window.min_width = 420
     page.window.min_height = 600
+
+    # ── Inicializar sistema de toasts (notificações) ──────────────
+    setup_toasts(page)
 
     # ── Router ───────────────────────────────────────────────────
     router = Router(page)

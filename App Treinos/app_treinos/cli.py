@@ -32,9 +32,9 @@ class CLIManager:
             Exit code (0 = sucesso, 1 = erro)
         """
         try:
-            print(f"🚀 Iniciando {self.config.title or 'App Treinos'} v{self.config.version}")
-            print(f"   Modo: {self.config.environment}")
-            print(f"   Debug: {self.config.debug}")
+            print(f"[INIT] Iniciando App Treinos v{self.config.version}")
+            print(f"       Modo: {self.config.environment}")
+            print(f"       Debug: {self.config.debug}")
             print()
 
             # Import aqui para evitar erros de import se Flet não estiver instalado
@@ -46,11 +46,11 @@ class CLIManager:
             return 0
 
         except ImportError as e:
-            print(f"❌ Erro de dependência: {e}", file=sys.stderr)
+            print(f"[ERROR] Erro de dependência: {e}", file=sys.stderr)
             print("   Execute: pip install -e .", file=sys.stderr)
             return 1
         except Exception as e:
-            print(f"❌ Erro ao iniciar: {e}", file=sys.stderr)
+            print(f"[ERROR] Erro ao iniciar: {e}", file=sys.stderr)
             if self.config.debug:
                 import traceback
                 traceback.print_exc()
@@ -68,7 +68,7 @@ class CLIManager:
             Exit code do pytest
         """
         try:
-            print("🧪 Rodando testes automatizados...")
+            print("[TEST] Rodando testes automatizados...")
             print()
 
             cmd = ["pytest", "tests/", "-v" if verbose else ""]
@@ -78,16 +78,16 @@ class CLIManager:
             result = subprocess.run(cmd, cwd=self.project_root)
             print()
             if result.returncode == 0:
-                print("✅ Todos os testes passaram!")
+                print("[OK] Todos os testes passaram!")
             else:
-                print("❌ Alguns testes falharam")
+                print("[ERROR] Alguns testes falharam")
             return result.returncode
 
         except FileNotFoundError:
-            print("❌ pytest não encontrado. Execute: pip install pytest", file=sys.stderr)
+            print("[ERROR] pytest não encontrado. Execute: pip install pytest", file=sys.stderr)
             return 1
         except Exception as e:
-            print(f"❌ Erro ao rodar testes: {e}", file=sys.stderr)
+            print(f"[ERROR] Erro ao rodar testes: {e}", file=sys.stderr)
             return 1
 
     def build_exe(self) -> int:
@@ -104,7 +104,7 @@ class CLIManager:
             # Carregar e executar script de build
             build_script = self.project_root / "scripts" / "build.py"
             if not build_script.exists():
-                print(f"❌ Script não encontrado: {build_script}", file=sys.stderr)
+                print(f"[ERROR] Script não encontrado: {build_script}", file=sys.stderr)
                 return 1
 
             result = subprocess.run(
@@ -115,17 +115,17 @@ class CLIManager:
             if result.returncode == 0:
                 exe_path = self.project_root / "dist" / "App_Treinos.exe"
                 print()
-                print(f"✅ Executável gerado: {exe_path}")
+                print(f"[OK] Executável gerado: {exe_path}")
                 if exe_path.exists():
                     size_mb = exe_path.stat().st_size / (1024 * 1024)
                     print(f"   Tamanho: {size_mb:.1f} MB")
             else:
-                print("❌ Erro ao compilar", file=sys.stderr)
+                print("[ERROR] Erro ao compilar", file=sys.stderr)
 
             return result.returncode
 
         except Exception as e:
-            print(f"❌ Erro ao gerar build: {e}", file=sys.stderr)
+            print(f"[ERROR] Erro ao gerar build: {e}", file=sys.stderr)
             return 1
 
     def build_installer(self) -> int:
@@ -141,7 +141,7 @@ class CLIManager:
 
             installer_script = self.project_root / "scripts" / "installer.iss"
             if not installer_script.exists():
-                print(f"❌ Script não encontrado: {installer_script}", file=sys.stderr)
+                print(f"[ERROR] Script não encontrado: {installer_script}", file=sys.stderr)
                 return 1
 
             # Tentar executar iscc (Inno Setup compiler)
@@ -153,18 +153,18 @@ class CLIManager:
             if result.returncode == 0:
                 setup_exe = self.project_root / "Output" / "App_Treinos_Setup.exe"
                 print()
-                print(f"✅ Instalador gerado: {setup_exe}")
+                print(f"[OK] Instalador gerado: {setup_exe}")
             else:
-                print("❌ Erro ao gerar instalador", file=sys.stderr)
+                print("[ERROR] Erro ao gerar instalador", file=sys.stderr)
                 print("   Certifique-se de ter Inno Setup 6 instalado", file=sys.stderr)
 
             return result.returncode
 
         except FileNotFoundError:
-            print("❌ iscc não encontrado. Instale Inno Setup 6", file=sys.stderr)
+            print("[ERROR] iscc não encontrado. Instale Inno Setup 6", file=sys.stderr)
             return 1
         except Exception as e:
-            print(f"❌ Erro ao gerar instalador: {e}", file=sys.stderr)
+            print(f"[ERROR] Erro ao gerar instalador: {e}", file=sys.stderr)
             return 1
 
     def show_version(self) -> int:
@@ -191,7 +191,7 @@ class CLIManager:
         if self.run_tests(verbose=False) != 0:
             return 1
 
-        print("✅ Validação OK")
+        print("[OK] Validação OK")
         return 0
 
     def ci_test(self) -> int:
