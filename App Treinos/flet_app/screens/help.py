@@ -22,6 +22,14 @@ def help_view(page: ft.Page, route: str) -> ft.View:
 
     dark = app_state.dark_mode
 
+    # ── Helper para restart de tour ──────────────────────────────
+    def _restart_tour():
+        """Marca todos os tours como não vistos (para restart)."""
+        app_state.seen_tours = {}  # Reseta tours
+        page.snack_bar = ft.SnackBar(ft.Text("Tour será exibido na próxima tela!"))
+        page.snack_bar.open = True
+        page.update()
+
     # ── Expandible sections ──────────────────────────────────────
 
     # Section 1: Como Usar
@@ -44,7 +52,7 @@ def help_view(page: ft.Page, route: str) -> ft.View:
                        size=13, color=c("text_secondary", dark)),
                 ft.Divider(height=16),
                 ft.ElevatedButton(
-                    text="Refazer Tour Interativo",
+                    "Refazer Tour Interativo",
                     icon=ft.Icons.PLAY_ARROW,
                     on_click=lambda e: _restart_tour()
                 ),
@@ -158,13 +166,6 @@ def help_view(page: ft.Page, route: str) -> ft.View:
         expand=True,
         bgcolor=c("bg_secondary", dark),
     )
-
-    def _restart_tour():
-        """Marca todos os tours como não vistos (para restart)."""
-        app_state.seen_tours = {}  # Reseta tours
-        page.snack_bar = ft.SnackBar(ft.Text("Tour será exibido na próxima tela!"))
-        page.snack_bar.open = True
-        page.update()
 
     # Iniciar tour se for primeira vez
     tour = create_help_tour(page)

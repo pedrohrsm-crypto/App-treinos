@@ -211,7 +211,7 @@ def onboarding_view_v2(page: ft.Page, route: str) -> ft.View:
 
     def _update_slide():
         slide = slides[current[0]]
-        icon_display.name = slide["icon"]
+        icon_display.icon = slide["icon"]  # ✅ Usar .icon (não .name)
         icon_display.color = slide.get("icon_color", c("primary", dark))
         title_text.value = slide["title"]
         subtitle_text.value = slide.get("subtitle", "")
