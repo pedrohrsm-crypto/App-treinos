@@ -49,33 +49,37 @@ def splash_view(page: ft.Page, route: str) -> ft.View:
         opacity=0, animate_opacity=ft.Animation(500, ft.AnimationCurve.EASE_OUT),
     )
 
+    # Criar referências aos ícones de etapas para atualização posterior
+    step_icons = {
+        1: ft.Icon(ft.Icons.RADIO_BUTTON_UNCHECKED, size=12, color=c("text_secondary", dark)),
+        2: ft.Icon(ft.Icons.RADIO_BUTTON_UNCHECKED, size=12, color=c("text_secondary", dark)),
+        3: ft.Icon(ft.Icons.RADIO_BUTTON_UNCHECKED, size=12, color=c("text_secondary", dark)),
+        4: ft.Icon(ft.Icons.RADIO_BUTTON_UNCHECKED, size=12, color=c("text_secondary", dark)),
+        5: ft.Icon(ft.Icons.RADIO_BUTTON_UNCHECKED, size=12, color=c("text_secondary", dark)),
+    }
+
     # Labels de progresso por etapa (Database, Session, Preferences, Theme, Done)
     step_labels = ft.Row(
         [
             ft.Column([
                 ft.Text("Database", size=10, color=c("text_secondary", dark)),
-                ft.Icon(ft.Icons.RADIO_BUTTON_UNCHECKED, size=12,
-                       color=c("text_secondary", dark), name="step_1_icon")
+                step_icons[1]
             ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
             ft.Column([
                 ft.Text("Session", size=10, color=c("text_secondary", dark)),
-                ft.Icon(ft.Icons.RADIO_BUTTON_UNCHECKED, size=12,
-                       color=c("text_secondary", dark), name="step_2_icon")
+                step_icons[2]
             ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
             ft.Column([
                 ft.Text("Preferences", size=10, color=c("text_secondary", dark)),
-                ft.Icon(ft.Icons.RADIO_BUTTON_UNCHECKED, size=12,
-                       color=c("text_secondary", dark), name="step_3_icon")
+                step_icons[3]
             ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
             ft.Column([
                 ft.Text("Theme", size=10, color=c("text_secondary", dark)),
-                ft.Icon(ft.Icons.RADIO_BUTTON_UNCHECKED, size=12,
-                       color=c("text_secondary", dark), name="step_4_icon")
+                step_icons[4]
             ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
             ft.Column([
                 ft.Text("Ready", size=10, color=c("text_secondary", dark)),
-                ft.Icon(ft.Icons.RADIO_BUTTON_UNCHECKED, size=12,
-                       color=c("text_secondary", dark), name="step_5_icon")
+                step_icons[5]
             ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
         ],
         spacing=20, alignment=ft.MainAxisAlignment.CENTER,
@@ -118,15 +122,12 @@ def splash_view(page: ft.Page, route: str) -> ft.View:
     # ── Helpers de progresso ─────────────────────────────────────
     def _mark_step_complete(step_num: int):
         """Marca um passo como completo com checkmark."""
-        icon_name = f"step_{step_num}_icon"
-        for control in step_labels.controls:
-            if hasattr(control, 'controls'):
-                for subcontrol in control.controls:
-                    if hasattr(subcontrol, 'name') and subcontrol.name == icon_name:
-                        subcontrol.name_old = subcontrol.name
-                        subcontrol.name = ft.Icons.CHECK_CIRCLE
-                        subcontrol.color = c("primary", dark)
-                        page.update()
+        if step_num in step_icons:
+            icon = step_icons[step_num]
+            # Alterar o ícone usando a propriedade 'icon'
+            icon.icon = ft.Icons.CHECK_CIRCLE
+            icon.color = c("primary", dark)
+            page.update()
 
     async def _set_progress(value: float, msg: str, mark_step: int = 0):
         progress_bar.value = min(value, 1.0)
