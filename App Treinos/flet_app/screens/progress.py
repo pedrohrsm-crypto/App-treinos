@@ -13,6 +13,7 @@ from flet_app.theme import c, SPORT_COLORS, RADIUS, SPACING, card_shadow
 from flet_app.state import app_state
 from flet_app.components.adaptive_nav import build_adaptive_layout
 from flet_app.components.loading_overlay import build_loading
+from flet_app.components.hover_effects import apply_hover_effects_to_card
 from training_manager import training_manager
 
 
@@ -32,7 +33,7 @@ def progress_view(page: ft.Page, route: str) -> ft.View:
 
         # Stats cards
         def _stat(icon_name, value, label):
-            return ft.Container(
+            container = ft.Container(
                 content=ft.Column(
                     [ft.Icon(icon_name, size=24, color=c("primary", dark)), ft.Text(value, size=20, weight=ft.FontWeight.BOLD), ft.Text(label, size=11, color=c("text_secondary", dark))],
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=2,
@@ -40,6 +41,7 @@ def progress_view(page: ft.Page, route: str) -> ft.View:
                 padding=SPACING["md"], border_radius=RADIUS["md"], bgcolor=c("bg_card", dark),
                 shadow=card_shadow(dark, "sm"), expand=True,
             )
+            return apply_hover_effects_to_card(container, scale_ratio=1.02, shadow_level="lg", dark=dark)
 
         stats_row = ft.Row(
             [
@@ -72,19 +74,18 @@ def progress_view(page: ft.Page, route: str) -> ft.View:
             action = entry.action if hasattr(entry, "action") else str(entry)
             ts = entry.timestamp if hasattr(entry, "timestamp") else ""
             detail = entry.details if hasattr(entry, "details") else ""
-            log_items.append(
-                ft.Container(
-                    content=ft.Row([
-                        ft.Icon(ft.Icons.EDIT_NOTE, size=16, color=c("primary", dark)),
-                        ft.Column([
-                            ft.Text(action, size=13, weight=ft.FontWeight.W_500),
-                            ft.Text(f"{ts} — {detail}", size=11, color=c("text_secondary", dark)),
-                        ], spacing=1, expand=True),
-                    ], spacing=8),
-                    padding=8,
-                    border=ft.border.only(bottom=ft.BorderSide(1, c("border_light", dark))),
-                )
+            log_container = ft.Container(
+                content=ft.Row([
+                    ft.Icon(ft.Icons.EDIT_NOTE, size=16, color=c("primary", dark)),
+                    ft.Column([
+                        ft.Text(action, size=13, weight=ft.FontWeight.W_500),
+                        ft.Text(f"{ts} — {detail}", size=11, color=c("text_secondary", dark)),
+                    ], spacing=1, expand=True),
+                ], spacing=8),
+                padding=8,
+                border=ft.border.only(bottom=ft.BorderSide(1, c("border_light", dark))),
             )
+            log_items.append(apply_hover_effects_to_card(log_container, scale_ratio=1.02, shadow_level="md", dark=dark))
         if not log_items:
             log_items.append(ft.Text(t("progress_no_log"), size=13, color=c("text_secondary", dark)))
 

@@ -10,6 +10,7 @@ from flet_app.theme import c, SPACING
 from flet_app.state import app_state
 from flet_app.components.adaptive_nav import build_adaptive_layout
 from flet_app.components.feature_tooltip import build_feature_tooltip
+from flet_app.components.hover_effects import apply_hover_effects_to_button, apply_hover_effects_to_card
 
 
 def fitness_view(page: ft.Page, route: str) -> ft.View:
@@ -63,7 +64,7 @@ def fitness_view(page: ft.Page, route: str) -> ft.View:
             acts = connector.get_activities(limit=20)
             activities_col.controls.clear()
             for a in acts:
-                activities_col.controls.append(
+                activity_card = apply_hover_effects_to_card(
                     ft.Container(
                         content=ft.Row([
                             ft.Icon(
@@ -79,8 +80,12 @@ def fitness_view(page: ft.Page, route: str) -> ft.View:
                         bgcolor=c("bg_card", dark),
                         border_radius=10,
                         padding=12,
-                    )
+                    ),
+                    scale_ratio=1.02,
+                    shadow_level="md",
+                    dark=dark,
                 )
+                activities_col.controls.append(activity_card)
             if not acts:
                 activities_col.controls.append(ft.Text("Nenhuma atividade encontrada.", color=c("text_secondary", dark)))
             page.update()
@@ -88,32 +93,52 @@ def fitness_view(page: ft.Page, route: str) -> ft.View:
             page.open(ft.SnackBar(ft.Text(f"Erro: {ex}"), bgcolor=c("error", dark)))
 
     # ── UI ───────────────────────────────────────────────────────
-    strava_section = ft.Container(
-        content=ft.Column([
-            ft.Row([
-                ft.Image(src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Strava_Logo.svg", width=100, height=30, fit=ft.ImageFit.CONTAIN)
-                if False else ft.Row([ft.Icon(ft.Icons.FLASH_ON, size=20, color="#FC4C02"), ft.Text("Strava", size=18, weight=ft.FontWeight.BOLD)], spacing=SPACING["sm"]),
-                ft.ElevatedButton("Conectar", icon=ft.Icons.LINK, on_click=_connect_strava),
-                ft.OutlinedButton("Carregar Atividades", icon=ft.Icons.REFRESH, on_click=_load_activities),
-            ], spacing=12),
-            ft.Text(
-                "Configure client_id e client_secret em fitness_connectors.py para usar a integração Strava.",
-                size=12, color=c("text_secondary", dark),
-            ),
-        ], spacing=8),
-        padding=16,
-        bgcolor=c("bg_card", dark),
-        border_radius=12,
+    strava_section = apply_hover_effects_to_card(
+        ft.Container(
+            content=ft.Column([
+                ft.Row([
+                    ft.Image(src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Strava_Logo.svg", width=100, height=30, fit=ft.ImageFit.CONTAIN)
+                    if False else ft.Row([ft.Icon(ft.Icons.FLASH_ON, size=20, color="#FC4C02"), ft.Text("Strava", size=18, weight=ft.FontWeight.BOLD)], spacing=SPACING["sm"]),
+                    apply_hover_effects_to_button(
+                        ft.ElevatedButton("Conectar", icon=ft.Icons.LINK, on_click=_connect_strava),
+                        scale_ratio=1.05,
+                        duration_ms=150,
+                        dark=dark,
+                    ),
+                    apply_hover_effects_to_button(
+                        ft.OutlinedButton("Carregar Atividades", icon=ft.Icons.REFRESH, on_click=_load_activities),
+                        scale_ratio=1.05,
+                        duration_ms=150,
+                        dark=dark,
+                    ),
+                ], spacing=12),
+                ft.Text(
+                    "Configure client_id e client_secret em fitness_connectors.py para usar a integração Strava.",
+                    size=12, color=c("text_secondary", dark),
+                ),
+            ], spacing=8),
+            padding=16,
+            bgcolor=c("bg_card", dark),
+            border_radius=12,
+        ),
+        scale_ratio=1.02,
+        shadow_level="md",
+        dark=dark,
     )
 
-    garmin_section = ft.Container(
-        content=ft.Column([
-            ft.Row([ft.Icon(ft.Icons.WATCH, size=20, color=c("primary", dark)), ft.Text("Garmin", size=18, weight=ft.FontWeight.BOLD)], spacing=SPACING["sm"]),
-            ft.Text("Integração Garmin Connect em breve.", size=13, color=c("text_secondary", dark)),
-        ], spacing=8),
-        padding=16,
-        bgcolor=c("bg_card", dark),
-        border_radius=12,
+    garmin_section = apply_hover_effects_to_card(
+        ft.Container(
+            content=ft.Column([
+                ft.Row([ft.Icon(ft.Icons.WATCH, size=20, color=c("primary", dark)), ft.Text("Garmin", size=18, weight=ft.FontWeight.BOLD)], spacing=SPACING["sm"]),
+                ft.Text("Integração Garmin Connect em breve.", size=13, color=c("text_secondary", dark)),
+            ], spacing=8),
+            padding=16,
+            bgcolor=c("bg_card", dark),
+            border_radius=12,
+        ),
+        scale_ratio=1.02,
+        shadow_level="md",
+        dark=dark,
     )
 
     return build_adaptive_layout(

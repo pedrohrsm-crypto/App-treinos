@@ -13,6 +13,7 @@ from flet_app.state import app_state
 from flet_app.components.template_card import build_template_card
 from flet_app.components.adaptive_nav import build_adaptive_layout
 from flet_app.components.loading_overlay import build_loading
+from flet_app.components.hover_effects import apply_hover_effects_to_button
 from training_manager import training_manager
 
 
@@ -136,8 +137,18 @@ def templates_view(page: ft.Page, route: str) -> ft.View:
                 width=420, height=280,
             ),
             actions=[
-                ft.TextButton("Cancelar", on_click=lambda e: page.close(dialog)),
-                ft.ElevatedButton("Salvar", on_click=_save, bgcolor=c("primary", dark), color=c("text_light", dark)),
+                apply_hover_effects_to_button(
+                    ft.TextButton("Cancelar", on_click=lambda e: page.close(dialog)),
+                    scale_ratio=1.05,
+                    duration_ms=150,
+                    dark=dark,
+                ),
+                apply_hover_effects_to_button(
+                    ft.ElevatedButton("Salvar", on_click=_save, bgcolor=c("primary", dark), color=c("text_light", dark)),
+                    scale_ratio=1.05,
+                    duration_ms=150,
+                    dark=dark,
+                ),
             ],
         )
         page.open(dialog)
@@ -167,12 +178,17 @@ def templates_view(page: ft.Page, route: str) -> ft.View:
     page.run_task(_load_data)
 
     # ── FAB ──────────────────────────────────────────────────────
-    fab = ft.FloatingActionButton(
-        icon=ft.Icons.ADD,
-        tooltip="Novo",
-        bgcolor=c("primary", dark),
-        foreground_color=c("text_light", dark),
-        on_click=_open_create_dialog,
+    fab = apply_hover_effects_to_button(
+        ft.FloatingActionButton(
+            icon=ft.Icons.ADD,
+            tooltip="Novo",
+            bgcolor=c("primary", dark),
+            foreground_color=c("text_light", dark),
+            on_click=_open_create_dialog,
+        ),
+        scale_ratio=1.1,
+        duration_ms=200,
+        dark=dark,
     )
 
     return build_adaptive_layout(

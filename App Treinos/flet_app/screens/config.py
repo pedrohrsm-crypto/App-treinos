@@ -11,6 +11,7 @@ from flet_app.theme import c, build_theme, SPACING
 from flet_app.state import app_state
 from flet_app.components.adaptive_nav import build_adaptive_layout
 from flet_app.components.feature_tooltip import build_feature_tooltip
+from flet_app.components.hover_effects import apply_hover_effects_to_button, apply_hover_effects_to_card
 
 
 _LANG_LABELS = {"pt": "Português", "en": "English", "es": "Español"}
@@ -45,12 +46,17 @@ def config_view(page: ft.Page, route: str) -> ft.View:
 
     lang_chips = ft.Row(
         [
-            ft.ElevatedButton(
-                label,
-                data=code,
-                bgcolor=c("primary", dark) if get_language() == code else c("bg_card", dark),
-                color=c("text_light", dark) if get_language() == code else c("text_primary", dark),
-                on_click=_change_lang,
+            apply_hover_effects_to_button(
+                ft.ElevatedButton(
+                    label,
+                    data=code,
+                    bgcolor=c("primary", dark) if get_language() == code else c("bg_card", dark),
+                    color=c("text_light", dark) if get_language() == code else c("text_primary", dark),
+                    on_click=_change_lang,
+                ),
+                scale_ratio=1.05,
+                duration_ms=150,
+                dark=dark,
             )
             for code, label in _LANG_LABELS.items()
         ],
@@ -62,56 +68,78 @@ def config_view(page: ft.Page, route: str) -> ft.View:
         app_state.logout()
         page.go("/login")
 
+    logout_btn = apply_hover_effects_to_button(
+        ft.OutlinedButton(t("config_logout"), icon=ft.Icons.LOGOUT, on_click=_logout),
+        scale_ratio=1.05,
+        duration_ms=150,
+        dark=dark,
+    )
+
     # ── Admin ────────────────────────────────────────────────────
-    admin_btn = ft.ElevatedButton(
-        t("config_admin"),
-        icon=ft.Icons.ADMIN_PANEL_SETTINGS,
-        bgcolor=c("triadic_1", dark),
-        color=c("text_light", dark),
-        on_click=lambda _: page.go("/admin"),
-        visible=app_state.is_admin,
+    admin_btn = apply_hover_effects_to_button(
+        ft.ElevatedButton(
+            t("config_admin"),
+            icon=ft.Icons.ADMIN_PANEL_SETTINGS,
+            bgcolor=c("triadic_1", dark),
+            color=c("text_light", dark),
+            on_click=lambda _: page.go("/admin"),
+            visible=app_state.is_admin,
+        ),
+        scale_ratio=1.05,
+        duration_ms=150,
+        dark=dark,
     )
 
     # ── IA Config ────────────────────────────────────────────────
-    ai_btn = ft.ElevatedButton(
-        "Configuracao de IA",
-        icon=ft.Icons.SMART_TOY,
-        bgcolor=c("primary", dark),
-        color=c("text_light", dark),
-        on_click=lambda _: page.go("/ai-config"),
+    ai_btn = apply_hover_effects_to_button(
+        ft.ElevatedButton(
+            "Configuracao de IA",
+            icon=ft.Icons.SMART_TOY,
+            bgcolor=c("primary", dark),
+            color=c("text_light", dark),
+            on_click=lambda _: page.go("/ai-config"),
+        ),
+        scale_ratio=1.05,
+        duration_ms=150,
+        dark=dark,
     )
 
     # ── Sobre ──────────────────────────────────────────────────
     from version import __version__
-    about_card = ft.Container(
-        content=ft.Column(
-            [
-                ft.Text("Sobre o App Treinos", size=16, weight=ft.FontWeight.W_600,
-                         color=c("text_primary", dark)),
-                ft.Divider(height=4, color=ft.Colors.TRANSPARENT),
-                ft.Row([
-                    ft.Icon(ft.Icons.INFO_OUTLINE, size=16, color=c("text_secondary", dark)),
-                    ft.Text(f"Versao {__version__}", size=13, color=c("text_secondary", dark)),
-                ], spacing=6),
-                ft.Row([
-                    ft.Icon(ft.Icons.VERIFIED_USER, size=16, color=c("text_secondary", dark)),
-                    ft.Text("Licenca Profissional", size=13, color=c("text_secondary", dark)),
-                ], spacing=6),
-                ft.Row([
-                    ft.Icon(ft.Icons.COPYRIGHT, size=16, color=c("text_secondary", dark)),
-                    ft.Text(f"2026 App Treinos", size=13, color=c("text_secondary", dark)),
-                ], spacing=6),
-                ft.Divider(height=8, color=ft.Colors.TRANSPARENT),
-                ft.Text("Documentos legais disponiveis no diretorio de instalacao:",
-                         size=12, color=c("text_disabled", dark)),
-                ft.Text("  EULA.md  |  PRIVACY.md  |  LICENSE",
-                         size=12, color=c("text_disabled", dark)),
-            ],
-            spacing=4,
+    about_card = apply_hover_effects_to_card(
+        ft.Container(
+            content=ft.Column(
+                [
+                    ft.Text("Sobre o App Treinos", size=16, weight=ft.FontWeight.W_600,
+                             color=c("text_primary", dark)),
+                    ft.Divider(height=4, color=ft.Colors.TRANSPARENT),
+                    ft.Row([
+                        ft.Icon(ft.Icons.INFO_OUTLINE, size=16, color=c("text_secondary", dark)),
+                        ft.Text(f"Versao {__version__}", size=13, color=c("text_secondary", dark)),
+                    ], spacing=6),
+                    ft.Row([
+                        ft.Icon(ft.Icons.VERIFIED_USER, size=16, color=c("text_secondary", dark)),
+                        ft.Text("Licenca Profissional", size=13, color=c("text_secondary", dark)),
+                    ], spacing=6),
+                    ft.Row([
+                        ft.Icon(ft.Icons.COPYRIGHT, size=16, color=c("text_secondary", dark)),
+                        ft.Text(f"2026 App Treinos", size=13, color=c("text_secondary", dark)),
+                    ], spacing=6),
+                    ft.Divider(height=8, color=ft.Colors.TRANSPARENT),
+                    ft.Text("Documentos legais disponiveis no diretorio de instalacao:",
+                             size=12, color=c("text_disabled", dark)),
+                    ft.Text("  EULA.md  |  PRIVACY.md  |  LICENSE",
+                             size=12, color=c("text_disabled", dark)),
+                ],
+                spacing=4,
+            ),
+            padding=16,
+            border_radius=8,
+            border=ft.border.all(1, c("text_disabled", dark)),
         ),
-        padding=16,
-        border_radius=8,
-        border=ft.border.all(1, c("text_disabled", dark)),
+        scale_ratio=1.02,
+        shadow_level="md",
+        dark=dark,
     )
 
     # ── Layout ───────────────────────────────────────────────────
@@ -137,7 +165,7 @@ def config_view(page: ft.Page, route: str) -> ft.View:
             about_card,
             ft.Divider(height=20, color=ft.Colors.TRANSPARENT),
             ft.Text(t("config_session", name=app_state.trainer_name or "—"), size=13, color=c("text_secondary", dark)),
-            ft.OutlinedButton(t("config_logout"), icon=ft.Icons.LOGOUT, on_click=_logout),
+            logout_btn,
         ],
         spacing=8,
         expand=True,

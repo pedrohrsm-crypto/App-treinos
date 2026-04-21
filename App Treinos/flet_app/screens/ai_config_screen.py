@@ -17,6 +17,7 @@ from i18n import t
 from flet_app.theme import c, SPACING, RADIUS, card_shadow
 from flet_app.state import app_state
 from flet_app.components.adaptive_nav import build_adaptive_layout
+from flet_app.components.hover_effects import apply_hover_effects_to_button, apply_hover_effects_to_card
 from ai.ai_config import (
     AIProviderConfig,
     SUPPORTED_PROVIDERS,
@@ -280,92 +281,117 @@ def ai_config_view(page: ft.Page, route: str) -> ft.View:
         spacing=SPACING["sm"],
     )
 
-    usage_section = ft.Container(
-        content=ft.Column(
-            [
-                ft.Row(
-                    [
-                        ft.Icon(ft.Icons.DATA_USAGE, size=18, color=c("text_secondary", dark)),
-                        ft.Text("Consumo Mensal", size=16, weight=ft.FontWeight.W_600),
-                    ],
-                    spacing=SPACING["xs"],
-                ),
-                usage_progress,
-                usage_text,
-            ],
-            spacing=SPACING["xs"],
+    usage_section = apply_hover_effects_to_card(
+        ft.Container(
+            content=ft.Column(
+                [
+                    ft.Row(
+                        [
+                            ft.Icon(ft.Icons.DATA_USAGE, size=18, color=c("text_secondary", dark)),
+                            ft.Text("Consumo Mensal", size=16, weight=ft.FontWeight.W_600),
+                        ],
+                        spacing=SPACING["xs"],
+                    ),
+                    usage_progress,
+                    usage_text,
+                ],
+                spacing=SPACING["xs"],
+            ),
+            bgcolor=c("bg_card", dark),
+            border_radius=RADIUS["md"],
         ),
-        bgcolor=c("bg_card", dark),
-        border_radius=RADIUS["md"],
-        padding=SPACING["md"],
-        shadow=card_shadow(dark),
+        scale_ratio=1.02,
+        shadow_level="md",
+        dark=dark,
     )
+    usage_section.padding = SPACING["md"]
+    usage_section.shadow = card_shadow(dark)
 
-    config_form = ft.Container(
-        content=ft.Column(
-            [
-                ft.Row(
-                    [
-                        ft.Icon(ft.Icons.TUNE, size=18, color=c("text_secondary", dark)),
-                        ft.Text("Provider e Credenciais", size=16, weight=ft.FontWeight.W_600),
-                    ],
-                    spacing=SPACING["xs"],
-                ),
-                ft.Text(
-                    "Escolha a plataforma de IA que prefere usar. Cada uma é gratuita para começar.",
-                    size=12,
-                    color=c("text_secondary", dark),
-                ),
-                provider_dd,
-                docs_url_button,
-                model_dd,
-                custom_model_field,
-                ft.Text(
-                    "Cole a sua API Key aqui. É uma senha única que você consegue na plataforma de IA.",
-                    size=12,
-                    color=c("text_secondary", dark),
-                ),
-                api_key_field,
-                base_url_field,
-                ft.Divider(height=12, color=ft.Colors.TRANSPARENT),
-                ft.Row(
-                    [
-                        ft.Icon(ft.Icons.SETTINGS_SUGGEST, size=18, color=c("text_secondary", dark)),
-                        ft.Text("Parâmetros", size=16, weight=ft.FontWeight.W_600),
-                    ],
-                    spacing=SPACING["xs"],
-                ),
-                token_limit_field,
-                temp_label,
-                temp_slider,
-                enabled_switch,
-            ],
-            spacing=SPACING["sm"],
+    config_form = apply_hover_effects_to_card(
+        ft.Container(
+            content=ft.Column(
+                [
+                    ft.Row(
+                        [
+                            ft.Icon(ft.Icons.TUNE, size=18, color=c("text_secondary", dark)),
+                            ft.Text("Provider e Credenciais", size=16, weight=ft.FontWeight.W_600),
+                        ],
+                        spacing=SPACING["xs"],
+                    ),
+                    ft.Text(
+                        "Escolha a plataforma de IA que prefere usar. Cada uma é gratuita para começar.",
+                        size=12,
+                        color=c("text_secondary", dark),
+                    ),
+                    provider_dd,
+                    docs_url_button,
+                    model_dd,
+                    custom_model_field,
+                    ft.Text(
+                        "Cole a sua API Key aqui. É uma senha única que você consegue na plataforma de IA.",
+                        size=12,
+                        color=c("text_secondary", dark),
+                    ),
+                    api_key_field,
+                    base_url_field,
+                    ft.Divider(height=12, color=ft.Colors.TRANSPARENT),
+                    ft.Row(
+                        [
+                            ft.Icon(ft.Icons.SETTINGS_SUGGEST, size=18, color=c("text_secondary", dark)),
+                            ft.Text("Parâmetros", size=16, weight=ft.FontWeight.W_600),
+                        ],
+                        spacing=SPACING["xs"],
+                    ),
+                    token_limit_field,
+                    temp_label,
+                    temp_slider,
+                    enabled_switch,
+                ],
+                spacing=SPACING["sm"],
+            ),
+            bgcolor=c("bg_card", dark),
+            border_radius=RADIUS["md"],
+            padding=SPACING["md"],
+            shadow=card_shadow(dark),
         ),
-        bgcolor=c("bg_card", dark),
-        border_radius=RADIUS["md"],
-        padding=SPACING["md"],
-        shadow=card_shadow(dark),
+        scale_ratio=1.02,
+        shadow_level="md",
+        dark=dark,
     )
 
     actions_row = ft.Row(
         [
-            ft.ElevatedButton(
-                "Guardar",
-                icon=ft.Icons.SAVE,
-                bgcolor=c("primary", dark),
-                color=c("text_light", dark),
-                on_click=_save_config,
+            apply_hover_effects_to_button(
+                ft.ElevatedButton(
+                    "Guardar",
+                    icon=ft.Icons.SAVE,
+                    bgcolor=c("primary", dark),
+                    color=c("text_light", dark),
+                    on_click=_save_config,
+                ),
+                scale_ratio=1.05,
+                duration_ms=150,
+                dark=dark,
             ),
-            ft.OutlinedButton(
-                "Testar Ligação",
-                icon=ft.Icons.WIFI_TETHERING,
-                on_click=_test_connection,
+            apply_hover_effects_to_button(
+                ft.OutlinedButton(
+                    "Testar Ligação",
+                    icon=ft.Icons.WIFI_TETHERING,
+                    on_click=_test_connection,
+                ),
+                scale_ratio=1.05,
+                duration_ms=150,
+                dark=dark,
             ),
-            ft.TextButton(
-                "Voltar",
-                icon=ft.Icons.ARROW_BACK,
-                on_click=lambda _: page.go("/config"),
+            apply_hover_effects_to_button(
+                ft.TextButton(
+                    "Voltar",
+                    icon=ft.Icons.ARROW_BACK,
+                    on_click=lambda _: page.go("/config"),
+                ),
+                scale_ratio=1.05,
+                duration_ms=150,
+                dark=dark,
             ),
         ],
         spacing=SPACING["sm"],
