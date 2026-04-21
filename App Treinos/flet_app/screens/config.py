@@ -105,7 +105,7 @@ def config_view(page: ft.Page, route: str) -> ft.View:
     )
 
     # ── Sobre ──────────────────────────────────────────────────
-    from version import __version__
+    from app_treinos.version import __version__
     about_card = apply_hover_effects_to_card(
         ft.Container(
             content=ft.Column(
