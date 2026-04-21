@@ -141,6 +141,30 @@ def fitness_view(page: ft.Page, route: str) -> ft.View:
         dark=dark,
     )
 
+    def _go_to_smartwatch(_):
+        page.go("/smartwatch")
+
+    smartwatch_section = apply_hover_effects_to_card(
+        ft.Container(
+            content=ft.Column([
+                ft.Row([ft.Icon(ft.Icons.DEVICES, size=20, color=c("primary", dark)), ft.Text("Smartwatches & Wearables", size=18, weight=ft.FontWeight.BOLD)], spacing=SPACING["sm"]),
+                ft.Text("Conecte relógios inteligentes para sincronizar atividades de fitness.", size=13, color=c("text_secondary", dark)),
+                ft.ElevatedButton(
+                    "Conectar Dispositivo",
+                    icon=ft.Icons.LINK,
+                    on_click=_go_to_smartwatch,
+                    color=c("text_light", dark),
+                ),
+            ], spacing=8),
+            padding=16,
+            bgcolor=c("bg_card", dark),
+            border_radius=12,
+        ),
+        scale_ratio=1.02,
+        shadow_level="md",
+        dark=dark,
+    )
+
     return build_adaptive_layout(
         page=page,
         selected_index=3,
@@ -151,6 +175,7 @@ def fitness_view(page: ft.Page, route: str) -> ft.View:
                     build_feature_tooltip("fitness", t("tooltip_fitness"), page, dark),
                     strava_section,
                     garmin_section,
+                    smartwatch_section,
                     ft.Divider(height=16),
                     ft.Text("Atividades Importadas", size=16, weight=ft.FontWeight.W_600),
                     activities_col,

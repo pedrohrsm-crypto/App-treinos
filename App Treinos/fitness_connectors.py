@@ -230,9 +230,177 @@ class GarminConnector(FitnessConnector):
         return False
 
 
+# ── SmartWatch / Wearables ───────────────────────────────────────
+
+class SmartWatchConnector(FitnessConnector):
+    """Interface base para conectores de smartwatch/wearables."""
+
+    name: str = "smartwatch"
+    device_type: str = "generic"  # garmin, apple, fitbit, samsung
+
+    def authorize_url(self) -> str:
+        """Retorna URL para o utilizador autorizar acesso ao dispositivo."""
+        raise NotImplementedError
+
+    def exchange_token(self, code: str) -> Dict:
+        """Troca código de autorização por access_token."""
+        raise NotImplementedError
+
+    def get_activities(self, limit: int = 30) -> List[ActivitySummary]:
+        """Retorna últimas atividades sincronizadas do relógio."""
+        raise NotImplementedError
+
+    def is_connected(self) -> bool:
+        """Verifica se há conexão ativa com o dispositivo."""
+        raise NotImplementedError
+
+    def pair_device(self, device_id: str) -> bool:
+        """Emparelha um novo dispositivo."""
+        raise NotImplementedError
+
+    def sync_now(self) -> bool:
+        """Força sincronização imediata com dispositivo."""
+        raise NotImplementedError
+
+
+class GarminWatchConnector(SmartWatchConnector):
+    """
+    Stub para integração com Garmin Devices (Edge, Watch, etc).
+
+    Suporta sincronização de atividades de dispositivos Garmin.
+    Configuração necessária:
+      - Garmin Connect credentials ou personal token
+    """
+
+    name = "garmin_watch"
+    device_type = "garmin"
+
+    def __init__(self, email: str = "", password: str = ""):
+        self.email = email
+        self.password = password
+        self.connected = False
+
+    def authorize_url(self) -> str:
+        # Garmin Connect OAuth would go here
+        return ""
+
+    def exchange_token(self, code: str) -> Dict:
+        return {}
+
+    def get_activities(self, limit: int = 30) -> List[ActivitySummary]:
+        return []
+
+    def is_connected(self) -> bool:
+        return self.connected
+
+    def pair_device(self, device_id: str) -> bool:
+        self.connected = True
+        return True
+
+    def sync_now(self) -> bool:
+        return True
+
+
+class AppleWatchConnector(SmartWatchConnector):
+    """
+    Stub para integração com Apple Watch / HealthKit.
+
+    Macros está disponível apenas no ecossistema Apple.
+    """
+
+    name = "apple_watch"
+    device_type = "apple"
+
+    def authorize_url(self) -> str:
+        return ""
+
+    def exchange_token(self, code: str) -> Dict:
+        return {}
+
+    def get_activities(self, limit: int = 30) -> List[ActivitySummary]:
+        return []
+
+    def is_connected(self) -> bool:
+        return False
+
+    def pair_device(self, device_id: str) -> bool:
+        return False
+
+    def sync_now(self) -> bool:
+        return False
+
+
+class FitbitConnector(SmartWatchConnector):
+    """
+    Stub para integração com Fitbit.
+
+    Requer autenticação OAuth2 com Fitbit API.
+    """
+
+    name = "fitbit"
+    device_type = "fitbit"
+
+    def __init__(self, client_id: str = "", client_secret: str = ""):
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.connected = False
+
+    def authorize_url(self) -> str:
+        return ""
+
+    def exchange_token(self, code: str) -> Dict:
+        return {}
+
+    def get_activities(self, limit: int = 30) -> List[ActivitySummary]:
+        return []
+
+    def is_connected(self) -> bool:
+        return self.connected
+
+    def pair_device(self, device_id: str) -> bool:
+        self.connected = True
+        return True
+
+    def sync_now(self) -> bool:
+        return True
+
+
+class SamsungConnector(SmartWatchConnector):
+    """
+    Stub para integração com Samsung Galaxy Watch.
+
+    Requer Samsung Health API e credenciais apropriadas.
+    """
+
+    name = "samsung"
+    device_type = "samsung"
+
+    def authorize_url(self) -> str:
+        return ""
+
+    def exchange_token(self, code: str) -> Dict:
+        return {}
+
+    def get_activities(self, limit: int = 30) -> List[ActivitySummary]:
+        return []
+
+    def is_connected(self) -> bool:
+        return False
+
+    def pair_device(self, device_id: str) -> bool:
+        return False
+
+    def sync_now(self) -> bool:
+        return False
+
+
 # ── Registo de conectores ────────────────────────────────────────
 
 CONNECTORS = {
     "strava": StravaConnector,
     "garmin": GarminConnector,
+    "garmin_watch": GarminWatchConnector,
+    "apple_watch": AppleWatchConnector,
+    "fitbit": FitbitConnector,
+    "samsung": SamsungConnector,
 }

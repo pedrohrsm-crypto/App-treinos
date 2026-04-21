@@ -447,6 +447,43 @@ _translations: Dict[str, Dict[str, str]] = {
         "es": "No se encontraron actividades en Strava.",
     },
 
+    # ── Smartwatch / Wearables ────────────────────────────────────
+    "smartwatch_title": {
+        "pt": "Conectar Smartwatch",
+        "en": "Connect Smartwatch",
+        "es": "Conectar Smartwatch",
+    },
+    "smartwatch_subtitle": {
+        "pt": "Emparelhe seus relógios e pulseiras de fitness para sincronizar atividades automaticamente.",
+        "en": "Pair your smartwatches and fitness bands to automatically sync activities.",
+        "es": "Empareja tus smartwatches y bandas de fitness para sincronizar actividades automáticamente.",
+    },
+    "smartwatch_recent_activities": {
+        "pt": "Atividades Sincronizadas Recentemente",
+        "en": "Recently Synced Activities",
+        "es": "Actividades Sincronizadas Recientemente",
+    },
+    "smartwatch_garmin": {
+        "pt": "Garmin Watch / Edge",
+        "en": "Garmin Watch / Edge",
+        "es": "Garmin Watch / Edge",
+    },
+    "smartwatch_apple": {
+        "pt": "Apple Watch",
+        "en": "Apple Watch",
+        "es": "Apple Watch",
+    },
+    "smartwatch_fitbit": {
+        "pt": "Fitbit",
+        "en": "Fitbit",
+        "es": "Fitbit",
+    },
+    "smartwatch_samsung": {
+        "pt": "Samsung Galaxy Watch",
+        "en": "Samsung Galaxy Watch",
+        "es": "Samsung Galaxy Watch",
+    },
+
     # ── Calendário ───────────────────────────────────────────────
     "calendar_title": {
         "pt": "Calendário de Treino",
