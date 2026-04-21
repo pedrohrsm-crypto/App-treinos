@@ -16,17 +16,17 @@ from typing import Optional, Dict, List, Tuple
 
 class DatabaseManager:
     """Gerenciador de banco de dados para autenticação de usuários."""
-    
+
     def __init__(self, db_path: Optional[str] = None, use_mysql: bool = False):
         """
         Inicializa o gerenciador de banco de dados.
-        
+
         Args:
             db_path: Caminho para o arquivo SQLite (None = padrão)
             use_mysql: Se True, usa MySQL ao invés de SQLite
         """
         self.use_mysql = use_mysql
-        
+
         if use_mysql:
             try:
                 import mysql.connector
@@ -36,7 +36,7 @@ class DatabaseManager:
             except ImportError:
                 print("⚠️ MySQL não instalado. Usando SQLite como fallback.")
                 self.use_mysql = False
-        
+
         if not self.use_mysql:
             if db_path is None:
                 # Usar diretório data/ no projeto
@@ -44,19 +44,19 @@ class DatabaseManager:
                 data_dir = project_root / "data"
                 data_dir.mkdir(exist_ok=True)
                 db_path = str(data_dir / "app_treinos.db")
-            
+
             self.db_path = db_path
             self.connection = None
             self._init_sqlite_db()
-    
+
     def _connect_mysql(self):
-        """Conecta ao MySQL (configurações podem ser ajustadas)."""
+        """Conecta ao MySQL usando variáveis de ambiente."""
         try:
             self.connection = self.mysql_connector.connect(
-                host="localhost",
-                user="root",
-                password="",  # Ajustar conforme necessário
-                database="app_treinos"
+                host=os.environ.get("DB_HOST", "localhost"),
+                user=os.environ.get("DB_USER", "root"),
+                password=os.environ.get("DB_PASS", ""),
+                database=os.environ.get("DB_NAME", "app_treinos"),
             )
             self._init_mysql_db()
         except Exception as e:
@@ -67,7 +67,7 @@ class DatabaseManager:
         """Inicializa banco de dados SQLite."""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
-        
+
         # Tabela de usuários
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS usuarios (
@@ -83,29 +83,18 @@ class DatabaseManager:
                 ativo INTEGER DEFAULT 1
             )
         ''')
-        
-        # Criar usuário administrador padrão se não existir
-        cursor.execute('SELECT id FROM usuarios WHERE tipo = "admin"')
-        if not cursor.fetchone():
-            senha_hash = self._hash_password("adminDB")
-            cursor.execute('''
-                INSERT INTO usuarios (cpf, nome, email, senha_hash, tipo, data_cadastro)
-                VALUES (?, ?, ?, ?, ?, ?)
-            ''', ("00000000000", "Administrador", "admin@apptreinos.com", 
-                  senha_hash, "admin", datetime.now().isoformat()))
-            print("✅ Usuário administrador criado")
-        
+
         conn.commit()
         conn.close()
     
     def _init_mysql_db(self):
         """Inicializa tabelas no MySQL."""
         cursor = self.connection.cursor()
-        
+
         # Criar database se não existir
         cursor.execute("CREATE DATABASE IF NOT EXISTS app_treinos")
         cursor.execute("USE app_treinos")
-        
+
         # Tabela de usuários
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS usuarios (
@@ -121,17 +110,7 @@ class DatabaseManager:
                 ativo TINYINT DEFAULT 1
             )
         ''')
-        
-        # Criar admin se não existir
-        cursor.execute('SELECT id FROM usuarios WHERE tipo = "admin"')
-        if not cursor.fetchone():
-            senha_hash = self._hash_password("adminDB")
-            cursor.execute('''
-                INSERT INTO usuarios (cpf, nome, email, senha_hash, tipo, data_cadastro)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            ''', ("00000000000", "Administrador", "admin@apptreinos.com", 
-                  senha_hash, "admin", datetime.now()))
-        
+
         self.connection.commit()
     
     def _hash_password(self, password: str) -> str:
@@ -381,18 +360,35 @@ class DatabaseManager:
     def autenticar_admin(self, usuario: str, senha: str) -> bool:
         """
         Autentica acesso administrativo.
-        
+
         Args:
-            usuario: Nome de usuário (deve ser "admin")
-            senha: Senha de acesso (deve ser "adminDB")
-        
+            usuario: CPF ou CREF do admin
+            senha: Senha de acesso
+
         Returns:
-            True se autenticado
+            True se autenticado como admin
         """
-        if usuario != "admin":
-            return False
-        
-        return self.autenticar_usuario("00000000000", senha)[0]
+        success, data = self.autenticar_usuario(usuario, senha)
+        return success and data is not None and data.get("tipo") == "admin"
+
+    def needs_initial_setup(self) -> bool:
+        """Verifica se o sistema precisa de configuração inicial (sem utilizadores)."""
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+            cursor.execute('SELECT COUNT(*) FROM usuarios')
+            count = cursor.fetchone()[0]
+            conn.close()
+            return count == 0
+        except Exception:
+            return True
+
+    def criar_admin_inicial(self, cpf: str, cref: str, nome: str,
+                            senha: str, email: str = "") -> Tuple[bool, str]:
+        """Cria o primeiro administrador do sistema (apenas se não existir nenhum utilizador)."""
+        if not self.needs_initial_setup():
+            return False, "Sistema já possui utilizadores cadastrados."
+        return self.cadastrar_usuario_com_tipo(cpf, cref, nome, senha, email, tipo="admin")
     
     def listar_usuarios(self) -> List[Dict]:
         """Lista todos os usuários cadastrados (apenas admin)."""
@@ -471,14 +467,66 @@ class DatabaseManager:
     def deletar_usuario(self, user_id: int) -> Tuple[bool, str]:
         """
         Desativa um usuário (soft delete).
-        
+
         Args:
             user_id: ID do usuário
-        
+
         Returns:
             Tupla (sucesso, mensagem)
         """
         return self.atualizar_usuario(user_id, ativo=0)
+
+    def cadastrar_usuario_com_tipo(self, cpf: str, cref: str, nome: str,
+                                   senha: str, email: str = "",
+                                   tipo: str = "usuario") -> Tuple[bool, str]:
+        """Cadastra utilizador com tipo específico (admin ou usuario)."""
+        if not senha or len(senha.strip()) < 6:
+            return False, "A senha deve ter no mínimo 6 caracteres."
+        if not nome or len(nome.strip()) < 2:
+            return False, "O nome deve ter no mínimo 2 caracteres."
+
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            if self.use_mysql:
+                cursor.execute(
+                    'SELECT id FROM usuarios WHERE cpf = %s OR cref = %s',
+                    (cpf, cref)
+                )
+            else:
+                cursor.execute(
+                    'SELECT id FROM usuarios WHERE cpf = ? OR cref = ?',
+                    (cpf, cref)
+                )
+
+            if cursor.fetchone():
+                conn.close()
+                return False, "CPF ou CREF já cadastrados no sistema."
+
+            senha_hash = self._hash_password(senha)
+            data_cadastro = datetime.now()
+
+            if self.use_mysql:
+                cursor.execute('''
+                    INSERT INTO usuarios
+                    (cpf, cref, nome, email, senha_hash, tipo, data_cadastro)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                ''', (cpf, cref, nome, email, senha_hash, tipo, data_cadastro))
+            else:
+                cursor.execute('''
+                    INSERT INTO usuarios
+                    (cpf, cref, nome, email, senha_hash, tipo, data_cadastro)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                ''', (cpf, cref, nome, email, senha_hash, tipo,
+                      data_cadastro.isoformat()))
+
+            conn.commit()
+            conn.close()
+            return True, "Usuário cadastrado com sucesso!"
+
+        except Exception as e:
+            return False, f"Erro ao cadastrar: {str(e)}"
 
 
 # Instância global

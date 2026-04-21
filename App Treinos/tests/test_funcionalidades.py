@@ -624,7 +624,7 @@ class TestVersionamento:
         assert all(p.isdigit() for p in parts)
 
     def test_versao_atual(self):
-        assert __version__ == "3.0.0"
+        assert __version__ == "3.1.0"
 
 
 # ═══════════════════════════════════════════════════════════════════

@@ -90,6 +90,19 @@ class AppState:
         data["_onboarding_completed"] = True
         self._write_prefs_file(data)
 
+    # ── EULA ───────────────────────────────────────────────────
+
+    def is_eula_accepted(self) -> bool:
+        """Verifica se o EULA foi aceito."""
+        data = self._read_prefs_file()
+        return data.get("_eula_accepted", False)
+
+    def set_eula_accepted(self):
+        """Marca o EULA como aceito."""
+        data = self._read_prefs_file()
+        data["_eula_accepted"] = True
+        self._write_prefs_file(data)
+
     def load_preferences(self) -> Optional[Dict]:
         """Carrega preferências do treinador logado (ou _global)."""
         data = self._read_prefs_file()

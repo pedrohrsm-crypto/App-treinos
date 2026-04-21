@@ -2,9 +2,9 @@
 Onboarding — Carrossel de boas-vindas (primeiro uso)
 =====================================================
 
-Exibido apenas na primeira execução. Apresenta as
-funcionalidades do app em 4 slides com navegação por
-botões e indicadores de página. Botão Voltar incluído.
+Exibido apenas na primeira execução ou quando o EULA
+ainda não foi aceito. Apresenta as funcionalidades do app
+em 4 slides + slide de aceitação de Termos de Uso.
 """
 
 import flet as ft
@@ -14,10 +14,11 @@ from flet_app.state import app_state
 
 
 def onboarding_view(page: ft.Page, route: str) -> ft.View:
-    """Constrói a View de onboarding com 4 slides."""
+    """Constrói a View de onboarding com 4 slides + EULA."""
 
     dark = app_state.dark_mode
     current = [0]
+    eula_accepted = [False]
 
     slides = [
         {
@@ -40,6 +41,22 @@ def onboarding_view(page: ft.Page, route: str) -> ft.View:
             "title": t("onboarding_devices_title"),
             "body": t("onboarding_devices_body"),
         },
+        {
+            "icon": ft.Icons.GAVEL,
+            "title": "Termos de Uso",
+            "body": (
+                "Ao utilizar o App Treinos, voce concorda com nossos Termos de Uso "
+                "e Politica de Privacidade.\n\n"
+                "Resumo:\n"
+                "- Seus dados sao armazenados localmente no seu computador\n"
+                "- Nenhum dado pessoal e enviado a servidores externos\n"
+                "- A integracao com IA (opcional) envia dados de treino ao provedor escolhido\n"
+                "- O software e uma ferramenta de apoio, nao substitui o julgamento profissional\n\n"
+                "Os documentos completos (EULA.md e PRIVACY.md) estao disponiveis "
+                "no diretorio de instalacao do software."
+            ),
+            "is_eula": True,
+        },
     ]
 
     # ── Elementos visuais ────────────────────────────────────────
@@ -52,6 +69,20 @@ def onboarding_view(page: ft.Page, route: str) -> ft.View:
         slides[0]["body"], size=17, text_align=ft.TextAlign.CENTER,
         color=c("text_secondary", dark),
     )
+
+    # ── Checkbox EULA (visível apenas no slide 5) ──────────────
+    eula_checkbox = ft.Checkbox(
+        label="Li e aceito os Termos de Uso e a Politica de Privacidade",
+        value=False,
+        visible=False,
+    )
+
+    def _on_eula_change(e):
+        eula_accepted[0] = e.control.value
+        btn_start.disabled = not eula_accepted[0]
+        page.update()
+
+    eula_checkbox.on_change = _on_eula_change
 
     # ── Indicadores de página (maiores para acessibilidade) ──────
     def _build_dots():
@@ -83,7 +114,7 @@ def onboarding_view(page: ft.Page, route: str) -> ft.View:
     )
     btn_skip = ft.TextButton(
         t("onboarding_skip"),
-        on_click=lambda _: _finish(),
+        on_click=lambda _: _skip_to_eula(),
         style=ft.ButtonStyle(color=c("text_secondary", dark)),
     )
     btn_next = ft.ElevatedButton(
@@ -94,13 +125,14 @@ def onboarding_view(page: ft.Page, route: str) -> ft.View:
         on_click=lambda _: _advance(),
     )
     btn_start = ft.ElevatedButton(
-        t("onboarding_start"),
+        "Aceitar e Comecar",
         icon=ft.Icons.ROCKET_LAUNCH,
         bgcolor=c("primary", dark),
         color=c("text_light", dark),
-        width=200,
+        width=240,
         height=48,
         on_click=lambda _: _finish(),
+        disabled=True,
     )
     btn_start.visible = False
 
@@ -115,7 +147,9 @@ def onboarding_view(page: ft.Page, route: str) -> ft.View:
         btn_next.visible = not is_last
         btn_skip.visible = not is_last
         btn_start.visible = is_last
+        btn_start.disabled = not eula_accepted[0]
         btn_back.visible = not is_first
+        eula_checkbox.visible = is_last
 
         # Rebuild dots
         nonlocal dots_row
@@ -142,8 +176,15 @@ def onboarding_view(page: ft.Page, route: str) -> ft.View:
             current[0] -= 1
             _update_slide()
 
+    def _skip_to_eula():
+        current[0] = len(slides) - 1
+        _update_slide()
+
     def _finish():
+        if not eula_accepted[0]:
+            return
         app_state.set_onboarding_completed()
+        app_state.set_eula_accepted()
         page.go("/login")
 
     # ── Layout ───────────────────────────────────────────────────
@@ -159,6 +200,8 @@ def onboarding_view(page: ft.Page, route: str) -> ft.View:
                     content=body_text,
                     padding=ft.padding.symmetric(horizontal=32),
                 ),
+                ft.Container(height=8),
+                eula_checkbox,
                 ft.Container(expand=1),
                 dots_row,
                 ft.Container(height=24),

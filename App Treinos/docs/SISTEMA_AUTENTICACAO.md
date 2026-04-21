@@ -30,14 +30,14 @@ Sistema completo de gerenciamento de usuários com banco de dados integrado, aut
 
 ---
 
-## 👤 Credenciais Padrão
+## 👤 Configuração Inicial
 
-### Administrador
-- **CPF**: `00000000000`
-- **Usuário**: `admin`
-- **Senha**: `adminDB`
+### Primeiro Arranque
+No primeiro arranque, o sistema detecta que não existem utilizadores e redireciona
+para o ecrã de **Configuração Inicial**, onde o profissional deve criar
+a conta de administrador com CPF, CREF, nome e senha.
 
-> **Importante**: Altere a senha padrão após a primeira configuração!
+> **Não existem credenciais padrão.** O administrador é definido pelo utilizador.
 
 ---
 
@@ -66,8 +66,8 @@ Sistema completo de gerenciamento de usuários com banco de dados integrado, aut
 ### Para Administradores
 
 #### 1. Painel de Administração
-- Acesso via link no rodapé da tela de login
-- Senha de administrador: `adminDB`
+- Acesso via ecrã de configurações (apenas para utilizadores com tipo "admin")
+- Credenciais definidas no primeiro arranque
 
 #### 2. Gerenciamento de Usuários
 - ✅ Listar todos os usuários
@@ -128,7 +128,7 @@ else:
 ### Autenticar administrador
 
 ```python
-if db_manager.autenticar_admin("admin", "adminDB"):
+if db_manager.autenticar_admin("12345678900", "minha_senha"):
     print("Acesso administrativo concedido")
 else:
     print("Acesso negado")
@@ -233,10 +233,10 @@ data/
 
 ### 1. Primeiro Acesso (Admin)
 ```
-1. Execute: python gui/main_gui.py
-2. Após splash screen, clique em "🔐 Acesso Administrativo"
-3. Digite senha: adminDB
-4. Painel de administração será aberto
+1. Execute: python App_Treinos_Flet.py
+2. O sistema detecta BD vazia e abre o ecra de Configuracao Inicial
+3. Preencha CPF, CREF, nome e senha para criar o administrador
+4. Faca login com as credenciais definidas
 ```
 
 ### 2. Criar Usuário de Teste

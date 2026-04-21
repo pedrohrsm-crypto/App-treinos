@@ -25,6 +25,8 @@ from flet_app.screens.progress import progress_view
 from flet_app.screens.fitness import fitness_view
 from flet_app.screens.templates import templates_view
 from flet_app.screens.onboarding import onboarding_view
+from flet_app.screens.initial_setup import initial_setup_view
+from flet_app.screens.ai_config_screen import ai_config_view
 from flet_app.components.calendar_view import calendar_view_screen
 
 
@@ -32,7 +34,7 @@ def main(page: ft.Page):
     """Ponto de entrada da aplicação Flet."""
 
     # ── Configuração da página ───────────────────────────────────
-    page.title = "App Treinos v3.0"
+    page.title = "App Treinos v3.1"
     page.theme_mode = ft.ThemeMode.LIGHT
     page.theme = build_theme(dark=False)
     page.window.width = 1024
@@ -46,6 +48,7 @@ def main(page: ft.Page):
     router.add("/", splash_view)
     router.add("/splash", splash_view)
     router.add("/onboarding", onboarding_view)
+    router.add("/initial-setup", initial_setup_view)
     router.add("/login", login_view)
     router.add("/register", register_view)
     router.add("/dashboard", dashboard_view)
@@ -57,6 +60,7 @@ def main(page: ft.Page):
     router.add("/progress", progress_view)
     router.add("/fitness", fitness_view)
     router.add("/templates", templates_view)
+    router.add("/ai-config", ai_config_view)
 
     # ── Arranque ─────────────────────────────────────────────────
     page.go("/splash")

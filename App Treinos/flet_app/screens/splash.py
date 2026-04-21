@@ -82,6 +82,13 @@ def splash_view(page: ft.Page, route: str) -> ft.View:
         app_state.db = DatabaseManager()
         await _set_progress(0.30, "Banco de dados pronto ✓")
 
+        # Etapa 1.5: Verificar setup inicial
+        if app_state.db.needs_initial_setup():
+            await _set_progress(1.0, "Configuração inicial necessária…")
+            await asyncio.sleep(0.3)
+            page.go("/initial-setup")
+            return
+
         # Etapa 2: Preferências
         await _set_progress(0.45, "Carregando preferências…")
         session = app_state.load_session()
@@ -131,7 +138,7 @@ def splash_view(page: ft.Page, route: str) -> ft.View:
         # Navegar
         if auto_logged:
             page.go("/dashboard")
-        elif not app_state.is_onboarding_completed():
+        elif not app_state.is_onboarding_completed() or not app_state.is_eula_accepted():
             page.go("/onboarding")
         else:
             page.go("/login")

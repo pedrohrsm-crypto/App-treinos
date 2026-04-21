@@ -11,6 +11,7 @@ Permite ao treinador:
 
 import asyncio
 import hashlib
+import webbrowser
 import flet as ft
 from i18n import t
 from flet_app.theme import c, SPACING, RADIUS, card_shadow
@@ -162,7 +163,27 @@ def ai_config_view(page: ft.Page, route: str) -> ft.View:
         color=c("text_secondary", dark),
     )
 
-    docs_url_text = ft.Text("", size=12, color=c("info", dark))
+    # Provider-specific API key instructions
+    def _open_docs_url(docs_url: str):
+        if docs_url:
+            webbrowser.open(docs_url)
+
+    docs_url_button = ft.Container(
+        visible=False,
+        content=ft.Row(
+            [
+                ft.Icon(ft.Icons.OPEN_IN_NEW, size=14, color=c("info", dark)),
+                ft.TextButton(
+                    "👉 Clique aqui para obter a API Key",
+                    style=ft.ButtonStyle(
+                        color=c("info", dark),
+                    ),
+                ),
+            ],
+            spacing=4,
+            tight=True,
+        ),
+    )
 
     # ── Event handlers ───────────────────────────────────────────
 
@@ -179,7 +200,9 @@ def ai_config_view(page: ft.Page, route: str) -> ft.View:
         model_dd.visible = not is_custom
 
         docs = SUPPORTED_PROVIDERS.get(prov, {}).get("docs_url", "")
-        docs_url_text.value = f"Obtenha a sua key: {docs}" if docs else ""
+        docs_url_button.visible = bool(docs)
+        if docs:
+            docs_url_button.content.controls[1].on_click = lambda _: _open_docs_url(docs)
 
         page.update()
 
@@ -288,10 +311,20 @@ def ai_config_view(page: ft.Page, route: str) -> ft.View:
                     ],
                     spacing=SPACING["xs"],
                 ),
+                ft.Text(
+                    "Escolha a plataforma de IA que prefere usar. Cada uma é gratuita para começar.",
+                    size=12,
+                    color=c("text_secondary", dark),
+                ),
                 provider_dd,
-                docs_url_text,
+                docs_url_button,
                 model_dd,
                 custom_model_field,
+                ft.Text(
+                    "Cole a sua API Key aqui. É uma senha única que você consegue na plataforma de IA.",
+                    size=12,
+                    color=c("text_secondary", dark),
+                ),
                 api_key_field,
                 base_url_field,
                 ft.Divider(height=12, color=ft.Colors.TRANSPARENT),

@@ -72,6 +72,48 @@ def config_view(page: ft.Page, route: str) -> ft.View:
         visible=app_state.is_admin,
     )
 
+    # ── IA Config ────────────────────────────────────────────────
+    ai_btn = ft.ElevatedButton(
+        "Configuracao de IA",
+        icon=ft.Icons.SMART_TOY,
+        bgcolor=c("primary", dark),
+        color=c("text_light", dark),
+        on_click=lambda _: page.go("/ai-config"),
+    )
+
+    # ── Sobre ──────────────────────────────────────────────────
+    from version import __version__
+    about_card = ft.Container(
+        content=ft.Column(
+            [
+                ft.Text("Sobre o App Treinos", size=16, weight=ft.FontWeight.W_600,
+                         color=c("text_primary", dark)),
+                ft.Divider(height=4, color=ft.Colors.TRANSPARENT),
+                ft.Row([
+                    ft.Icon(ft.Icons.INFO_OUTLINE, size=16, color=c("text_secondary", dark)),
+                    ft.Text(f"Versao {__version__}", size=13, color=c("text_secondary", dark)),
+                ], spacing=6),
+                ft.Row([
+                    ft.Icon(ft.Icons.VERIFIED_USER, size=16, color=c("text_secondary", dark)),
+                    ft.Text("Licenca Profissional", size=13, color=c("text_secondary", dark)),
+                ], spacing=6),
+                ft.Row([
+                    ft.Icon(ft.Icons.COPYRIGHT, size=16, color=c("text_secondary", dark)),
+                    ft.Text(f"2026 App Treinos", size=13, color=c("text_secondary", dark)),
+                ], spacing=6),
+                ft.Divider(height=8, color=ft.Colors.TRANSPARENT),
+                ft.Text("Documentos legais disponiveis no diretorio de instalacao:",
+                         size=12, color=c("text_disabled", dark)),
+                ft.Text("  EULA.md  |  PRIVACY.md  |  LICENSE",
+                         size=12, color=c("text_disabled", dark)),
+            ],
+            spacing=4,
+        ),
+        padding=16,
+        border_radius=8,
+        border=ft.border.all(1, c("text_disabled", dark)),
+    )
+
     # ── Layout ───────────────────────────────────────────────────
     tooltip = build_feature_tooltip(
         "config",
@@ -89,6 +131,10 @@ def config_view(page: ft.Page, route: str) -> ft.View:
             lang_chips,
             ft.Divider(height=20, color=ft.Colors.TRANSPARENT),
             admin_btn,
+            ft.Divider(height=20, color=ft.Colors.TRANSPARENT),
+            ai_btn,
+            ft.Divider(height=20, color=ft.Colors.TRANSPARENT),
+            about_card,
             ft.Divider(height=20, color=ft.Colors.TRANSPARENT),
             ft.Text(t("config_session", name=app_state.trainer_name or "—"), size=13, color=c("text_secondary", dark)),
             ft.OutlinedButton(t("config_logout"), icon=ft.Icons.LOGOUT, on_click=_logout),
