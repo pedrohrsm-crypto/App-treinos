@@ -38,6 +38,9 @@ class AppState:
     dark_mode: bool = False
     language: str = "pt"
 
+    # ── Tours (first-use) ────────────────────────────────────────
+    seen_tours: Dict[str, bool] = field(default_factory=dict)  # {"dashboard": True, ...}
+
     # ── DB singleton (inicializado no splash) ────────────────────
     db: object = None  # DatabaseManager instance
 
@@ -102,6 +105,27 @@ class AppState:
         data = self._read_prefs_file()
         data["_eula_accepted"] = True
         self._write_prefs_file(data)
+
+    # ── LGPD Compliance ────────────────────────────────────────────
+
+    def is_lgpd_confirmed(self) -> bool:
+        """Verifica se o LGPD foi confirmado."""
+        data = self._read_prefs_file()
+        return data.get("_lgpd_confirmed", False)
+
+    def mark_lgpd_confirmed(self):
+        """Marca o LGPD como confirmado com timestamp."""
+        from datetime import datetime
+        data = self._read_prefs_file()
+        data["_lgpd_confirmed"] = True
+        data["_lgpd_confirmed_date"] = datetime.now().isoformat()
+        self._write_prefs_file(data)
+
+    # ── Onboarding e Marks ─────────────────────────────────────────
+
+    def mark_onboarding_complete(self):
+        """Marca o onboarding como concluído (alias para retrocompatibilidade)."""
+        self.set_onboarding_completed()
 
     def load_preferences(self) -> Optional[Dict]:
         """Carrega preferências do treinador logado (ou _global)."""

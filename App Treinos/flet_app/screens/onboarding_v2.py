@@ -1,15 +1,17 @@
 """
-Onboarding Melhorado v2 — 5 slides com foco em ação
-====================================================
+Onboarding Expandido v3 — 6 slides com LGPD obrigatória
+==========================================================
 
 Novo fluxo:
 1. Bem-vindo (valor prop)
-2. Crie treino em 2 min (benefit)
-3. Conecte IA (setup opcional)
-4. Vamos começar! (CTA)
-5. Termos de Uso (legal)
+2. Organize seus atletas (feature)
+3. Gere treinos com IA (feature)
+4. Acompanhe o progresso (feature)
+5. Conformidade LGPD (legal - MANDATORY)
+6. Vamos começar! (CTA)
 
-Plus: Opção de criar primeiro treino guiado após onboarding.
+Nota: Slide 5 tem checkbox obrigatório do LGPD que bloqueia progresso para slide 6.
+Confirmação persiste em preferences.json.
 """
 
 import flet as ft
@@ -19,75 +21,100 @@ from flet_app.state import app_state
 
 
 def onboarding_view_v2(page: ft.Page, route: str) -> ft.View:
-    """Onboarding melhorado com foco em ação rápida."""
+    """Onboarding expandido com LGPD obrigatória como slide 5."""
 
     dark = app_state.dark_mode
     current = [0]
-    eula_accepted = [False]
+    lgpd_accepted = [False]
 
     slides = [
         {
             "icon": ft.Icons.DIRECTIONS_RUN,
             "icon_color": c("primary", dark),
             "title": "Bem-vindo ao App Treinos",
-            "subtitle": "Crie planos de treino em minutos",
+            "subtitle": "Software para Personal Trainers Profissionais",
             "body": (
-                "Organize seus atletas, personalize treinos "
-                "e acompanhe progresso com inteligência artificial opcional."
+                "Organize seus atletas, crie planos de treino "
+                "personalizados e acompanhe o progresso com "
+                "inteligência artificial opcional.\n\n"
+                "Todos os seus dados ficam em seu computador."
             ),
             "highlight": None,
         },
         {
-            "icon": ft.Icons.FLASH_ON,
+            "icon": ft.Icons.PEOPLE,
             "icon_color": c("success", dark),
-            "title": "Crie um treino em 2 minutos",
-            "subtitle": "Processo guiado",
+            "title": "Organize seus atletas",
+            "subtitle": "Gestão centralizada",
             "body": (
-                "1. Escolha o atleta\n"
-                "2. Selecione modalidade (corrida, musculação, etc)\n"
-                "3. Aproveite templates pré-feitos\n"
-                "4. Ajuste e pronto!"
+                "Crie um perfil completo para cada atleta:\n\n"
+                "• Dados pessoais e parâmetros fisiológicos\n"
+                "• Histórico de métricas (peso, VO2 max, etc)\n"
+                "• Limitações de saúde e ciclo menstrual\n"
+                "• Disponibilidade e preferências"
             ),
-            "highlight": "RÁPIDO",
+            "highlight": "NOVO",
         },
         {
             "icon": ft.Icons.SMART_TOY,
             "icon_color": c("primary", dark),
-            "title": "Potencialize com IA (opcional)",
-            "subtitle": "Sugestões inteligentes",
+            "title": "Gere treinos com IA",
+            "subtitle": "Automatização inteligente",
             "body": (
-                "Conecte OpenAI, Anthropic ou outro provedor.\n\n"
-                "A IA sugere exercícios, periodização e adaptações "
-                "conforme o progresso do atleta.\n\n"
-                "Pode deixar para depois."
+                "Configure múltiplos provedores de IA:\n\n"
+                "• OpenAI (ChatGPT, GPT-4)\n"
+                "• Anthropic (Claude)\n"
+                "• Google (Gemini)\n"
+                "• DeepSeek ou API personalizadas\n\n"
+                "A IA sugere exercícios e periodização automática."
             ),
             "highlight": None,
+        },
+        {
+            "icon": ft.Icons.SHOW_CHART,
+            "icon_color": c("success", dark),
+            "title": "Acompanhe o progresso",
+            "subtitle": "Métricas em tempo real",
+            "body": (
+                "Visualize o desenvolvimento dos seus atletas:\n\n"
+                "• Histórico de treinos realizados\n"
+                "• Evolução de métricas fisiológicas\n"
+                "• Gráficos de tendências\n"
+                "• Exportar dados para análise\n"
+                "• Conformidade com LGPD brasileira"
+            ),
+            "highlight": None,
+        },
+        {
+            "icon": ft.Icons.LOCK,
+            "icon_color": c("warning", dark),
+            "title": "Proteção de Dados (LGPD)",
+            "subtitle": "Conformidade brasileira obrigatória",
+            "body": (
+                "CONFORMIDADE LGPD:\n\n"
+                "✓ Todos os dados são armazenados localmente NO SEU COMPUTADOR\n"
+                "✓ Nenhuma informação pessoal de atletas é enviada a servidores externos\n"
+                "✓ IA externa (opcional) receberá apenas dados anônimos de treino\n"
+                "✓ Você controla total acesso e pode deletar dados de atletas\n\n"
+                "Clique para ler: PRIVACY.md (política completa)"
+            ),
+            "is_lgpd": True,
+            "show_checkbox": True,
         },
         {
             "icon": ft.Icons.CHECK_CIRCLE,
             "icon_color": c("success", dark),
             "title": "Vamos começar!",
-            "subtitle": "Estamos prontos",
+            "subtitle": "Sistema pronto para uso",
             "body": (
-                "Na próxima tela você verá seu painel.\n\n"
-                "Use o botão '+' para criar seu primeiro atleta e treino.\n\n"
-                "Qualquer dúvida? Veja a documentação em Configurações."
+                "Configuração concluída com sucesso!\n\n"
+                "Na próxima tela você acessa o painel principal.\n\n"
+                "Use o botão '+' para criar seu primeiro atleta "
+                "e comece a gerar treinos imediatamente.\n\n"
+                "Dúvidas? Veja o menu 'Ajuda' em qualquer momento."
             ),
-            "highlight": "PRÓXIMO",
-        },
-        {
-            "icon": ft.Icons.GAVEL,
-            "icon_color": c("warning", dark),
-            "title": "Termos de Uso & Privacidade",
-            "subtitle": "Importante",
-            "body": (
-                "✓ Seus dados estão SEMPRE locais (no seu computador)\n"
-                "✓ Nenhum dado pessoal é enviado a servers externos\n"
-                "✓ IA (opcional) pode compartilhar vossos treinos com o provedor escolhido\n"
-                "✓ O app é uma ferramenta de apoio, não substitui avaliação profissional\n\n"
-                "Documentos completos: EULA.md e PRIVACY.md na pasta de instalação"
-            ),
-            "is_eula": True,
+            "highlight": "PRONTO",
+            "is_final": True,
         },
     ]
 
@@ -111,13 +138,13 @@ def onboarding_view_v2(page: ft.Page, route: str) -> ft.View:
     )
     body_text = ft.Text(
         slides[0]["body"],
-        size=15,
-        text_align=ft.TextAlign.CENTER,
+        size=14,
+        text_align=ft.TextAlign.LEFT,
         color=c("text_secondary", dark),
-        min_lines=4,
+        min_lines=5,
     )
 
-    # Badge de "RÁPIDO" ou "PRÓXIMO" se existir
+    # Badge de destaque
     highlight_badge = ft.Container(
         visible=False,
         content=ft.Text(
@@ -129,19 +156,31 @@ def onboarding_view_v2(page: ft.Page, route: str) -> ft.View:
         border_radius=16,
     )
 
-    # ── Checkbox EULA (visível apenas no slide 5) ──────────────
-    eula_checkbox = ft.Checkbox(
-        label="Li e aceito Termos de Uso e Privacidade",
+    # ── Checkbox LGPD (visível apenas no slide 5) ─────────────────
+    lgpd_checkbox = ft.Checkbox(
+        label="Entendo e confirmo que li a política de LGPD",
         value=False,
         visible=False,
     )
 
-    def _on_eula_change(e):
-        eula_accepted[0] = e.control.value
-        btn_next.disabled = not eula_accepted[0]
+    def _on_lgpd_change(e):
+        lgpd_accepted[0] = e.control.value
+        btn_next.disabled = not lgpd_accepted[0]
         page.update()
 
-    eula_checkbox.on_change = _on_eula_change
+    lgpd_checkbox.on_change = _on_lgpd_change
+
+    # ── Link para ler PRIVACY.md
+    privacy_link = ft.TextButton(
+        "Ler política de privacidade completa (PRIVACY.md)",
+        visible=False,
+        on_click=lambda e: _open_privacy_doc()
+    )
+
+    def _open_privacy_doc():
+        # Placeholder para abrir documento
+        # Em produção, isso abrira usando webbrowser ou system open
+        pass
 
     # ── Indicadores de página (dots) ──────
     def _build_dots():
@@ -185,18 +224,30 @@ def onboarding_view_v2(page: ft.Page, route: str) -> ft.View:
         else:
             highlight_badge.visible = False
 
-        # EULA
-        eula_checkbox.visible = slide.get("is_eula", False)
-        btn_next.disabled = slide.get("is_eula", False) and not eula_accepted[0]
-        btn_next.text = "Iniciar ➜" if current[0] == len(slides) - 1 else "Seguinte ➜"
+        # LGPD checkbox e link
+        lgpd_checkbox.visible = slide.get("show_checkbox", False)
+        privacy_link.visible = slide.get("is_lgpd", False)
+
+        # Botão "Próximo" desativado até aceitar LGPD
+        if slide.get("is_lgpd", False):
+            btn_next.disabled = not lgpd_accepted[0]
+            btn_next.text = "Confirmar e Continuar ➜"
+        else:
+            btn_next.disabled = False
+            btn_next.text = "Iniciar ➜" if current[0] == len(slides) - 1 else "Seguinte ➜"
+
         dots.controls = _build_dots().controls
 
         page.update()
 
     def _on_start():
         # Marcar onboarding como concluído
-        app_state.db.mark_onboarding_complete()
-        app_state.db.mark_eula_accepted()
+        app_state.mark_onboarding_complete()
+
+        # Marcar LGPD como aceito (se aplicável)
+        if lgpd_accepted[0]:
+            app_state.mark_lgpd_confirmed()
+
         page.go("/dashboard")
 
     # ── Botões ───────────────────────────────────────────────────
@@ -223,18 +274,22 @@ def onboarding_view_v2(page: ft.Page, route: str) -> ft.View:
                 ft.Container(height=16),
                 title_text,
                 subtitle_text,
-                ft.Container(height=24),
+                ft.Container(height=20),
                 body_text,
-                ft.Container(height=24),
+                ft.Container(height=20),
                 highlight_badge,
                 ft.Container(expand=True),
 
+                # Privacy link (LGPD slide)
+                privacy_link,
+
                 # Dots
                 dots,
-                ft.Container(height=24),
+                ft.Container(height=20),
 
-                # EULA checkbox
-                eula_checkbox,
+                # LGPD checkbox
+                lgpd_checkbox,
+                ft.Container(height=12),
 
                 # Navigation
                 ft.Row(

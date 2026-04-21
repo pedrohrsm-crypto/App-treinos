@@ -1498,6 +1498,11 @@ _translations: Dict[str, Dict[str, str]] = {
         "en": "Settings",
         "es": "Ajustes",
     },
+    "nav_help": {
+        "pt": "Ajuda",
+        "en": "Help",
+        "es": "Ayuda",
+    },
 
     # ── Onboarding extras ────────────────────────────────────────
     "onboarding_back": {

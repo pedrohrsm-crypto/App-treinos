@@ -100,7 +100,29 @@ def dashboard_view(page: ft.Page, route: str) -> ft.View:
     async def _load_data():
         nonlocal athletes
         await asyncio.sleep(0.01)  # liberar thread
-        athletes = training_manager.get_athletes_summary(trainer) if trainer else []
+
+        # Carregar atletas do banco de dados
+        if app_state.db and app_state.trainer_cref:
+            db_athletes = app_state.db.get_athletes_by_trainer(app_state.trainer_cref)
+            for athlete in db_athletes:
+                athletes.append({
+                    "athlete_name": athlete.get("nome", ""),
+                    "latest_sport": athlete.get("esporte_principal", "N/A"),
+                    "latest_date": athlete.get("ultimo_atualizado", ""),
+                    "db_id": athlete.get("id"),
+                })
+
+        # Combinar com treinos existentes
+        plans = training_manager.get_trainer_plans(trainer) if trainer else []
+        for p in plans:
+            # Verificar se atleta do treino não está duplicado
+            if not any(a["athlete_name"] == p.athlete_name for a in athletes):
+                athletes.append({
+                    "athlete_name": p.athlete_name,
+                    "latest_sport": p.sport,
+                    "latest_date": p.created_at,
+                })
+
         _populate()
         body.content = grid
         page.update()

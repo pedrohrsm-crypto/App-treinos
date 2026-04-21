@@ -84,6 +84,45 @@ class DatabaseManager:
             )
         ''')
 
+        # Tabela de atletas
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS atletas (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                trainer_cref TEXT NOT NULL,
+                nome TEXT NOT NULL,
+                cpf TEXT,
+                email TEXT,
+                genero TEXT,
+                data_nascimento TEXT,
+                peso_atual REAL,
+                altura REAL,
+                imc_atual REAL,
+                esporte_principal TEXT,
+                dias_disponibilidade_semana INTEGER,
+                limiar_lactato REAL,
+                vo2_max REAL,
+                frequencia_cardiaca_repouso REAL,
+                frequencia_cardiaca_maxima REAL,
+                ciclo_menstrual_ativo INTEGER DEFAULT 0,
+                problemas_saude TEXT,
+                data_criacao TEXT NOT NULL,
+                ultimo_atualizado TEXT NOT NULL,
+                ativo INTEGER DEFAULT 1,
+                UNIQUE(trainer_cref, cpf),
+                FOREIGN KEY(trainer_cref) REFERENCES usuarios(cref)
+            )
+        ''')
+
+        # Índices para performance
+        cursor.execute('''
+            CREATE INDEX IF NOT EXISTS idx_atletas_trainer
+            ON atletas(trainer_cref)
+        ''')
+        cursor.execute('''
+            CREATE INDEX IF NOT EXISTS idx_atletas_nome
+            ON atletas(nome)
+        ''')
+
         conn.commit()
         conn.close()
     
@@ -108,6 +147,37 @@ class DatabaseManager:
                 data_cadastro DATETIME NOT NULL,
                 ultimo_acesso DATETIME,
                 ativo TINYINT DEFAULT 1
+            )
+        ''')
+
+        # Tabela de atletas
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS atletas (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                trainer_cref VARCHAR(20) NOT NULL,
+                nome VARCHAR(255) NOT NULL,
+                cpf VARCHAR(11),
+                email VARCHAR(255),
+                genero VARCHAR(20),
+                data_nascimento DATE,
+                peso_atual DECIMAL(5, 2),
+                altura DECIMAL(5, 2),
+                imc_atual DECIMAL(5, 2),
+                esporte_principal VARCHAR(100),
+                dias_disponibilidade_semana INT,
+                limiar_lactato DECIMAL(6, 2),
+                vo2_max DECIMAL(6, 2),
+                frequencia_cardiaca_repouso DECIMAL(6, 2),
+                frequencia_cardiaca_maxima DECIMAL(6, 2),
+                ciclo_menstrual_ativo TINYINT DEFAULT 0,
+                problemas_saude JSON,
+                data_criacao DATETIME NOT NULL,
+                ultimo_atualizado DATETIME NOT NULL,
+                ativo TINYINT DEFAULT 1,
+                UNIQUE(trainer_cref, cpf),
+                FOREIGN KEY(trainer_cref) REFERENCES usuarios(cref),
+                INDEX idx_atletas_trainer (trainer_cref),
+                INDEX idx_atletas_nome (nome)
             )
         ''')
 
@@ -527,6 +597,314 @@ class DatabaseManager:
 
         except Exception as e:
             return False, f"Erro ao cadastrar: {str(e)}"
+
+    # =====================================================================
+    # ATLETAS - CRUD Methods
+    # =====================================================================
+
+    def create_athlete(self, trainer_cref: str, athlete_data: dict) -> int:
+        """
+        Cria novo atleta para um treinador.
+
+        Args:
+            trainer_cref: CREF do treinador
+            athlete_data: Dicionário com dados do atleta
+                - nome (obrigatório): str
+                - cpf: str
+                - email: str
+                - genero: str ('masculino', 'feminino', 'outro')
+                - data_nascimento: str (ISO date)
+                - peso_atual: float (kg)
+                - altura: float (cm)
+                - imc_atual: float
+                - esporte_principal: str
+                - dias_disponibilidade_semana: int (1-7)
+                - limiar_lactato: float
+                - vo2_max: float
+                - frequencia_cardiaca_repouso: float
+                - frequencia_cardiaca_maxima: float
+                - ciclo_menstrual_ativo: bool
+                - problemas_saude: str (JSON)
+
+        Returns:
+            ID do atleta criado, ou -1 se falho
+        """
+        import json
+
+        try:
+            if not athlete_data.get('nome'):
+                raise ValueError("Nome do atleta é obrigatório")
+
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            agora = datetime.now().isoformat()
+
+            # Preparar dados com valores padrão
+            dados = {
+                'trainer_cref': trainer_cref,
+                'nome': athlete_data.get('nome'),
+                'cpf': athlete_data.get('cpf'),
+                'email': athlete_data.get('email'),
+                'genero': athlete_data.get('genero'),
+                'data_nascimento': athlete_data.get('data_nascimento'),
+                'peso_atual': athlete_data.get('peso_atual'),
+                'altura': athlete_data.get('altura'),
+                'imc_atual': athlete_data.get('imc_atual'),
+                'esporte_principal': athlete_data.get('esporte_principal'),
+                'dias_disponibilidade_semana': athlete_data.get('dias_disponibilidade_semana'),
+                'limiar_lactato': athlete_data.get('limiar_lactato'),
+                'vo2_max': athlete_data.get('vo2_max'),
+                'frequencia_cardiaca_repouso': athlete_data.get('frequencia_cardiaca_repouso'),
+                'frequencia_cardiaca_maxima': athlete_data.get('frequencia_cardiaca_maxima'),
+                'ciclo_menstrual_ativo': 1 if athlete_data.get('ciclo_menstrual_ativo') else 0,
+                'problemas_saude': json.dumps(athlete_data.get('problemas_saude', [])) if athlete_data.get('problemas_saude') else None,
+                'data_criacao': agora,
+                'ultimo_atualizado': agora,
+                'ativo': 1
+            }
+
+            if self.use_mysql:
+                campos = ', '.join(dados.keys())
+                placeholders = ', '.join(['%s'] * len(dados))
+                cursor.execute(
+                    f'INSERT INTO atletas ({campos}) VALUES ({placeholders})',
+                    tuple(dados.values())
+                )
+            else:
+                campos = ', '.join(dados.keys())
+                placeholders = ', '.join(['?'] * len(dados))
+                cursor.execute(
+                    f'INSERT INTO atletas ({campos}) VALUES ({placeholders})',
+                    tuple(dados.values())
+                )
+
+            conn.commit()
+            athlete_id = cursor.lastrowid
+            conn.close()
+
+            return athlete_id
+
+        except Exception as e:
+            print(f"[ERROR] Erro ao criar atleta: {e}")
+            return -1
+
+    def get_athlete(self, athlete_id: int) -> Optional[Dict]:
+        """
+        Recupera dados completos de um atleta.
+
+        Args:
+            athlete_id: ID do atleta
+
+        Returns:
+            Dicionário com dados do atleta, ou None se não encontrado
+        """
+        import json
+
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            if self.use_mysql:
+                cursor.execute('SELECT * FROM atletas WHERE id = %s AND ativo = 1', (athlete_id,))
+            else:
+                cursor.execute('SELECT * FROM atletas WHERE id = ? AND ativo = 1', (athlete_id,))
+
+            row = cursor.fetchone()
+            conn.close()
+
+            if not row:
+                return None
+
+            # Converter row em dicionário
+            colnames = [
+                'id', 'trainer_cref', 'nome', 'cpf', 'email', 'genero',
+                'data_nascimento', 'peso_atual', 'altura', 'imc_atual',
+                'esporte_principal', 'dias_disponibilidade_semana',
+                'limiar_lactato', 'vo2_max', 'frequencia_cardiaca_repouso',
+                'frequencia_cardiaca_maxima', 'ciclo_menstrual_ativo',
+                'problemas_saude', 'data_criacao', 'ultimo_atualizado', 'ativo'
+            ]
+
+            atleta = dict(zip(colnames, row))
+
+            # Parse JSON campos
+            if atleta.get('problemas_saude'):
+                try:
+                    atleta['problemas_saude'] = json.loads(atleta['problemas_saude'])
+                except:
+                    atleta['problemas_saude'] = []
+
+            return atleta
+
+        except Exception as e:
+            print(f"[ERROR] Erro ao recuperar atleta: {e}")
+            return None
+
+    def get_athletes_by_trainer(self, trainer_cref: str) -> List[Dict]:
+        """
+        Lista todos os atletas de um treinador.
+
+        Args:
+            trainer_cref: CREF do treinador
+
+        Returns:
+            Lista de dicionários com dados dos atletas
+        """
+        import json
+
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            if self.use_mysql:
+                cursor.execute(
+                    'SELECT * FROM atletas WHERE trainer_cref = %s AND ativo = 1 ORDER BY nome',
+                    (trainer_cref,)
+                )
+            else:
+                cursor.execute(
+                    'SELECT * FROM atletas WHERE trainer_cref = ? AND ativo = 1 ORDER BY nome',
+                    (trainer_cref,)
+                )
+
+            rows = cursor.fetchall()
+            conn.close()
+
+            colnames = [
+                'id', 'trainer_cref', 'nome', 'cpf', 'email', 'genero',
+                'data_nascimento', 'peso_atual', 'altura', 'imc_atual',
+                'esporte_principal', 'dias_disponibilidade_semana',
+                'limiar_lactato', 'vo2_max', 'frequencia_cardiaca_repouso',
+                'frequencia_cardiaca_maxima', 'ciclo_menstrual_ativo',
+                'problemas_saude', 'data_criacao', 'ultimo_atualizado', 'ativo'
+            ]
+
+            atletas = []
+            for row in rows:
+                atleta = dict(zip(colnames, row))
+                if atleta.get('problemas_saude'):
+                    try:
+                        atleta['problemas_saude'] = json.loads(atleta['problemas_saude'])
+                    except:
+                        atleta['problemas_saude'] = []
+                atletas.append(atleta)
+
+            return atletas
+
+        except Exception as e:
+            print(f"[ERROR] Erro ao listar atletas: {e}")
+            return []
+
+    def update_athlete(self, athlete_id: int, data: dict) -> bool:
+        """
+        Atualiza dados de um atleta.
+
+        Args:
+            athlete_id: ID do atleta
+            data: Dicionário com campos a atualizar
+
+        Returns:
+            True se atualizado com sucesso
+        """
+        import json
+
+        try:
+            # Whitelist de campos permitidos
+            _CAMPOS_PERMITIDOS = frozenset({
+                'nome', 'cpf', 'email', 'genero', 'data_nascimento',
+                'peso_atual', 'altura', 'imc_atual', 'esporte_principal',
+                'dias_disponibilidade_semana', 'limiar_lactato', 'vo2_max',
+                'frequencia_cardiaca_repouso', 'frequencia_cardiaca_maxima',
+                'ciclo_menstrual_ativo', 'problemas_saude', 'ativo'
+            })
+
+            campos = []
+            valores = []
+
+            for campo, valor in data.items():
+                if campo in _CAMPOS_PERMITIDOS:
+                    if campo == 'ciclo_menstrual_ativo':
+                        valor = 1 if valor else 0
+                    elif campo == 'problemas_saude' and isinstance(valor, (list, dict)):
+                        valor = json.dumps(valor)
+
+                    if self.use_mysql:
+                        campos.append(f"{campo} = %s")
+                    else:
+                        campos.append(f"{campo} = ?")
+                    valores.append(valor)
+
+            if not campos:
+                return False
+
+            # Adicionar timestamp de atualização
+            agora = datetime.now().isoformat()
+            if self.use_mysql:
+                campos.append("ultimo_atualizado = %s")
+            else:
+                campos.append("ultimo_atualizado = ?")
+            valores.append(agora)
+            valores.append(athlete_id)
+
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            if self.use_mysql:
+                query = f"UPDATE atletas SET {', '.join(campos)} WHERE id = %s"
+            else:
+                query = f"UPDATE atletas SET {', '.join(campos)} WHERE id = ?"
+
+            cursor.execute(query, valores)
+            conn.commit()
+            conn.close()
+
+            return True
+
+        except Exception as e:
+            print(f"[ERROR] Erro ao atualizar atleta: {e}")
+            return False
+
+    def delete_athlete(self, athlete_id: int) -> bool:
+        """
+        Marca atleta como inativo (soft delete).
+
+        Args:
+            athlete_id: ID do atleta
+
+        Returns:
+            True se deletado com sucesso
+        """
+        return self.update_athlete(athlete_id, {'ativo': 0})
+
+    def get_athlete_metrics_history(self, athlete_id: int) -> List[Dict]:
+        """
+        Retorna histórico de métricas do atleta (peso, VO2, etc.).
+
+        NOTA: Versão atual retorna apenas o registro atual.
+        Em futuras versões, pode-se criar tabela separada para histórico.
+
+        Args:
+            athlete_id: ID do atleta
+
+        Returns:
+            Lista com histórico de métricas
+        """
+        atleta = self.get_athlete(athlete_id)
+
+        if not atleta:
+            return []
+
+        # Retornar snapshot atual
+        return [{
+            'timestamp': atleta.get('ultimo_atualizado'),
+            'peso': atleta.get('peso_atual'),
+            'vo2_max': atleta.get('vo2_max'),
+            'frequencia_cardiaca_repouso': atleta.get('frequencia_cardiaca_repouso'),
+            'frequencia_cardiaca_maxima': atleta.get('frequencia_cardiaca_maxima'),
+            'limiar_lactato': atleta.get('limiar_lactato'),
+            'imc': atleta.get('imc_atual')
+        }]
 
 
 # Instância global

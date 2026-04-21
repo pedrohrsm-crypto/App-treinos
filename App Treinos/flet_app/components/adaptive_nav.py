@@ -19,6 +19,7 @@ NAV_ITEMS = [
     {"route": "/templates", "icon": ft.Icons.LIBRARY_BOOKS_OUTLINED, "icon_selected": ft.Icons.LIBRARY_BOOKS, "label_key": "nav_templates"},
     {"route": "/fitness", "icon": ft.Icons.WATCH_OUTLINED, "icon_selected": ft.Icons.WATCH, "label_key": "nav_fitness"},
     {"route": "/config", "icon": ft.Icons.SETTINGS_OUTLINED, "icon_selected": ft.Icons.SETTINGS, "label_key": "nav_config"},
+    {"route": "/help", "icon": ft.Icons.HELP_OUTLINE, "icon_selected": ft.Icons.HELP, "label_key": "nav_help"},
 ]
 
 DESKTOP_BREAKPOINT = 768

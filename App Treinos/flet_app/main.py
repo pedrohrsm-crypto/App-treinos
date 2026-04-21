@@ -18,12 +18,14 @@ from flet_app.screens.login import login_view
 from flet_app.screens.register import register_view
 from flet_app.screens.dashboard import dashboard_view
 from flet_app.screens.athlete_dashboard import athlete_dashboard_view
+from flet_app.screens.athletes_management import athletes_management_view
 from flet_app.screens.training_wizard import training_wizard_view
 from flet_app.screens.config import config_view
 from flet_app.screens.admin import admin_view
 from flet_app.screens.progress import progress_view
 from flet_app.screens.fitness import fitness_view
 from flet_app.screens.templates import templates_view
+from flet_app.screens.help import help_view
 from flet_app.screens.onboarding_v2 import onboarding_view_v2 as onboarding_view
 from flet_app.screens.initial_setup import initial_setup_view
 from flet_app.screens.ai_config_screen import ai_config_view
@@ -57,9 +59,11 @@ def main(page: ft.Page):
     router.add("/register", register_view)
     router.add("/dashboard", dashboard_view)
     router.add("/athlete", athlete_dashboard_view)
+    router.add("/athletes", athletes_management_view)
     router.add("/wizard", training_wizard_view)
     router.add("/calendar", calendar_view_screen)
     router.add("/config", config_view)
+    router.add("/help", help_view)
     router.add("/admin", admin_view)
     router.add("/progress", progress_view)
     router.add("/fitness", fitness_view)
