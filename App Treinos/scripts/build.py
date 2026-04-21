@@ -27,7 +27,7 @@ def build_executable():
         print("  Execute: pip install pyinstaller")
         return 1
 
-    print("[BUILD] Compilando App Treinos v3.1.0...")
+    print("[BUILD] Compilando App Treinos v3.2.0...")
     print()
 
     # Opções do PyInstaller
@@ -36,15 +36,13 @@ def build_executable():
         "--onefile",                          # Gerar um único executável
         "--windowed",                         # Sem janela de console
         "--name=AppTreinos",                  # Nome do executável
-        "--icon=flet_app/assets/icon.ico",   # Ícone (se existir)
-        "--add-data=flet_app/assets:flet_app/assets",
         "--add-data=data:data",
         "--hidden-import=flet",
         "--hidden-import=pandas",
         "--hidden-import=reportlab",
         "--hidden-import=openpyxl",
         "--distpath=dist",
-        "--buildpath=build",
+        "--workpath=build",
         "--specpath=.",
         str(project_root / "app_treinos" / "__main__.py"),
     ]
