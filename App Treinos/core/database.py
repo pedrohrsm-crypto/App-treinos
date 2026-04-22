@@ -113,6 +113,21 @@ class DatabaseManager:
             )
         ''')
 
+        # Tabela de perfil do usuário (com dados encriptados)
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS user_profiles (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER UNIQUE NOT NULL,
+                encrypted_cpf TEXT,
+                encrypted_phone TEXT,
+                birth_date TEXT,
+                gender TEXT,
+                profile_photo_path TEXT,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(user_id) REFERENCES usuarios(id) ON DELETE CASCADE
+            )
+        ''')
+
         # Índices para performance
         cursor.execute('''
             CREATE INDEX IF NOT EXISTS idx_atletas_trainer
@@ -178,6 +193,21 @@ class DatabaseManager:
                 FOREIGN KEY(trainer_cref) REFERENCES usuarios(cref),
                 INDEX idx_atletas_trainer (trainer_cref),
                 INDEX idx_atletas_nome (nome)
+            )
+        ''')
+
+        # Tabela de perfil do usuário (com dados encriptados)
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS user_profiles (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT UNIQUE NOT NULL,
+                encrypted_cpf VARCHAR(500),
+                encrypted_phone VARCHAR(500),
+                birth_date DATE,
+                gender VARCHAR(20),
+                profile_photo_path VARCHAR(500),
+                updated_at DATETIME NOT NULL,
+                FOREIGN KEY(user_id) REFERENCES usuarios(id) ON DELETE CASCADE
             )
         ''')
 
@@ -906,8 +936,151 @@ class DatabaseManager:
             'imc': atleta.get('imc_atual')
         }]
 
+    # ── Gestão de Perfil do Usuário (com encriptação) ───────────────
 
-# Instância global
+    def create_default_profile(self, user_id: int) -> bool:
+        """
+        Cria um perfil vazio para um novo utilizador.
+
+        Args:
+            user_id: ID do utilizador
+
+        Returns:
+            True se criado, False se erro
+        """
+        from datetime import datetime
+
+        try:
+            if self.db_type == "sqlite":
+                conn = sqlite3.connect(self.db_path)
+                cursor = conn.cursor()
+                cursor.execute(
+                    '''INSERT INTO user_profiles (user_id, updated_at)
+                       VALUES (?, ?)''',
+                    (user_id, datetime.now().isoformat())
+                )
+                conn.commit()
+                conn.close()
+            else:
+                self.connection.cursor().execute(
+                    '''INSERT INTO user_profiles (user_id, updated_at)
+                       VALUES (%s, %s)''',
+                    (user_id, datetime.now().isoformat())
+                )
+                self.connection.commit()
+            return True
+        except Exception:
+            return False
+
+    def get_user_profile(self, user_id: int) -> dict:
+        """
+        Obtém perfil do utilizador (com dados ainda encriptados).
+
+        Args:
+            user_id: ID do utilizador
+
+        Returns:
+            Dicionário com dados do perfil ou {} se não existe
+        """
+        try:
+            if self.db_type == "sqlite":
+                conn = sqlite3.connect(self.db_path)
+                cursor = conn.cursor()
+                cursor.execute(
+                    '''SELECT id, user_id, encrypted_cpf, encrypted_phone,
+                             birth_date, gender, profile_photo_path, updated_at
+                       FROM user_profiles WHERE user_id = ?''',
+                    (user_id,)
+                )
+                row = cursor.fetchone()
+                conn.close()
+            else:
+                cursor = self.connection.cursor()
+                cursor.execute(
+                    '''SELECT id, user_id, encrypted_cpf, encrypted_phone,
+                             birth_date, gender, profile_photo_path, updated_at
+                       FROM user_profiles WHERE user_id = %s''',
+                    (user_id,)
+                )
+                row = cursor.fetchone()
+
+            if not row:
+                return {}
+
+            return {
+                'id': row[0],
+                'user_id': row[1],
+                'encrypted_cpf': row[2],
+                'encrypted_phone': row[3],
+                'birth_date': row[4],
+                'gender': row[5],
+                'profile_photo_path': row[6],
+                'updated_at': row[7],
+            }
+        except Exception:
+            return {}
+
+    def update_user_profile(self, user_id: int, profile_data: dict) -> tuple:
+        """
+        Atualiza perfil do utilizador com dados encriptados.
+
+        Args:
+            user_id: ID do utilizador
+            profile_data: Dicionário com dados (pode incluir encrypted_cpf, encrypted_phone, etc.)
+
+        Returns:
+            (success: bool, message: str)
+        """
+        from datetime import datetime
+
+        try:
+            if self.db_type == "sqlite":
+                conn = sqlite3.connect(self.db_path)
+                cursor = conn.cursor()
+
+                # Construir UPDATE dinamicamente baseado nos campos fornecidos
+                update_fields = []
+                update_values = []
+
+                for field in ['encrypted_cpf', 'encrypted_phone', 'birth_date', 'gender', 'profile_photo_path']:
+                    if field in profile_data:
+                        update_fields.append(f"{field} = ?")
+                        update_values.append(profile_data[field])
+
+                if update_fields:
+                    update_fields.append("updated_at = ?")
+                    update_values.append(datetime.now().isoformat())
+                    update_values.append(user_id)
+
+                    sql = f"UPDATE user_profiles SET {', '.join(update_fields)} WHERE user_id = ?"
+                    cursor.execute(sql, tuple(update_values))
+                    conn.commit()
+
+                conn.close()
+            else:
+                cursor = self.connection.cursor()
+                update_fields = []
+                update_values = []
+
+                for field in ['encrypted_cpf', 'encrypted_phone', 'birth_date', 'gender', 'profile_photo_path']:
+                    if field in profile_data:
+                        update_fields.append(f"{field} = %s")
+                        update_values.append(profile_data[field])
+
+                if update_fields:
+                    update_fields.append("updated_at = %s")
+                    update_values.append(datetime.now().isoformat())
+                    update_values.append(user_id)
+
+                    sql = f"UPDATE user_profiles SET {', '.join(update_fields)} WHERE user_id = %s"
+                    cursor.execute(sql, tuple(update_values))
+                    self.connection.commit()
+
+            return (True, "Perfil atualizado com sucesso")
+        except Exception as e:
+            return (False, f"Erro ao atualizar perfil: {str(e)[:100]}")
+
+
 db_manager = DatabaseManager()
 
 
