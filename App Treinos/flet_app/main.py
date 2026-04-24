@@ -25,6 +25,7 @@ from flet_app.screens.admin import admin_view
 from flet_app.screens.progress import progress_view
 from flet_app.screens.fitness import fitness_view
 from flet_app.screens.smartwatch import smartwatch_view
+from flet_app.screens.profile import profile_view
 from flet_app.screens.templates import templates_view
 from flet_app.screens.help import help_view
 from flet_app.screens.onboarding_v2 import onboarding_view_v2 as onboarding_view
@@ -69,6 +70,7 @@ def main(page: ft.Page):
     router.add("/progress", progress_view)
     router.add("/fitness", fitness_view)
     router.add("/smartwatch", smartwatch_view)
+    router.add("/profile", profile_view)
     router.add("/templates", templates_view)
     router.add("/ai-config", ai_config_view)
 

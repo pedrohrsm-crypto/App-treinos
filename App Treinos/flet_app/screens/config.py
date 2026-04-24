@@ -104,6 +104,20 @@ def config_view(page: ft.Page, route: str) -> ft.View:
         dark=dark,
     )
 
+    # ── Meu Perfil ──────────────────────────────────────────────
+    profile_btn = apply_hover_effects_to_button(
+        ft.ElevatedButton(
+            t("config_profile"),
+            icon=ft.Icons.PERSON,
+            bgcolor=c("primary", dark),
+            color=c("text_light", dark),
+            on_click=lambda _: page.go("/profile"),
+        ),
+        scale_ratio=1.05,
+        duration_ms=150,
+        dark=dark,
+    )
+
     # ── Sobre ──────────────────────────────────────────────────
     from app_treinos.version import __version__
     about_card = apply_hover_effects_to_card(
@@ -161,6 +175,8 @@ def config_view(page: ft.Page, route: str) -> ft.View:
             admin_btn,
             ft.Divider(height=20, color=ft.Colors.TRANSPARENT),
             ai_btn,
+            ft.Divider(height=20, color=ft.Colors.TRANSPARENT),
+            profile_btn,
             ft.Divider(height=20, color=ft.Colors.TRANSPARENT),
             about_card,
             ft.Divider(height=20, color=ft.Colors.TRANSPARENT),

@@ -1215,6 +1215,43 @@ _translations: Dict[str, Dict[str, str]] = {
         "en": "Admin Panel",
         "es": "Panel Admin",
     },
+    "config_profile": {
+        "pt": "Meu Perfil",
+        "en": "My Profile",
+        "es": "Mi Perfil",
+    },
+
+    # ── Perfil do Utilizador ─────────────────────────────────────
+    "profile_title": {
+        "pt": "Meu Perfil",
+        "en": "My Profile",
+        "es": "Mi Perfil",
+    },
+    "profile_section_account": {
+        "pt": "Conta",
+        "en": "Account",
+        "es": "Cuenta",
+    },
+    "profile_section_personal": {
+        "pt": "Dados Pessoais",
+        "en": "Personal Data",
+        "es": "Datos Personales",
+    },
+    "profile_section_security": {
+        "pt": "Segurança",
+        "en": "Security",
+        "es": "Seguridad",
+    },
+    "profile_password_warning": {
+        "pt": "Altere sua senha regularmente para maior segurança.",
+        "en": "Change your password regularly for better security.",
+        "es": "Cambia tu contraseña regularmente para mayor seguridad.",
+    },
+    "profile_change_password": {
+        "pt": "Alterar Senha",
+        "en": "Change Password",
+        "es": "Cambiar Contraseña",
+    },
 
     # ── Progress (hardcoded → i18n) ──────────────────────────────
     "progress_plans_label": {

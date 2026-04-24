@@ -44,6 +44,10 @@ class AppState:
     # ── DB singleton (inicializado no splash) ────────────────────
     db: object = None  # DatabaseManager instance
 
+    # ── Perfil do utilizador (encriptado) ────────────────────────
+    user_profile: Optional[Dict] = None  # Perfil carregado da BD
+    profile_dirty: bool = False          # Flags mudanças não guardadas
+
     # ── Helpers ──────────────────────────────────────────────────
 
     def login(self, user_data: Dict):
@@ -173,6 +177,52 @@ class AppState:
         data = self._read_prefs_file()
         data.pop("_session", None)
         self._write_prefs_file(data)
+
+    # ── Perfil do utilizador ─────────────────────────────────────
+
+    def load_profile(self) -> bool:
+        """
+        Carrega perfil do utilizador da base de dados.
+
+        Returns:
+            True se carregado, False se erro
+        """
+        if not self.user or not self.user.get("id") or not self.db:
+            return False
+
+        try:
+            profile = self.db.get_user_profile(self.user["id"])
+            self.user_profile = profile if profile else {}
+            self.profile_dirty = False
+            return True
+        except Exception:
+            return False
+
+    def save_profile(self, master_key: bytes = None) -> tuple:
+        """
+        Guarda perfil do utilizador com encriptação.
+
+        Args:
+            master_key: Chave de encriptação (derivada do hash da password)
+
+        Returns:
+            (success: bool, message: str)
+        """
+        if not self.user or not self.user.get("id") or not self.db:
+            return (False, "Erro: Utilizador não identificado")
+
+        if not self.user_profile:
+            return (False, "Erro: Nenhum perfil para guardar")
+
+        try:
+            success, message = self.db.update_user_profile(
+                self.user["id"], self.user_profile
+            )
+            if success:
+                self.profile_dirty = False
+            return (success, message)
+        except Exception as e:
+            return (False, f"Erro ao guardar perfil: {str(e)[:100]}")
 
     # ── I/O helpers ──────────────────────────────────────────────
 
