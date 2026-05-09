@@ -18,7 +18,7 @@ build/
 
 # Data
 *.db
-App Treinos/data/
+Velix/data/
 
 # OS
 Thumbs.db

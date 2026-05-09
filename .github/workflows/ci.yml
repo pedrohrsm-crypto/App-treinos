@@ -1,4 +1,4 @@
-name: CI — App Treinos
+name: CI — Velix
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: "App Treinos"
+        working-directory: "Velix"
 
     steps:
       - uses: actions/checkout@v4
